@@ -1,0 +1,15 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-partygg-dev-31339-authRole",
+      "UnauthRoleArn": "arn:aws:iam::165161938819:role/amplify-partygg-dev-31339-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::165161938819:role/amplify-partygg-dev-31339-authRole",
+      "Region": "ap-northeast-2",
+      "DeploymentBucketName": "amplify-partygg-dev-31339-deployment",
+      "UnauthRoleName": "amplify-partygg-dev-31339-unauthRole",
+      "StackName": "amplify-partygg-dev-31339",
+      "StackId": "arn:aws:cloudformation:ap-northeast-2:165161938819:stack/amplify-partygg-dev-31339/963ae230-cefa-11ec-adea-06a27ae911da",
+      "AmplifyAppId": "dbj3frffm3w33"
+    }
+  }
+}
