@@ -1,19 +1,21 @@
-import { useCallback, useRef, useState } from "react";
-import { Button, Form, Modal } from "react-bootstrap";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import Register from "../components/Register";
+import RegisterConfirmModal from "../components/RegisterConfirmModal";
 import AuthServices from "../services/AuthServices";
 import styles from "./LoginPage.module.scss";
+import RegisterModal from "../components/RegisterModal";
 
 export default function LoginPage() {
-  const username = useRef<HTMLInputElement>(null);
-  const password = useRef<HTMLInputElement>(null);
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+
   const [loginFailMessage, setLoginFailMessage] = useState<string>("");
   const submitRef = useRef<HTMLButtonElement>(null);
   const [mdShow, setMdShow] = useState<boolean>(false);
   const [btnDisabled, setbtnDisabled] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
-  const [user, setUser] = useState<any>();
+
   const navigate = useNavigate();
 
   const openModal = useCallback(() => {
@@ -24,38 +26,93 @@ export default function LoginPage() {
     setMdShow(false);
   }, []);
 
-  const validText = useCallback(() => {
-    const usernameText = username.current?.value;
-    const passwordText = password.current?.value;
-    if (usernameText && passwordText) {
-      setbtnDisabled(false);
-    } else {
-      setbtnDisabled(true);
-    }
-  }, [username, password]);
+  //username input 데이터 state에 저장 + 로그인 버튼 활성화 검증
+  const usernameChange = useCallback(
+    (event: any) => {
+      const usernameText = (event.target as HTMLInputElement).value;
+      if (usernameText && password) {
+        setbtnDisabled(false);
+      } else {
+        setbtnDisabled(true);
+      }
+      setUsername(usernameText);
+    },
+    [password]
+  );
 
+  //password input 데이터 state에 저장 + 로그인 버튼 활성화 검증
+  const passwordChange = useCallback(
+    (event: any) => {
+      const passwordText = (event.target as HTMLInputElement).value;
+      if (username && passwordText) {
+        setbtnDisabled(false);
+      } else {
+        setbtnDisabled(true);
+      }
+      setPassword(passwordText);
+    },
+    [username]
+  );
+
+  //가입 확인 안한 유저에 대한 확인 모달
+  const [confirmModalShow, setConfirmModalShow] = useState<boolean>(false);
+  const closeConfirmModal = useCallback(() => {
+    return () => {
+      setConfirmModalShow(false);
+    };
+  }, []);
+
+  //모달에 전달할 유저 이름 상태
+  const [loginUsername, setLoginUserName] = useState<string>("");
+
+  //제출
   const click = async () => {
-    const usernameValue = username.current?.value;
-    const passwordValue = password.current?.value;
-
-    if (usernameValue && passwordValue) {
+    if (username && password) {
       setLoading(true);
       try {
         const user = await AuthServices.signIn({
-          username: usernameValue,
-          password: passwordValue,
+          username,
+          password,
         });
-        setUser(user);
         navigate("/");
-      } catch (error) {
-        console.log(error);
+      } catch (error: any) {
+        console.log(error.message);
         setLoading(false);
-        setLoginFailMessage(
-          "닉네임 혹은 비밀번호를 다시 확인하세요. 등록되지 않은 닉네임이거나 닉네임 혹은 비밀번호를 잘못 입력하셨습니다. "
-        );
+        //가입 확인을 안한 유저이면
+        if (error.message === "User is not confirmed.") {
+          try {
+            //확인 코드 재전송
+            console.log("hi");
+            await AuthServices.resendConfirmationCode(username);
+            //확인 모달 열기
+            setLoginFailMessage("");
+            setLoginUserName(username);
+            setConfirmModalShow(true);
+          } catch {
+            setLoginFailMessage(
+              "가입 코드를 재전송하는데 실패했습니다. 재시도 해주세요."
+            );
+          }
+        } else {
+          setLoginFailMessage(
+            "닉네임 혹은 비밀번호를 다시 확인하세요. 등록되지 않은 닉네임이거나 닉네임 혹은 비밀번호를 잘못 입력하셨습니다. "
+          );
+        }
       }
     }
   };
+
+  //login 페이지 input 값 변경마다,
+  //즉 렌더마다 confirmModal이 계속 호출되는걸 방지
+  const confirmModal = useMemo(() => {
+    return (
+      <RegisterConfirmModal
+        mdShow={confirmModalShow}
+        closeModal={closeConfirmModal}
+        username={loginUsername}
+      />
+    );
+  }, [closeConfirmModal, confirmModalShow, loginUsername]);
 
   const enterSubmit = useCallback(
     (event: KeyboardEvent) => {
@@ -83,8 +140,8 @@ export default function LoginPage() {
                   placeholder="닉네임을 입력해주세요."
                   bsPrefix={`${styles.input}`}
                   name="username"
-                  ref={username}
-                  onChange={validText}
+                  value={username}
+                  onChange={usernameChange}
                   required
                 />
               </Form.Group>
@@ -95,8 +152,8 @@ export default function LoginPage() {
                   placeholder="비밀번호를 입력해주세요."
                   bsPrefix={`${styles.input}`}
                   name="password"
-                  ref={password}
-                  onChange={validText}
+                  value={password}
+                  onChange={passwordChange}
                   onKeyDown={enterSubmit as any}
                   required
                 />
@@ -126,22 +183,11 @@ export default function LoginPage() {
             >
               회원가입
             </Button>
-            <Modal
-              show={mdShow}
-              onHide={closeModal}
-              centered
-              backdrop={"static"}
-            >
-              <Modal.Header closeButton>
-                <span style={{ fontSize: "2rem" }}>회원가입</span>
-              </Modal.Header>
-              <Modal.Body>
-                <Register parentMdClose={closeModal} />
-              </Modal.Body>
-            </Modal>
+            <RegisterModal parentMdShow={mdShow} parentMdClose={closeModal} />
           </div>
         </div>
       </div>
+      {confirmModal}
     </div>
   );
 }

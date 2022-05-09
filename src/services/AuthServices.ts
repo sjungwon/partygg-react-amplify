@@ -7,18 +7,22 @@ import {
 
 export default class AuthServices {
   public static async signUp(data: SignUpReqData) {
-    const response = await Auth.signUp(data);
-    console.log(response);
-    return response;
+    await Auth.signUp(data);
   }
 
   public static async confirmSignUp(data: ConfirmSignUpReqData) {
-    Auth.confirmSignUp(data.username, data.code);
+    await Auth.confirmSignUp(data.username, data.code);
+  }
+
+  public static async resendConfirmationCode(username: string) {
+    await Auth.resendSignUp(username);
   }
 
   public static async signIn(data: SignInReqData) {
-    const user = await Auth.signIn(data.username, data.password);
-    console.log(user);
-    return user;
+    await Auth.signIn(data.username, data.password);
+  }
+
+  public static async signOut() {
+    await Auth.signOut();
   }
 }

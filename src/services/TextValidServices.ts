@@ -1,6 +1,14 @@
 export default class TextValidServices {
-  public static isLongerthan8(text: string): boolean {
-    if (text.length < 8) {
+  public static isLongerThanNumber(text: string, length: number): boolean {
+    if (text.length < length) {
+      return false;
+    }
+
+    return true;
+  }
+
+  public static isShorterThanNumber(text: string, length: number): boolean {
+    if (text.length > length) {
       return false;
     }
 

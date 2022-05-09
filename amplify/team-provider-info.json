@@ -10,6 +10,11 @@
       "StackName": "amplify-partygg-dev-31339",
       "StackId": "arn:aws:cloudformation:ap-northeast-2:165161938819:stack/amplify-partygg-dev-31339/963ae230-cefa-11ec-adea-06a27ae911da",
       "AmplifyAppId": "dbj3frffm3w33"
+    },
+    "categories": {
+      "auth": {
+        "partyggaa2588db": {}
+      }
     }
   }
 }

@@ -1,4 +1,5 @@
 export interface SignBasicType {
+  //username = id
   username: string;
   password: string;
 }
