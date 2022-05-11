@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "paths": {
+    "/profiles": {
+      "name": "/profiles",
+      "lambdaFunction": "partyggProfileLamda",
+      "permissions": {
+        "setting": "private",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ]
+      }
+    }
+  }
+}

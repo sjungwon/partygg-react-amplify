@@ -9,11 +9,18 @@
       "UnauthRoleName": "amplify-partygg-dev-31339-unauthRole",
       "StackName": "amplify-partygg-dev-31339",
       "StackId": "arn:aws:cloudformation:ap-northeast-2:165161938819:stack/amplify-partygg-dev-31339/963ae230-cefa-11ec-adea-06a27ae911da",
-      "AmplifyAppId": "dbj3frffm3w33"
+      "AmplifyAppId": "dbj3frffm3w33",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-partygg-dev-31339-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
     },
     "categories": {
       "auth": {
         "partyggaa2588db": {}
+      },
+      "function": {
+        "partyggProfileLamda": {
+          "deploymentBucketName": "amplify-partygg-dev-31339-deployment",
+          "s3Key": "amplify-builds/partyggProfileLamda-624c6b6736315547536c-build.zip"
+        }
       }
     }
   }
