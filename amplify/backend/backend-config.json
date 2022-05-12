@@ -32,6 +32,10 @@
     "partyggProfileTable": {
       "service": "DynamoDB",
       "providerPlugin": "awscloudformation"
+    },
+    "partyggPostTable": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
     }
   },
   "function": {
@@ -53,13 +57,40 @@
           }
         }
       ]
+    },
+    "partyggPostLamda": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "partyggPostTable",
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "attributeEnvMap": {
+            "Name": "TABLE_NAME",
+            "Arn": "TABLE_ARN"
+          }
+        }
+      ]
     }
   },
   "api": {
-    "partyggProfileApi": {
+    "partyggApi": {
       "service": "API Gateway",
       "providerPlugin": "awscloudformation",
       "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "partyggPostLamda",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
         {
           "category": "function",
           "resourceName": "partyggProfileLamda",

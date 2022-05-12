@@ -1,0 +1,14 @@
+{
+  "resourceName": "partyggPostTable",
+  "tableName": "partyggPostTable",
+  "partitionKey": {
+    "fieldName": "game",
+    "fieldType": "string"
+  },
+  "sortKey": {
+    "fieldName": "date",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

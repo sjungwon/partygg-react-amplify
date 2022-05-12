@@ -3,7 +3,7 @@ import {
   ConfirmSignUpReqData,
   SignInReqData,
   SignUpReqData,
-} from "../types/AuthServices.type";
+} from "../types/auth.type";
 
 export default class AuthServices {
   public static async signUp(data: SignUpReqData) {

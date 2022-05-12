@@ -2,7 +2,7 @@
   "version": "1",
   "cognitoConfig": {
     "identityPoolName": "partyggaa2588db_identitypool_aa2588db",
-    "allowUnauthenticatedIdentities": false,
+    "allowUnauthenticatedIdentities": true,
     "resourceNameTruncated": "partygaa2588db",
     "userPoolName": "partyggaa2588db_userpool_aa2588db",
     "autoVerifiedAttributes": [

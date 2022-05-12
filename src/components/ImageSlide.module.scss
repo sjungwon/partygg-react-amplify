@@ -1,0 +1,32 @@
+.slide{
+  height: 17rem;
+  min-height: 7rem;
+  max-height: 17rem;
+}
+
+.slide_item{
+  display: block;
+  height: 15rem;
+  max-width: 100%;
+  min-height: 10rem;
+  max-height: 15rem;
+  margin: 0 auto;
+  object-fit: cover;
+  border-radius: .25rem;
+}
+
+.modal_slide{
+  min-height: 7rem;
+  margin-top: 1rem;
+}
+
+.modal_slide_item{
+  display: block;
+  max-width: 100%;
+  min-height: 10rem;
+  max-height: 15rem;
+  margin: 0 auto;
+  object-fit: cover;
+  border-radius: .25rem;
+}
+

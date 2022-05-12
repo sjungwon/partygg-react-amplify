@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "paths": {
+    "/posts": {
+      "name": "/posts",
+      "lambdaFunction": "partyggPostLamda",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
+    },
+    "/profiles": {
+      "name": "/profiles",
+      "lambdaFunction": "partyggProfileLamda",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
+    }
+  }
+}

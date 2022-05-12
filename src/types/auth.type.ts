@@ -1,5 +1,5 @@
 export interface SignBasicType {
-  //username = id
+  //username = partition key
   username: string;
   password: string;
 }

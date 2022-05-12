@@ -1,13 +1,13 @@
 import React, { createContext, useCallback, useEffect, useState } from "react";
-import { ProfileData, ProfilesGetResData } from "../types/UserServices.type";
+import { GetProfilesResData, Profile } from "../types/profile.type";
 
 interface UserDataContextType {
   username: string;
   setUsernameHandler: (username: string) => void;
-  profileArr: ProfilesGetResData;
-  setProfileArrHandler: (profile: ProfilesGetResData) => void;
-  currentProfile: ProfileData;
-  setCurrentProfileHandler: (index: number) => void;
+  profileArr: Profile[];
+  setProfileArrHandler: (profiles: Profile[]) => void;
+  currentProfile: Profile;
+  setCurrentProfileHandler: (profile: Profile) => void;
 }
 
 interface Props {
@@ -18,14 +18,14 @@ export const UserDataContext = createContext<UserDataContextType>({
   username: "",
   setUsernameHandler: (username: string) => {},
   profileArr: [],
-  setProfileArrHandler: (profile: ProfilesGetResData) => {},
+  setProfileArrHandler: (profiles: GetProfilesResData) => {},
   currentProfile: {
     username: "",
     nickname: "",
     game: "",
     profileImage: "",
   },
-  setCurrentProfileHandler: (index: number) => {},
+  setCurrentProfileHandler: (profile: Profile) => {},
 });
 
 const UserDataContextProvider: React.FC<Props> = ({ children }) => {
@@ -36,14 +36,14 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
     []
   );
 
-  const [profileArr, setProfileArr] = useState<ProfilesGetResData>([]);
+  const [profileArr, setProfileArr] = useState<GetProfilesResData>([]);
 
-  const setProfileArrHandler = useCallback((profileArr: ProfilesGetResData) => {
+  const setProfileArrHandler = useCallback((profileArr: Profile[]) => {
     setProfileArr(profileArr);
     setCurrentProfile(profileArr[0]);
   }, []);
 
-  const [currentProfile, setCurrentProfile] = useState<ProfileData>({
+  const [currentProfile, setCurrentProfile] = useState<Profile>({
     username: "",
     nickname: "",
     game: "",
@@ -51,8 +51,8 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
   });
 
   const setCurrentProfileHandler = useCallback(
-    (index: number) => setCurrentProfile(profileArr[index]),
-    [profileArr]
+    (profile: Profile) => setCurrentProfile(profile),
+    []
   );
 
   console.log("context render");

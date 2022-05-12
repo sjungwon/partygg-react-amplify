@@ -14,7 +14,7 @@ export default function ProfileSelector({ size }: PropsType) {
   const select = useCallback(
     (eventKey: string | null) => {
       if (eventKey !== null && profileArr) {
-        setCurrentProfileHandler(parseInt(eventKey));
+        setCurrentProfileHandler(profileArr[parseInt(eventKey)]);
       }
     },
     [profileArr, setCurrentProfileHandler]

@@ -14,12 +14,17 @@
     },
     "categories": {
       "auth": {
-        "partyggaa2588db": {}
+        "partyggaa2588db": {},
+        "true": {}
       },
       "function": {
         "partyggProfileLamda": {
           "deploymentBucketName": "amplify-partygg-dev-31339-deployment",
           "s3Key": "amplify-builds/partyggProfileLamda-624c6b6736315547536c-build.zip"
+        },
+        "partyggPostLamda": {
+          "deploymentBucketName": "amplify-partygg-dev-31339-deployment",
+          "s3Key": "amplify-builds/partyggPostLamda-2b774d37375179674466-build.zip"
         }
       }
     }

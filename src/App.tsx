@@ -9,6 +9,7 @@ import ErrorPage from "./pages/ErrorPage";
 import { useContext, useEffect } from "react";
 import UserServices from "./services/UserServices";
 import { UserDataContext } from "./context/UserDataContextProvider";
+import ProfileServices from "./services/ProfileServices";
 
 function App() {
   const { setUsernameHandler, setProfileArrHandler } =
@@ -18,7 +19,7 @@ function App() {
     UserServices.getUsername().then((username) => {
       if (username) {
         setUsernameHandler(username);
-        UserServices.getProfiles().then((profiles) => {
+        ProfileServices.getProfiles().then((profiles) => {
           if (profiles) {
             setProfileArrHandler(profiles);
           }

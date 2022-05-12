@@ -1,17 +1,15 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Button, Card } from "react-bootstrap";
 import styles from "./AddPostElement.module.scss";
 // import PostForm from "./PostForm";
 import { BsPlusLg } from "react-icons/bs";
 import ProfileSelector from "../ProfileSelector";
 import { UserDataContext } from "../../context/UserDataContextProvider";
-
-interface PostData {
-  nickname: string;
-}
+import AddPostForm from "./PostForm";
+import { Post } from "../../types/post.type";
 
 interface Props {
-  prevData?: PostData;
+  prevData?: Post;
 }
 
 //prevData에 따라 수정, 추가 상태 결정
@@ -24,9 +22,9 @@ export default function AddPostElement({ prevData }: Props) {
   useEffect(() => {
     if (prevData) {
       const index = profileArr.findIndex(
-        (profile) => profile.nickname === prevData.nickname
+        (profile) => profile.nickname === prevData.profile.nickname
       );
-      setCurrentProfileHandler(index > -1 ? index : 0);
+      setCurrentProfileHandler(index > -1 ? profileArr[index] : profileArr[0]);
       return;
     }
   }, [profileArr, prevData, setCurrentProfileHandler]);
@@ -39,14 +37,13 @@ export default function AddPostElement({ prevData }: Props) {
     setShow(true);
   }, []);
 
-  // const close = useCallback(() => {
-  //   if (prevData) {
-  //     // dispatch(setModifyPostId(null));
-  //     return;
-  //   }
+  const close = useCallback(() => {
+    setShow(false);
+  }, []);
 
-  //   setShow(false);
-  // }, [prevData, dispatch]);
+  const postForm = useMemo(() => {
+    return <AddPostForm close={close} prevData={prevData} />;
+  }, [close, prevData]);
 
   return (
     <Card className={styles.card}>
@@ -70,7 +67,7 @@ export default function AddPostElement({ prevData }: Props) {
           </Button>
         </div>
       </Card.Header>
-      {/* {show ? <PostForm close={close} prevData={prevData} /> : null} */}
+      {show ? postForm : null}
     </Card>
   );
 }
