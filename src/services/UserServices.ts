@@ -1,12 +1,18 @@
 import { API, Auth } from "aws-amplify";
 import {
   ProfilePostReqData,
+  ProfilesGetResData,
   TokenRefreshResData,
 } from "../types/UserServices.type";
 
 export default class UserServices {
-  public static async getUser() {
-    return await Auth.currentAuthenticatedUser();
+  public static async getUsername(): Promise<string | null> {
+    try {
+      const { username } = await Auth.currentAuthenticatedUser();
+      return username;
+    } catch {
+      return null;
+    }
   }
 
   public static async tokenRefresh(): Promise<TokenRefreshResData> {
@@ -29,7 +35,7 @@ export default class UserServices {
     }
   }
 
-  public static async getProfiles() {
+  public static async getProfiles(): Promise<ProfilesGetResData | null> {
     const apiName = "partyggProfileApi";
     const path = "/profiles";
     try {
@@ -40,8 +46,10 @@ export default class UserServices {
         {}
       );
       console.log(profiles);
+      return profiles;
     } catch (error) {
       console.log(error);
+      return null;
     }
   }
 
@@ -58,7 +66,11 @@ export default class UserServices {
       },
     };
     try {
-      const profiles = await API.post(apiName, path, myInit);
+      const profiles: ProfilesGetResData = await API.post(
+        apiName,
+        path,
+        myInit
+      );
       console.log(profiles);
     } catch (error) {
       console.log(error);

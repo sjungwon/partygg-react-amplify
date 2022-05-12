@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import AddPostElement from "../components/posts/AddPostElement";
 import AuthServices from "../services/AuthServices";
 import UserServices from "../services/UserServices";
 
@@ -11,7 +12,7 @@ export default function HomePage() {
 
   const getUser = async () => {
     try {
-      const user = await UserServices.getUser();
+      const user = await UserServices.getUsername();
       console.log(user);
     } catch {
       console.log("");
@@ -51,6 +52,7 @@ export default function HomePage() {
       <button onClick={refresh}>refresh</button>
       <button onClick={getProfile}>프로필</button>
       <button onClick={postProfile}>post profile</button>
+      <AddPostElement />
     </div>
   );
 }

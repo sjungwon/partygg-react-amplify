@@ -5,6 +5,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Amplify } from "aws-amplify";
 import awsExports from "./aws-exports";
+import UserDataContextProvider from "./context/UserDataContextProvider";
 
 //Amplify 리소스 사용
 Amplify.configure(awsExports);
@@ -14,7 +15,9 @@ const root = ReactDOM.createRoot(
 );
 root.render(
   <React.StrictMode>
-    <App />
+    <UserDataContextProvider>
+      <App />
+    </UserDataContextProvider>
   </React.StrictMode>
 );
 

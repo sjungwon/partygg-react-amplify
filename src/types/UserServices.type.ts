@@ -10,9 +10,11 @@ export interface ProfilePostReqData {
   profileImage: string;
 }
 
-export interface ProfilesGetResData {
+export interface ProfileData {
   username: string;
   nickname: string;
   game: string;
   profileImage: string;
 }
+
+export type ProfilesGetResData = ProfileData[];

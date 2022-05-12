@@ -6,8 +6,27 @@ import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ErrorPage from "./pages/ErrorPage";
+import { useContext, useEffect } from "react";
+import UserServices from "./services/UserServices";
+import { UserDataContext } from "./context/UserDataContextProvider";
 
 function App() {
+  const { setUsernameHandler, setProfileArrHandler } =
+    useContext(UserDataContext);
+
+  useEffect(() => {
+    UserServices.getUsername().then((username) => {
+      if (username) {
+        setUsernameHandler(username);
+        UserServices.getProfiles().then((profiles) => {
+          if (profiles) {
+            setProfileArrHandler(profiles);
+          }
+        });
+      }
+    });
+  }, [setProfileArrHandler, setUsernameHandler]);
+
   return (
     <div className="App">
       <ErrorBoundary FallbackComponent={ErrorPage}>
