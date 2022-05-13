@@ -1,15 +1,25 @@
+import { UserResource } from "./db.type";
+
 export interface ProfileStruct {
-  //sort key
   nickname: string;
   game: string;
   profileImage: string;
 }
 
-export interface Profile extends ProfileStruct {
+export interface Profile extends ProfileStruct, UserResource {
   //partition key
   username: string;
+  //sort key
+  date: string;
 }
 
 export interface AddProfileReqData extends ProfileStruct {}
 
+export interface UpdateProfileReqdata extends Profile {}
+
 export type GetProfilesResData = Profile[];
+
+export interface RemoveProfileReqData {
+  username: string;
+  nickname: string;
+}

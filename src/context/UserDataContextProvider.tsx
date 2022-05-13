@@ -24,6 +24,7 @@ export const UserDataContext = createContext<UserDataContextType>({
     nickname: "",
     game: "",
     profileImage: "",
+    date: "",
   },
   setCurrentProfileHandler: (profile: Profile) => {},
 });
@@ -48,6 +49,7 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
     nickname: "",
     game: "",
     profileImage: "",
+    date: "",
   });
 
   const setCurrentProfileHandler = useCallback(

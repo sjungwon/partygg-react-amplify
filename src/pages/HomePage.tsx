@@ -49,6 +49,20 @@ export default function HomePage() {
     });
   };
 
+  const updateProfile = async () => {
+    await ProfileServices.updateProfiles({
+      nickname: "호벗123",
+      game: "메이플스토리",
+      profileImage: "",
+      username: "호벗",
+      date: "2022-05-14 03:30:50am 395",
+    });
+  };
+
+  const deleteProfile = async () => {
+    await ProfileServices.deleteProfiles("2022-05-14 03:22:20am 796");
+  };
+
   const addPost = async () => {
     const newPost: AddPostReqData = {
       game: "리그 오브 레전드",
@@ -82,6 +96,8 @@ export default function HomePage() {
       <button onClick={refresh}>refresh</button>
       <button onClick={getProfile}>프로필</button>
       <button onClick={postProfile}>post profile</button>
+      <button onClick={deleteProfile}>delete profile</button>
+      <button onClick={updateProfile}>update profile</button>
       <button onClick={addPost}>add post</button>
       <button onClick={getPostByGame}>get post by game</button>
       <button onClick={removePost}>remove Post</button>

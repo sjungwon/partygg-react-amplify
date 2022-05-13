@@ -1,3 +1,4 @@
+import { UserResource } from "./db.type";
 import { Profile } from "./profile.type";
 
 //db 저장 형태
@@ -8,7 +9,7 @@ export interface PostStruct {
   text: string;
 }
 
-export interface Post extends PostStruct {
+export interface Post extends PostStruct, UserResource {
   //sort key
   date: string;
   images: string[] | null;
@@ -17,12 +18,12 @@ export interface Post extends PostStruct {
   comments: Comment[];
 }
 
-export interface Comment extends PostStruct {
+export interface Comment extends PostStruct, UserResource {
   date: string;
   subComments: SubComment[];
 }
 
-export interface SubComment extends PostStruct {
+export interface SubComment extends PostStruct, UserResource {
   date: string;
 }
 

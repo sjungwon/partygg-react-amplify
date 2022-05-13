@@ -36,6 +36,10 @@
     "partyggPostTable": {
       "service": "DynamoDB",
       "providerPlugin": "awscloudformation"
+    },
+    "partyggGameTable": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
     }
   },
   "function": {
@@ -76,6 +80,25 @@
           }
         }
       ]
+    },
+    "partyggGameLamda": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "partyggGameTable",
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "attributeEnvMap": {
+            "Name": "TABLE_NAME",
+            "Arn": "TABLE_ARN"
+          }
+        }
+      ]
     }
   },
   "api": {
@@ -83,6 +106,14 @@
       "service": "API Gateway",
       "providerPlugin": "awscloudformation",
       "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "partyggProfileLamda",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
         {
           "category": "function",
           "resourceName": "partyggPostLamda",
@@ -93,7 +124,7 @@
         },
         {
           "category": "function",
-          "resourceName": "partyggProfileLamda",
+          "resourceName": "partyggGameLamda",
           "attributes": [
             "Name",
             "Arn"
