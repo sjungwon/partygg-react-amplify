@@ -31,11 +31,12 @@ export default function AddPostElement({ updatePost, setUpdatePost }: Props) {
 
   //기본 프로필 이름
   const defaultNickname = useMemo(() => {
-    if (!profileArr.length) {
-      return "프로필을 추가해주세요.";
+    if (!username) {
+      return "로그인이 필요합니다.";
     }
-    return "로그인이 필요합니다.";
-  }, [profileArr.length]);
+
+    return "게임 프로필을 추가해주세요.";
+  }, [username]);
 
   console.log("add render");
 

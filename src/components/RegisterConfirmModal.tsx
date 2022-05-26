@@ -40,7 +40,9 @@ export default function RegisterConfirmModal({
         modalClose();
         parentMdClose();
       } else {
-        modalClose();
+        setCodeErrorMessage(
+          "코드 확인에 실패했습니다. 코드를 다시 확인해주세요."
+        );
       }
     },
     [modalClose, parentMdClose, username]

@@ -17,7 +17,11 @@ export default class AuthServices {
       const response = await Auth.confirmSignUp(data.username, data.code);
       console.log(response);
       return true;
-    } catch (error) {
+    } catch (error: any) {
+      console.log(error.message);
+      if (error.message.includes("Current status is CONFIRMED")) {
+        return true;
+      }
       return false;
     }
   }

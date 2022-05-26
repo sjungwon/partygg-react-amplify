@@ -1,10 +1,10 @@
 {
   "version": "1",
   "cognitoConfig": {
-    "identityPoolName": "partygg6d8b5290_identitypool_6d8b5290",
+    "identityPoolName": "partyggreactamplify_identitypool_042b68ba",
     "allowUnauthenticatedIdentities": true,
-    "resourceNameTruncated": "partyg6d8b5290",
-    "userPoolName": "partygg6d8b5290_userpool_6d8b5290",
+    "resourceNameTruncated": "partyg042b68ba",
+    "userPoolName": "partyggreactamplify_userpool_042b68ba",
     "autoVerifiedAttributes": [
       "email"
     ],
@@ -14,7 +14,7 @@
     ],
     "smsAuthenticationMessage": "Your authentication code is {####}",
     "smsVerificationMessage": "Your verification code is {####}",
-    "emailVerificationSubject": "Your partyGG verification code",
+    "emailVerificationSubject": "partyGG 인증번호 입니다.",
     "emailVerificationMessage": "Your verification code is {####}",
     "defaultPasswordPolicy": true,
     "passwordPolicyMinLength": 8,
@@ -34,17 +34,13 @@
     "userpoolClientReadAttributes": [
       "email"
     ],
-    "userpoolClientLambdaRole": "partyg6d8b5290_userpoolclient_lambda_role",
-    "userpoolClientSetAttributes": false,
-    "sharedId": "6d8b5290",
-    "resourceName": "partygg6d8b5290",
+    "userpoolClientLambdaRole": "partyg042b68ba_userpoolclient_lambda_role",
+    "userpoolClientSetAttributes": true,
     "authSelections": "identityPoolAndUserPool",
-    "useDefault": "manual",
-    "triggers": {},
-    "userPoolGroupList": [],
+    "resourceName": "partyggreactamplify",
+    "sharedId": "042b68ba",
     "serviceName": "Cognito",
-    "usernameCaseSensitive": false,
-    "useEnabledMfas": true,
+    "useDefault": "manual",
     "authRoleArn": {
       "Fn::GetAtt": [
         "AuthRole",
@@ -58,12 +54,15 @@
       ]
     },
     "breakCircularDependency": true,
+    "useEnabledMfas": true,
     "dependsOn": [],
+    "hostedUI": false,
+    "userPoolGroupList": [],
+    "authProviders": [],
     "thirdPartyAuth": false,
     "userPoolGroups": false,
     "adminQueries": false,
-    "hostedUI": false,
-    "authProviders": [],
+    "triggers": {},
     "parentStack": {
       "Ref": "AWS::StackId"
     },

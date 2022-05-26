@@ -23,6 +23,22 @@
     "storagepartyggLikeTableArn": {
       "Type": "String",
       "Default": "storagepartyggLikeTableArn"
+    },
+    "storagepartyggLikeTableStreamArn": {
+      "Type": "String",
+      "Default": "storagepartyggLikeTableStreamArn"
+    },
+    "storagepartyggDislikeTableName": {
+      "Type": "String",
+      "Default": "storagepartyggDislikeTableName"
+    },
+    "storagepartyggDislikeTableArn": {
+      "Type": "String",
+      "Default": "storagepartyggDislikeTableArn"
+    },
+    "storagepartyggDislikeTableStreamArn": {
+      "Type": "String",
+      "Default": "storagepartyggDislikeTableStreamArn"
     }
   },
   "Conditions": {
@@ -77,6 +93,24 @@
             },
             "REGION": {
               "Ref": "AWS::Region"
+            },
+            "STORAGE_PARTYGGLIKETABLE_NAME": {
+              "Ref": "storagepartyggLikeTableName"
+            },
+            "STORAGE_PARTYGGLIKETABLE_ARN": {
+              "Ref": "storagepartyggLikeTableArn"
+            },
+            "STORAGE_PARTYGGLIKETABLE_STREAMARN": {
+              "Ref": "storagepartyggLikeTableStreamArn"
+            },
+            "STORAGE_PARTYGGDISLIKETABLE_NAME": {
+              "Ref": "storagepartyggDislikeTableName"
+            },
+            "STORAGE_PARTYGGDISLIKETABLE_ARN": {
+              "Ref": "storagepartyggDislikeTableArn"
+            },
+            "STORAGE_PARTYGGDISLIKETABLE_STREAMARN": {
+              "Ref": "storagepartyggDislikeTableStreamArn"
             }
           }
         },
@@ -97,12 +131,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "partyggLambdaRole83b70d82",
+            "partyggreactamplifyLambdaRole61f169d0",
             {
               "Fn::Join": [
                 "",
                 [
-                  "partyggLambdaRole83b70d82",
+                  "partyggreactamplifyLambdaRole61f169d0",
                   "-",
                   {
                     "Ref": "env"
@@ -190,6 +224,86 @@
                     [
                       {
                         "Ref": "storagepartyggLikeTableArn"
+                      },
+                      "index/*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "AmplifyResourcesPolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Put*",
+                "dynamodb:Create*",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:Get*",
+                "dynamodb:BatchGetItem",
+                "dynamodb:List*",
+                "dynamodb:Describe*",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:Update*",
+                "dynamodb:RestoreTable*",
+                "dynamodb:Delete*"
+              ],
+              "Resource": [
+                {
+                  "Ref": "storagepartyggLikeTableArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "storagepartyggLikeTableArn"
+                      },
+                      "index/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Get*",
+                "dynamodb:BatchGetItem",
+                "dynamodb:List*",
+                "dynamodb:Describe*",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:Delete*"
+              ],
+              "Resource": [
+                {
+                  "Ref": "storagepartyggDislikeTableArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "storagepartyggDislikeTableArn"
                       },
                       "index/*"
                     ]

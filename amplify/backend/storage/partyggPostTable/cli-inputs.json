@@ -2,13 +2,25 @@
   "resourceName": "partyggPostTable",
   "tableName": "partyggPostTable",
   "partitionKey": {
-    "fieldName": "game",
+    "fieldName": "username",
     "fieldType": "string"
   },
   "sortKey": {
     "fieldName": "date",
     "fieldType": "string"
   },
-  "gsi": [],
+  "gsi": [
+    {
+      "name": "game-date-index",
+      "partitionKey": {
+        "fieldName": "game",
+        "fieldType": "string"
+      },
+      "sortKey": {
+        "fieldName": "date",
+        "fieldType": "string"
+      }
+    }
+  ],
   "triggerFunctions": []
 }

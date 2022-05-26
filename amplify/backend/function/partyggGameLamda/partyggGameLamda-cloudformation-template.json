@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"8.1.0\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"8.2.0\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
@@ -97,12 +97,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "partyggLambdaRole2e00a065",
+            "partyggreactamplifyLambdaRole7df6e2c4",
             {
               "Fn::Join": [
                 "",
                 [
-                  "partyggLambdaRole2e00a065",
+                  "partyggreactamplifyLambdaRole7df6e2c4",
                   "-",
                   {
                     "Ref": "env"

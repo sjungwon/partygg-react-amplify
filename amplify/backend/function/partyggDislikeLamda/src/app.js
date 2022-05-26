@@ -1,4 +1,13 @@
-/*
+/* Amplify Params - DO NOT EDIT
+	ENV
+	REGION
+	STORAGE_PARTYGGDISLIKETABLE_ARN
+	STORAGE_PARTYGGDISLIKETABLE_NAME
+	STORAGE_PARTYGGDISLIKETABLE_STREAMARN
+	STORAGE_PARTYGGLIKETABLE_ARN
+	STORAGE_PARTYGGLIKETABLE_NAME
+	STORAGE_PARTYGGLIKETABLE_STREAMARN
+Amplify Params - DO NOT EDIT */ /*
 Copyright 2017 - 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
     http://aws.amazon.com/apache2.0/

@@ -58,9 +58,7 @@ export default function LoginPage() {
   //가입 확인 안한 유저에 대한 확인 모달
   const [confirmModalShow, setConfirmModalShow] = useState<boolean>(false);
   const closeConfirmModal = useCallback(() => {
-    return () => {
-      setConfirmModalShow(false);
-    };
+    setConfirmModalShow(false);
   }, []);
 
   //모달에 전달할 유저 이름 상태
@@ -114,12 +112,12 @@ export default function LoginPage() {
     return (
       <RegisterConfirmModal
         mdShow={confirmModalShow}
-        modalClose={closeModal}
+        modalClose={closeConfirmModal}
         parentMdClose={() => {}}
         username={loginUsername}
       />
     );
-  }, [closeModal, confirmModalShow, loginUsername]);
+  }, [closeConfirmModal, confirmModalShow, loginUsername]);
 
   const enterSubmit = useCallback(
     (event: KeyboardEvent) => {
