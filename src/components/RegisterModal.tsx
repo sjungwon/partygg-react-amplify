@@ -22,22 +22,14 @@ export default function RegisterModal({
   //회원가입 제출 결과 모달
   const [mdShow, setMdShow] = useState<boolean>(false);
   //회원가입 제출시 결과 모달 열기
-  const openModal = useCallback(() => {
+  const modalOpen = useCallback(() => {
     setMdShow(true);
   }, []);
 
   //회원가입 제출 시 결과 모달 닫기 + 현재 모달 닫기
-  const closeModal = useCallback(
-    (regSuccess: boolean) => {
-      return () => {
-        setMdShow(false);
-        if (regSuccess) {
-          parentMdClose();
-        }
-      };
-    },
-    [parentMdClose]
-  );
+  const modalClose = useCallback(() => {
+    setMdShow(false);
+  }, []);
 
   //이름 입력 검증
   const [usernameVerify, setUsernameVerify] = useState<boolean>(false);
@@ -123,11 +115,12 @@ export default function RegisterModal({
     return (
       <RegisterConfirmModal
         mdShow={mdShow}
-        closeModal={closeModal}
+        modalClose={modalClose}
+        parentMdClose={parentMdClose}
         username={registerUsername}
       />
     );
-  }, [closeModal, mdShow, registerUsername]);
+  }, [mdShow, modalClose, parentMdClose, registerUsername]);
   //회원가입 제출
   const submitSignUp = useCallback(async () => {
     try {
@@ -140,13 +133,13 @@ export default function RegisterModal({
       });
       console.log(user);
       setRegisterUsername(username);
-      openModal();
+      modalOpen();
     } catch (error) {
       console.log(error);
       //닉네임 중복 오류 처리 -> 메세지 보여주기
       setUsernameVerifyMessage("닉네임이 중복되었습니다.");
     }
-  }, [openModal, username, password, email]);
+  }, [modalOpen, username, password, email]);
 
   return (
     <div>

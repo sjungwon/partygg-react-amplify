@@ -3,19 +3,20 @@ import { Profile } from "./profile.type";
 
 //db 저장 형태
 export interface PostStruct {
-  //partition key
   game: string;
   profile: Profile;
   text: string;
 }
 
 export interface Post extends PostStruct, UserResource {
+  //partition key
+  //username : string;
   //sort key
   date: string;
   images: string[] | null;
   likes: string[];
   dislikes: string[];
-  comments: Comment[];
+  // comments: Comment[];
 }
 
 export interface Comment extends PostStruct, UserResource {
@@ -27,16 +28,37 @@ export interface SubComment extends PostStruct, UserResource {
   date: string;
 }
 
+export interface LastEvaluatedKey {
+  username: string;
+  date: string;
+}
+
 export type GetPostReqData = Post[];
+
+export interface GetPostResData {
+  data: Post[];
+  lastEvaluatedKey?: LastEvaluatedKey;
+}
+
+export interface GetGamePostResData {
+  data: Post[];
+  lastEvaluatedKey?: LastEvaluatedKey;
+}
 
 export interface AddPostReqData extends PostStruct {
   images: string[] | null;
-  likes: string[];
-  dislikes: string[];
-  comments: Comment[];
 }
 
-export interface RemovePostReqData {
-  game: string;
+export interface AddPostReqBodyData extends AddPostReqData, UserResource {}
+
+export interface AddPostResData extends AddPostReqData, UserResource {
   date: string;
 }
+
+export interface UpdatePostReqData extends AddPostReqData, UserResource {
+  date: string;
+}
+
+export interface UpdatePostResData extends AddPostResData {}
+
+export interface RemovePostReqData extends LastEvaluatedKey {}

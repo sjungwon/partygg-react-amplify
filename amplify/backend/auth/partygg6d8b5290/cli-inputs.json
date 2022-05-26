@@ -1,10 +1,10 @@
 {
   "version": "1",
   "cognitoConfig": {
-    "identityPoolName": "partyggaa2588db_identitypool_aa2588db",
+    "identityPoolName": "partygg6d8b5290_identitypool_6d8b5290",
     "allowUnauthenticatedIdentities": true,
-    "resourceNameTruncated": "partygaa2588db",
-    "userPoolName": "partyggaa2588db_userpool_aa2588db",
+    "resourceNameTruncated": "partyg6d8b5290",
+    "userPoolName": "partygg6d8b5290_userpool_6d8b5290",
     "autoVerifiedAttributes": [
       "email"
     ],
@@ -14,9 +14,9 @@
     ],
     "smsAuthenticationMessage": "Your authentication code is {####}",
     "smsVerificationMessage": "Your verification code is {####}",
-    "emailVerificationSubject": "Your verification code",
+    "emailVerificationSubject": "Your partyGG verification code",
     "emailVerificationMessage": "Your verification code is {####}",
-    "defaultPasswordPolicy": false,
+    "defaultPasswordPolicy": true,
     "passwordPolicyMinLength": 8,
     "passwordPolicyCharacters": [
       "Requires Lowercase",
@@ -28,12 +28,16 @@
     "aliasAttributes": [],
     "userpoolClientGenerateSecret": false,
     "userpoolClientRefreshTokenValidity": 30,
-    "userpoolClientWriteAttributes": [],
-    "userpoolClientReadAttributes": [],
-    "userpoolClientLambdaRole": "partygaa2588db_userpoolclient_lambda_role",
+    "userpoolClientWriteAttributes": [
+      "email"
+    ],
+    "userpoolClientReadAttributes": [
+      "email"
+    ],
+    "userpoolClientLambdaRole": "partyg6d8b5290_userpoolclient_lambda_role",
     "userpoolClientSetAttributes": false,
-    "sharedId": "aa2588db",
-    "resourceName": "partyggaa2588db",
+    "sharedId": "6d8b5290",
+    "resourceName": "partygg6d8b5290",
     "authSelections": "identityPoolAndUserPool",
     "useDefault": "manual",
     "triggers": {},
@@ -55,11 +59,11 @@
     },
     "breakCircularDependency": true,
     "dependsOn": [],
+    "thirdPartyAuth": false,
     "userPoolGroups": false,
     "adminQueries": false,
-    "thirdPartyAuth": false,
-    "authProviders": [],
     "hostedUI": false,
+    "authProviders": [],
     "parentStack": {
       "Ref": "AWS::StackId"
     },

@@ -1,13 +1,16 @@
-import React, { createContext, useCallback, useEffect, useState } from "react";
-import { GetProfilesResData, Profile } from "../types/profile.type";
+import React, { createContext, useCallback, useState } from "react";
+import AuthServices from "../services/AuthServices";
+import ProfileServices from "../services/ProfileServices";
+import UserServices from "../services/UserServices";
+import { Profile } from "../types/profile.type";
 
 interface UserDataContextType {
   username: string;
   setUsernameHandler: (username: string) => void;
   profileArr: Profile[];
   setProfileArrHandler: (profiles: Profile[]) => void;
-  currentProfile: Profile;
-  setCurrentProfileHandler: (profile: Profile) => void;
+  checkLogin: () => void;
+  logout: () => void;
 }
 
 interface Props {
@@ -18,15 +21,9 @@ export const UserDataContext = createContext<UserDataContextType>({
   username: "",
   setUsernameHandler: (username: string) => {},
   profileArr: [],
-  setProfileArrHandler: (profiles: GetProfilesResData) => {},
-  currentProfile: {
-    username: "",
-    nickname: "",
-    game: "",
-    profileImage: "",
-    date: "",
-  },
-  setCurrentProfileHandler: (profile: Profile) => {},
+  setProfileArrHandler: (profiles: Profile[]) => {},
+  checkLogin: () => {},
+  logout: () => {},
 });
 
 const UserDataContextProvider: React.FC<Props> = ({ children }) => {
@@ -37,29 +34,36 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
     []
   );
 
-  const [profileArr, setProfileArr] = useState<GetProfilesResData>([]);
+  const [profileArr, setProfileArr] = useState<Profile[]>([]);
 
   const setProfileArrHandler = useCallback((profileArr: Profile[]) => {
     setProfileArr(profileArr);
-    setCurrentProfile(profileArr[0]);
   }, []);
 
-  const [currentProfile, setCurrentProfile] = useState<Profile>({
-    username: "",
-    nickname: "",
-    game: "",
-    profileImage: "",
-    date: "",
-  });
+  const checkLogin = useCallback(async () => {
+    try {
+      const { username } = await UserServices.getUsernameWithRefresh();
+      if (username) {
+        setUsername(username);
+        const profiles = await ProfileServices.getProfiles();
+        if (profiles) {
+          setProfileArr(profiles);
+        }
+      }
+    } catch {}
+  }, []);
 
-  const setCurrentProfileHandler = useCallback(
-    (profile: Profile) => setCurrentProfile(profile),
-    []
-  );
+  const logout = useCallback(async () => {
+    try {
+      await AuthServices.signOut();
+      setUsername("");
+      setProfileArr([]);
+    } catch {
+      window.alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
+    }
+  }, []);
 
   console.log("context render");
-
-  useEffect(() => {}, []);
 
   return (
     <UserDataContext.Provider
@@ -68,8 +72,8 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
         setUsernameHandler,
         profileArr,
         setProfileArrHandler,
-        currentProfile,
-        setCurrentProfileHandler,
+        checkLogin,
+        logout,
       }}
     >
       {children}

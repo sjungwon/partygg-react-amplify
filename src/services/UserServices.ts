@@ -1,5 +1,5 @@
 import { Auth } from "aws-amplify";
-import { TokenRefreshResData } from "../types/user.type";
+import { UserRefreshResData } from "../types/user.type";
 
 export default class UserServices {
   public static async getUsername(): Promise<string | null> {
@@ -11,21 +11,17 @@ export default class UserServices {
     }
   }
 
-  public static async getUsernameWithRefresh(): Promise<TokenRefreshResData> {
+  public static async getUsernameWithRefresh(): Promise<UserRefreshResData> {
     try {
       const response = await Auth.currentSession();
-      const token = response.getAccessToken().getJwtToken();
-      console.log(token);
       const username = response.getAccessToken().payload.username;
       return {
         username,
-        token: token,
         error: null,
       };
     } catch (error: any) {
       return {
         username: "",
-        token: "",
         error: error,
       };
     }

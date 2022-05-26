@@ -1,5 +1,4 @@
-export interface TokenRefreshResData {
+export interface UserRefreshResData {
   username: string;
-  token: string;
   error: Error | null;
 }

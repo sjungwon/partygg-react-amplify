@@ -1,6 +1,6 @@
 {
   "auth": {
-    "partyggaa2588db": {
+    "partygg6d8b5290": {
       "service": "Cognito",
       "providerPlugin": "awscloudformation",
       "dependsOn": [],
@@ -38,6 +38,14 @@
       "providerPlugin": "awscloudformation"
     },
     "partyggGameTable": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
+    },
+    "partyggLikeTable": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
+    },
+    "partyggDislikeTable": {
       "service": "DynamoDB",
       "providerPlugin": "awscloudformation"
     }
@@ -99,6 +107,44 @@
           }
         }
       ]
+    },
+    "partyggLikeLamda": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "partyggLikeTable",
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "attributeEnvMap": {
+            "Name": "TABLE_NAME",
+            "Arn": "TABLE_ARN"
+          }
+        }
+      ]
+    },
+    "partyggDislikeLamda": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "partyggDislikeTable",
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "attributeEnvMap": {
+            "Name": "TABLE_NAME",
+            "Arn": "TABLE_ARN"
+          }
+        }
+      ]
     }
   },
   "api": {
@@ -116,7 +162,7 @@
         },
         {
           "category": "function",
-          "resourceName": "partyggPostLamda",
+          "resourceName": "partyggGameLamda",
           "attributes": [
             "Name",
             "Arn"
@@ -124,7 +170,23 @@
         },
         {
           "category": "function",
-          "resourceName": "partyggGameLamda",
+          "resourceName": "partyggLikeLamda",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "partyggDislikeLamda",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "partyggPostLamda",
           "attributes": [
             "Name",
             "Arn"

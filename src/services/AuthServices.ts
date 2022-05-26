@@ -10,8 +10,16 @@ export default class AuthServices {
     await Auth.signUp(data);
   }
 
-  public static async confirmSignUp(data: ConfirmSignUpReqData) {
-    await Auth.confirmSignUp(data.username, data.code);
+  public static async confirmSignUp(
+    data: ConfirmSignUpReqData
+  ): Promise<boolean> {
+    try {
+      const response = await Auth.confirmSignUp(data.username, data.code);
+      console.log(response);
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 
   public static async resendConfirmationCode(username: string) {

@@ -16,12 +16,7 @@ export default class ProfileServices {
     try {
       const { username } = await UserServices.getUsernameWithRefresh();
 
-      // const myInit = {
-      //   headers: {
-      //     Authorization: `Bearer ${token}`,
-      //   },
-      // };
-      const profiles = await API.get(
+      const profiles: GetProfilesResData = await API.get(
         this.apiName,
         `${path}/${encodeURIComponent(username)}`,
         {}

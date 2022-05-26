@@ -5,13 +5,15 @@ import styles from "./RegisterConfirmModal.module.scss";
 
 interface PropsType {
   mdShow: boolean;
-  closeModal: (value: boolean) => () => void;
+  modalClose: () => void;
+  parentMdClose: () => void;
   username: string;
 }
 
 export default function RegisterConfirmModal({
   mdShow,
-  closeModal,
+  modalClose,
+  parentMdClose,
   username,
 }: PropsType) {
   const codeRef = useRef<HTMLInputElement>(null);
@@ -28,17 +30,21 @@ export default function RegisterConfirmModal({
   console.log(username);
 
   const [codeErrorMessage, setCodeErrorMessage] = useState<string>("");
-  const clickSubmit = async (event: any) => {
-    event.preventDefault();
-    console.log(username, codeRef.current?.value);
-    const code = (codeRef.current as HTMLInputElement).value;
-    try {
-      await AuthServices.confirmSignUp({ username, code });
-      closeModal(true);
-    } catch (error) {
-      setCodeErrorMessage("잘못된 코드를 입력하셨습니다. 다시 입력해주세요.");
-    }
-  };
+  const clickSubmit = useCallback(
+    async (event: any) => {
+      event.preventDefault();
+      console.log(username, codeRef.current?.value);
+      const code = (codeRef.current as HTMLInputElement).value;
+      const success = await AuthServices.confirmSignUp({ username, code });
+      if (success) {
+        modalClose();
+        parentMdClose();
+      } else {
+        modalClose();
+      }
+    },
+    [modalClose, parentMdClose, username]
+  );
 
   const enterSubmit = useCallback(
     (event: KeyboardEvent) => {
@@ -64,7 +70,7 @@ export default function RegisterConfirmModal({
   return (
     <Modal
       show={mdShow}
-      onHide={closeModal(false)}
+      onHide={modalClose}
       centered
       backdrop={"static"}
       size="sm"
@@ -74,7 +80,7 @@ export default function RegisterConfirmModal({
       </Modal.Header>
       <Modal.Body>
         <Form
-          onSubmit={(e) => {
+          onSubmit={(e: any) => {
             e.preventDefault();
           }}
         >

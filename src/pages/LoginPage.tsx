@@ -1,10 +1,11 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useMemo, useRef, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import RegisterConfirmModal from "../components/RegisterConfirmModal";
 import AuthServices from "../services/AuthServices";
 import styles from "./LoginPage.module.scss";
 import RegisterModal from "../components/RegisterModal";
+import { UserDataContext } from "../context/UserDataContextProvider";
 
 export default function LoginPage() {
   const [username, setUsername] = useState<string>("");
@@ -65,16 +66,21 @@ export default function LoginPage() {
   //모달에 전달할 유저 이름 상태
   const [loginUsername, setLoginUserName] = useState<string>("");
 
+  //제출시 로그인 내역 전역 user 데이터에 설정
+  const { checkLogin } = useContext(UserDataContext);
+
   //제출
   const click = async () => {
     if (username && password) {
       setLoading(true);
+      console.log(username, password);
       try {
-        const user = await AuthServices.signIn({
+        await AuthServices.signIn({
           username,
           password,
         });
-        navigate("/");
+        checkLogin();
+        navigate(-1);
       } catch (error: any) {
         console.log(error.message);
         setLoading(false);
@@ -108,11 +114,12 @@ export default function LoginPage() {
     return (
       <RegisterConfirmModal
         mdShow={confirmModalShow}
-        closeModal={closeConfirmModal}
+        modalClose={closeModal}
+        parentMdClose={() => {}}
         username={loginUsername}
       />
     );
-  }, [closeConfirmModal, confirmModalShow, loginUsername]);
+  }, [closeModal, confirmModalShow, loginUsername]);
 
   const enterSubmit = useCallback(
     (event: KeyboardEvent) => {

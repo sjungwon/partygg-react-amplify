@@ -10,26 +10,25 @@ const AWS = require("aws-sdk");
 const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 const bodyParser = require("body-parser");
 const express = require("express");
-const moment = require("moment");
-require("moment-timezone");
-moment.tz.setDefault("Asia/Seoul");
 
 AWS.config.update({ region: process.env.TABLE_REGION });
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-let tableName = "partyggProfileTable";
+let tableName = "partyggDislikeTable";
+let likeTableName = "partyggLikeTable";
 if (process.env.ENV && process.env.ENV !== "NONE") {
   tableName = tableName + "-" + process.env.ENV;
+  likeTableName = likeTableName + "-" + process.env.ENV;
 }
 
 const userIdPresent = false; // TODO: update in case is required to use that definition
-const partitionKeyName = "username";
+const partitionKeyName = "postId";
 const partitionKeyType = "S";
-const sortKeyName = "date";
+const sortKeyName = "username";
 const sortKeyType = "S";
 const hasSortKey = sortKeyName !== "";
-const path = "/profiles";
+const path = "/dislikes";
 const UNAUTH = "UNAUTH";
 const hashKeyPath = "/:" + partitionKeyName;
 const sortKeyPath = hasSortKey ? "/:" + sortKeyName : "";
@@ -85,8 +84,6 @@ app.get(path + hashKeyPath, function (req, res) {
     TableName: tableName,
     KeyConditions: condition,
   };
-
-  console.log(req.apiGateway.event.identity);
 
   dynamodb.query(queryParams, (err, data) => {
     if (err) {
@@ -179,7 +176,14 @@ app.put(path, function (req, res) {
  *************************************/
 
 app.post(path, function (req, res) {
+  if (!req.body["username"] || !req.body["postId"]) {
+    res.statusCode = 500;
+    res.json({ error: "username or postId missing", body: req.body });
+    return;
+  }
+
   const params = {};
+
   if (userIdPresent) {
     req.body["userId"] =
       req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
@@ -190,85 +194,65 @@ app.post(path, function (req, res) {
         req.body[partitionKeyName],
         partitionKeyType
       );
+      params[sortKeyName] = convertUrlType(req.body[sortKeyName], sortKeyType);
     } catch (err) {
       res.statusCode = 500;
       res.json({ error: "Wrong column type " + err });
     }
   }
 
-  let getItemParams = {
+  let putItemParams = {
     TableName: tableName,
-    KeyConditionExpression: "#user = :u",
-    FilterExpression: "game = :g AND nickname = :n",
-    ExpressionAttributeNames: {
-      "#user": "username",
-    },
-    ExpressionAttributeValues: {
-      ":u": req.body["username"],
-      ":g": req.body["game"],
-      ":n": req.body["nickname"],
-    },
+    Item: req.body,
   };
 
-  dynamodb.query(getItemParams, (err, data) => {
+  let checkLikeParams = {
+    TableName: likeTableName,
+    Key: params,
+  };
+
+  dynamodb.get(checkLikeParams, (err, data) => {
     if (err) {
       res.statusCode = 500;
       res.json({ error: "Could not load items: " + err.message });
     } else {
-      console.log(data);
-      if (data.Count) {
-        res.statusCode = 409;
-        res.json({ error: "Data already exists profile" });
+      if (data.Item) {
+        //싫어요가 있는 경우
+        //싫어요 제거 후 좋아요 추가
+        dynamodb.delete(checkLikeParams, (err, data) => {
+          if (err) {
+            res.statusCode = 500;
+            res.json({ error: err, url: req.url });
+          } else {
+            dynamodb.put(putItemParams, (err, data) => {
+              if (err) {
+                res.statusCode = 500;
+                res.json({ error: err, url: req.url, body: req.body });
+              } else {
+                res.json({
+                  success: "post call succeed!",
+                  url: req.url,
+                  data: data,
+                });
+              }
+            });
+          }
+        });
       } else {
-        const date = moment().format("YYYY-MM-DD hh:mm:ss a SSS");
-        let putItemParams = {
-          TableName: tableName,
-          Item: {
-            ...req.body,
-            date,
-          },
-        };
+        //싫어요가 없는 경우
         dynamodb.put(putItemParams, (err, data) => {
           if (err) {
             res.statusCode = 500;
             res.json({ error: err, url: req.url, body: req.body });
           } else {
             res.json({
-              success: "post update succeed!",
+              success: "post call succeed!",
               url: req.url,
               data: data,
             });
           }
         });
       }
-    }
-  });
-});
-
-/************************************
- * HTTP post method for update object *
- *************************************/
-app.post(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
-  const username = req.params[partitionKeyName];
-  if (username !== req.body[partitionKeyName]) {
-    res.statusCode = 403;
-    res.json({ error: "Unauthorized update profiles" });
-    return;
-  }
-
-  let putItemParams = {
-    TableName: tableName,
-    Item: {
-      ...req.body,
-    },
-  };
-
-  dynamodb.put(putItemParams, (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.json({ error: err, url: req.url, body: req.body });
-    } else {
-      res.json({ success: "post update succeed!", url: req.url, data: data });
     }
   });
 });
@@ -310,37 +294,12 @@ app.delete(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
     TableName: tableName,
     Key: params,
   };
-
-  const username = req.params[partitionKeyName];
-
-  dynamodb.get(removeItemParams, (err, data) => {
+  dynamodb.delete(removeItemParams, (err, data) => {
     if (err) {
       res.statusCode = 500;
       res.json({ error: err, url: req.url });
     } else {
-      if (data.Item) {
-        console.log(data.Item.username);
-        if (data.Item.username !== username) {
-          res.statusCode = 403;
-          res.json({ error: "Unauthorized Delete" });
-        } else {
-          dynamodb.delete(removeItemParams, (err, data) => {
-            if (err) {
-              res.statusCode = 500;
-              res.json({ error: err, url: req.url });
-            } else {
-              res.json({
-                success: "delete call succeed!",
-                url: req.url,
-                data: data,
-              });
-            }
-          });
-        }
-      } else {
-        res.statusCode = 500;
-        res.json({ error: "Could not load items: " + err.message });
-      }
+      res.json({ url: req.url, data: data });
     }
   });
 });

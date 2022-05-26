@@ -14,21 +14,29 @@
     },
     "categories": {
       "auth": {
-        "partyggaa2588db": {},
-        "true": {}
+        "true": {},
+        "partygg6d8b5290": {}
       },
       "function": {
         "partyggProfileLamda": {
           "deploymentBucketName": "amplify-partygg-dev-31339-deployment",
-          "s3Key": "amplify-builds/partyggProfileLamda-30434e544743312f4254-build.zip"
+          "s3Key": "amplify-builds/partyggProfileLamda-6d614142794d54484662-build.zip"
         },
         "partyggPostLamda": {
           "deploymentBucketName": "amplify-partygg-dev-31339-deployment",
-          "s3Key": "amplify-builds/partyggPostLamda-2b774d37375179674466-build.zip"
+          "s3Key": "amplify-builds/partyggPostLamda-6a716c626f6769365162-build.zip"
         },
         "partyggGameLamda": {
           "deploymentBucketName": "amplify-partygg-dev-31339-deployment",
           "s3Key": "amplify-builds/partyggGameLamda-734e44674d48362b564e-build.zip"
+        },
+        "partyggLikeLamda": {
+          "deploymentBucketName": "amplify-partygg-dev-31339-deployment",
+          "s3Key": "amplify-builds/partyggLikeLamda-736557794a5659396757-build.zip"
+        },
+        "partyggDislikeLamda": {
+          "deploymentBucketName": "amplify-partygg-dev-31339-deployment",
+          "s3Key": "amplify-builds/partyggDislikeLamda-3263513167646b794466-build.zip"
         }
       }
     }

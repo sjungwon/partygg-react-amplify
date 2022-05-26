@@ -17,9 +17,9 @@
         ]
       }
     },
-    "/posts": {
-      "name": "/posts",
-      "lambdaFunction": "partyggPostLamda",
+    "/games": {
+      "name": "/games",
+      "lambdaFunction": "partyggGameLamda",
       "permissions": {
         "setting": "protected",
         "auth": [
@@ -33,9 +33,41 @@
         ]
       }
     },
-    "/games": {
-      "name": "/games",
-      "lambdaFunction": "partyggGameLamda",
+    "/likes": {
+      "name": "/likes",
+      "lambdaFunction": "partyggLikeLamda",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
+    },
+    "/dislikes": {
+      "name": "/dislikes",
+      "lambdaFunction": "partyggDislikeLamda",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
+    },
+    "/posts": {
+      "name": "/posts",
+      "lambdaFunction": "partyggPostLamda",
       "permissions": {
         "setting": "protected",
         "auth": [

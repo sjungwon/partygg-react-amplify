@@ -7,26 +7,14 @@ import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
 import ErrorPage from "./pages/ErrorPage";
 import { useContext, useEffect } from "react";
-import UserServices from "./services/UserServices";
 import { UserDataContext } from "./context/UserDataContextProvider";
-import ProfileServices from "./services/ProfileServices";
 
 function App() {
-  const { setUsernameHandler, setProfileArrHandler } =
-    useContext(UserDataContext);
+  const { checkLogin } = useContext(UserDataContext);
 
   useEffect(() => {
-    UserServices.getUsername().then((username) => {
-      if (username) {
-        setUsernameHandler(username);
-        ProfileServices.getProfiles().then((profiles) => {
-          if (profiles) {
-            setProfileArrHandler(profiles);
-          }
-        });
-      }
-    });
-  }, [setProfileArrHandler, setUsernameHandler]);
+    checkLogin();
+  }, [checkLogin]);
 
   return (
     <div className="App">
