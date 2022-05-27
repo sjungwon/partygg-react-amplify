@@ -98,7 +98,7 @@ export default function AddPostImageModal({
       <Modal.Body>
         <input
           type="file"
-          accept="image/jpg image/png image/gif"
+          accept="image/jpg image/png image/jpeg"
           onInput={AddImages}
           multiple
           className={styles.modal_body_file}

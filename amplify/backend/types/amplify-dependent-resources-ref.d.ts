@@ -47,6 +47,10 @@ export type AmplifyDependentResourcesAttributes = {
             "SortKeyName": "string",
             "SortKeyType": "string",
             "Region": "string"
+        },
+        "partyggContentStorage": {
+            "BucketName": "string",
+            "Region": "string"
         }
     },
     "function": {
@@ -75,6 +79,12 @@ export type AmplifyDependentResourcesAttributes = {
             "LambdaExecutionRole": "string"
         },
         "partyggPostLamda": {
+            "Name": "string",
+            "Arn": "string",
+            "Region": "string",
+            "LambdaExecutionRole": "string"
+        },
+        "S3Trigger8322dec8": {
             "Name": "string",
             "Arn": "string",
             "Region": "string",

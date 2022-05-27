@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PostList from "../components/posts/PostList";
 import { UserDataContext } from "../context/UserDataContextProvider";
+import FileServices from "../services/FileServices";
 import LikeServices from "../services/LikeServices";
 import PostServices from "../services/PostServices";
 import ProfileServices from "../services/ProfileServices";
@@ -135,6 +136,40 @@ export default function HomePage() {
     LikeServices.postLike(postId);
   };
 
+  const addImage = async (files: FileList) => {
+    const image = await Promise.all(
+      Array.from(files).map((file) => {
+        const name = file.name;
+        return FileServices.putPostImage(name, file);
+      })
+    );
+    console.log(image);
+  };
+
+  const imageUpload = async (event: any) => {
+    const files = event.target.files as FileList;
+    if (files.length > 0) {
+      await addImage(files);
+    }
+  };
+
+  const addProfileImage = async (files: FileList) => {
+    const image = await Promise.all(
+      Array.from(files).map((file) => {
+        const name = file.name;
+        return FileServices.putProfileImage(name, file);
+      })
+    );
+    console.log(image);
+  };
+
+  const profileUpload = async (event: any) => {
+    const files = event.target.files as FileList;
+    if (files.length > 0) {
+      await addProfileImage(files);
+    }
+  };
+
   return (
     <div>
       <button onClick={click}>로그인</button>
@@ -153,7 +188,16 @@ export default function HomePage() {
       <button onClick={removePost}>remove Post</button>
       <button onClick={updatePost}>update Post</button>
       <button onClick={likePost}>like Post</button>
-
+      <input
+        onInput={imageUpload}
+        type="file"
+        accept="image/jpg image/png image/jpeg"
+      />
+      <input
+        onInput={profileUpload}
+        type="file"
+        accept="image/jpg image/png image/jpeg"
+      />
       <PostList />
     </div>
   );

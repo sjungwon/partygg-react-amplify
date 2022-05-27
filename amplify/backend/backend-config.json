@@ -19,6 +19,21 @@
     "partyggPostTable": {
       "service": "DynamoDB",
       "providerPlugin": "awscloudformation"
+    },
+    "partyggContentStorage": {
+      "service": "S3",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "S3Trigger8322dec8",
+          "attributes": [
+            "Name",
+            "Arn",
+            "LambdaExecutionRole"
+          ]
+        }
+      ]
     }
   },
   "function": {
@@ -152,6 +167,11 @@
           ]
         }
       ]
+    },
+    "S3Trigger8322dec8": {
+      "service": "Lambda",
+      "providerPlugin": "awscloudformation",
+      "build": true
     }
   },
   "auth": {
