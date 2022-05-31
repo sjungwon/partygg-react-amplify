@@ -1,6 +1,7 @@
 import { Carousel } from "react-bootstrap";
 import styles from "./ImageSlide.module.scss";
 import { useCallback, useEffect } from "react";
+import { LazyLoadImage } from "react-lazy-load-image-component";
 
 interface PropsType {
   images: string[];
@@ -45,13 +46,26 @@ export default function ImageSlide({
         {images?.map((img: string, i: number) => {
           return (
             <Carousel.Item key={`${img.slice(0, 10)}${i}`}>
-              <img
+              {type === "modal" ? (
+                <img
+                  className={
+                    type === "modal"
+                      ? styles.modal_slide_item
+                      : styles.slide_item
+                  }
+                  src={img}
+                  alt="inputImg"
+                />
+              ) : (
+                <LazyLoadImage className={styles.slide_item} src={img} />
+              )}
+              {/* <img
                 className={
                   type === "modal" ? styles.modal_slide_item : styles.slide_item
                 }
                 src={img}
                 alt="inputImg"
-              />
+              /> */}
             </Carousel.Item>
           );
         })}
