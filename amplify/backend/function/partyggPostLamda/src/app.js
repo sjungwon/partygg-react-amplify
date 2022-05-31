@@ -42,6 +42,7 @@ if (process.env.ENV && process.env.ENV !== "NONE") {
   dislikeTableName = dislikeTableName + "-" + process.env.ENV;
 }
 const gameIndexName = "game-date-index";
+const allIndexName = "forall-date-index";
 
 const userIdPresent = false; // TODO: update in case is required to use that definition
 const partitionKeyName = "username";
@@ -484,11 +485,16 @@ app.get(path, function (req, res) {
 
   let params = {
     TableName: tableName,
+    IndexName: allIndexName,
+    KeyConditionExpression: "forall = :a",
+    ExpressionAttributeValues: {
+      ":a": "all",
+    },
     ScanIndexForward: false,
     Limit: 6,
   };
 
-  dynamodb.scan(params, async (err, data) => {
+  dynamodb.query(params, async (err, data) => {
     if (err) {
       res.statusCode = 500;
       res.json({ error: "Could not load items: " + err });
@@ -524,10 +530,16 @@ app.get(path + hashKeyPath + sortKeyPath, function (req, res) {
   const lastEvaluatedKey = {
     username: req.params[partitionKeyName],
     date: req.params[sortKeyName],
+    forall: "all",
   };
 
   let params = {
     TableName: tableName,
+    IndexName: allIndexName,
+    KeyConditionExpression: "forall = :a",
+    ExpressionAttributeValues: {
+      ":a": "all",
+    },
     ScanIndexForward: false,
     ExclusiveStartKey: {
       ...lastEvaluatedKey,
@@ -535,7 +547,7 @@ app.get(path + hashKeyPath + sortKeyPath, function (req, res) {
     Limit: 6,
   };
 
-  dynamodb.scan(params, async (err, data) => {
+  dynamodb.query(params, async (err, data) => {
     if (err) {
       res.statusCode = 500;
       res.json({ error: "Could not load items: " + err });
@@ -642,6 +654,7 @@ app.post(path, function (req, res) {
     Item: {
       ...req.body,
       date: date,
+      forall: "all",
     },
   };
   dynamodb.put(putItemParams, (err, data) => {

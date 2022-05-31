@@ -8,8 +8,9 @@ import { AiOutlineFileAdd } from "react-icons/ai";
 interface PropsType {
   mdShow: boolean;
   closeMd: () => void;
-  postImages: string[] | null;
-  setPostImage: (value: string[] | null) => void;
+  postImages: string[];
+  setPostImage: (value: string[]) => void;
+  setPostFiles: (value: File[]) => void;
 }
 
 export default function AddPostImageModal({
@@ -17,10 +18,11 @@ export default function AddPostImageModal({
   closeMd,
   postImages,
   setPostImage,
+  setPostFiles,
 }: PropsType) {
   //이미지 상태 데이터
-  const [images, setImages] = useState<null | string[]>(null);
-
+  const [images, setImages] = useState<string[]>([]);
+  const [files, setFiles] = useState<File[]>([]);
   //모달이 열린 상태에서
   //이미지가 변하면 해당 이미지로 설정 -> postImages는 props로 들어오는거라
   //모달이 열린 상태에선 이미지가 변하지 않음 -> 모달 초기 설정
@@ -42,14 +44,14 @@ export default function AddPostImageModal({
       const files: FileList | null = (event.target as HTMLInputElement).files;
       if (files) {
         const fileArray = Array.from(files);
-        fileArray.forEach((file) => {
-          const reader = new FileReader();
-          reader.onload = () => {
-            const dataURL = reader.result as string;
-            setImages((prev) => (prev ? [...prev, dataURL] : [dataURL]));
-          };
-          reader.readAsDataURL(file);
-        });
+        setFiles((prev) => [...prev, ...fileArray]);
+        const fileURLs = fileArray.map((file) => URL.createObjectURL(file));
+        setImages((prev) => [...prev, ...fileURLs]);
+        setIndex(
+          images.length + fileURLs.length > 1
+            ? images.length + fileURLs.length - 1
+            : 0
+        );
       }
     }
   };
@@ -80,13 +82,14 @@ export default function AddPostImageModal({
         }
       });
     } else {
-      setImages(null);
+      setImages([]);
     }
   };
 
   //상위 컴포넌트의 상태로 이미지 전달, 모달 닫음
   const submitImage = () => {
     setPostImage(images);
+    setPostFiles(files);
     closeMd();
   };
 

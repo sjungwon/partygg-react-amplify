@@ -6,13 +6,13 @@
 
 .slide_item{
   display: block;
+  width: 100%;
   height: 15rem;
   max-width: 100%;
   min-height: 10rem;
   max-height: 15rem;
   margin: 0 auto;
   object-fit: cover;
-  border-radius: .25rem;
 }
 
 .modal_slide{
@@ -22,11 +22,11 @@
 
 .modal_slide_item{
   display: block;
+  width: 100%;
   max-width: 100%;
   min-height: 10rem;
   max-height: 15rem;
   margin: 0 auto;
   object-fit: cover;
-  border-radius: .25rem;
 }
 

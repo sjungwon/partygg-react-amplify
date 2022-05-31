@@ -5,7 +5,7 @@ import styles from "./AddPostElement.module.scss";
 import { BsPlusLg } from "react-icons/bs";
 import ProfileSelector from "../ProfileSelector";
 import { UserDataContext } from "../../context/UserDataContextProvider";
-import AddPostForm from "./PostForm";
+import PostForm from "./PostForm";
 import { Post } from "../../types/post.type";
 import { Profile } from "../../types/profile.type";
 import { UpdatePost } from "./PostList";
@@ -78,7 +78,7 @@ export default function AddPostElement({ updatePost, setUpdatePost }: Props) {
 
   const postForm = useMemo(() => {
     return (
-      <AddPostForm
+      <PostForm
         close={close}
         updatePost={updatePost}
         setUpdatePost={setUpdatePost}

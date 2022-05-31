@@ -1,34 +1,73 @@
 import { Storage } from "aws-amplify";
+import { addImageResData } from "../types/file.type";
 import UserServices from "./UserServices";
 
 export default class FileServices {
-  public static async putPostImage(fileName: string, file: object) {
+  public static async putPostImage(
+    file: File
+  ): Promise<addImageResData | null> {
     try {
       const { username } = await UserServices.getUsernameWithRefresh();
-      const result = await Storage.put(
-        `uploads/${encodeURIComponent(username)}/${encodeURIComponent(
-          fileName
-        )}`,
-        file
-      );
+      const encodedUsername = encodeURIComponent(username);
+      const encodedFilename = encodeURIComponent(file.name);
+      const path = `${encodedUsername}/${encodedFilename}`;
+      const uploadKey = `uploads/${path}`;
+      await Storage.put(uploadKey, file);
+      const fullsizeKey = `fullsize/${path}`;
+      const resizedKey = `resized/${path}`;
+      return {
+        fullsizeKey,
+        resizedKey,
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  public static async putProfileImage(
+    file: File
+  ): Promise<addImageResData | null> {
+    try {
+      const { username } = await UserServices.getUsernameWithRefresh();
+      const encodedUsername = encodeURIComponent(username);
+      const encodedFilename = encodeURIComponent(file.name);
+      const path = `profiles/${encodedUsername}/${encodedFilename}`;
+      await Storage.put(`uploads/${path}`, file);
+      const fullsizeKey = `fullsize/${path}`;
+      const resizedKey = `resized/${path}`;
+      return {
+        fullsizeKey,
+        resizedKey,
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  public static async getImage(
+    keyObject: addImageResData,
+    size: "fullsize" | "resized"
+  ): Promise<string | null> {
+    try {
+      const key =
+        size === "fullsize" ? keyObject.fullsizeKey : keyObject.resizedKey;
+      const result = await Storage.get(key);
       return result;
     } catch {
       return null;
     }
   }
 
-  public static async putProfileImage(fileName: string, file: object) {
+  public static async removeImage(
+    keyObject: addImageResData
+  ): Promise<boolean> {
     try {
-      const { username } = await UserServices.getUsernameWithRefresh();
-      const result = await Storage.put(
-        `uploads/profiles/${encodeURIComponent(username)}/${encodeURIComponent(
-          fileName
-        )}`,
-        file
-      );
-      return result;
-    } catch {
-      return null;
+      await Storage.remove(keyObject.fullsizeKey);
+      await Storage.remove(keyObject.resizedKey);
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
     }
   }
 }

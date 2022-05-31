@@ -6,6 +6,7 @@ import {
   GetGamePostResData,
   GetPostResData,
   LastEvaluatedKey,
+  LastEvaluatedKeyForGame,
   Post,
   RemovePostReqData,
   UpdatePostReqData,
@@ -142,12 +143,11 @@ export default class PostServices {
   }
 
   public static async getNextPostByGame(
-    game: string,
-    data: LastEvaluatedKey
+    data: LastEvaluatedKeyForGame
   ): Promise<GetGamePostResData | null> {
     try {
       const path = `${this.path}/game/${encodeURIComponent(
-        game
+        data.game
       )}/${encodeURIComponent(data.username)}/${encodeURIComponent(data.date)}`;
       const response: GetGamePostResData = await API.get(
         this.apiName,

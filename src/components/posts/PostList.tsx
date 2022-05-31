@@ -2,23 +2,15 @@ import styles from "./PostList.module.scss";
 import AddPostElement from "./AddPostElement";
 import PostElement from "./PostElement";
 import PostServices from "../../services/PostServices";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { Post } from "../../types/post.type";
+import { useContext, useEffect, useState } from "react";
 import { UserDataContext } from "../../context/UserDataContextProvider";
-import LikeServices from "../../services/LikeServices";
+import { Post } from "../../types/post.type";
+import FileServices from "../../services/FileServices";
 
 export interface UpdatePost {
   postData: Post | null;
   success: boolean;
-  type:
-    | "add"
-    | "update"
-    | "remove"
-    | "postLike"
-    | "postLikeRemove"
-    | "postDislike"
-    | "postDislikeRemove"
-    | "";
+  type: "add" | "update" | "remove" | "";
 }
 
 export const initialUpdatePost: UpdatePost = {
@@ -27,9 +19,25 @@ export const initialUpdatePost: UpdatePost = {
   type: "",
 };
 
+export interface UpdateLikeData {
+  type:
+    | "postLike"
+    | "postLikeRemove"
+    | "postDislike"
+    | "postDislikeRemove"
+    | "";
+  postId: string;
+}
+
+export const initialUpdateLikeData: UpdateLikeData = {
+  type: "",
+  postId: "",
+};
+
 export default function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const { username } = useContext(UserDataContext);
 
   useEffect(() => {
     setLoading(true);
@@ -41,36 +49,65 @@ export default function PostList() {
     });
   }, []);
 
+  const [updateLike, setUpdateLike] = useState<UpdateLikeData>(
+    initialUpdateLikeData
+  );
+
+  useEffect(() => {
+    if (updateLike.type && updateLike.postId) {
+      setPosts((prevPosts: Post[]) => {
+        const newPosts = prevPosts.map((post) => {
+          const postId = `${post.username}-${post.date}`;
+          if (postId === updateLike.postId) {
+            switch (updateLike.type) {
+              case "postLike": {
+                return {
+                  ...post,
+                  likes: [...post.likes, username],
+                  dislikes: post.dislikes.filter((user) => user !== username),
+                };
+              }
+              case "postLikeRemove": {
+                return {
+                  ...post,
+                  likes: post.likes.filter((user) => user !== username),
+                };
+              }
+              case "postDislike": {
+                return {
+                  ...post,
+                  likes: post.likes.filter((user) => user !== username),
+                  dislikes: [...post.dislikes, username],
+                };
+              }
+              case "postDislikeRemove": {
+                return {
+                  ...post,
+                  dislikes: post.dislikes.filter((user) => user !== username),
+                };
+              }
+              default:
+                return post;
+            }
+          }
+
+          return post;
+        });
+
+        return newPosts ? newPosts : prevPosts;
+      });
+      setUpdateLike(initialUpdateLikeData);
+    }
+  }, [updateLike, username]);
+
   const [updatePost, setUpdatePost] = useState<UpdatePost>(initialUpdatePost);
 
   //포스트 수정,추가 성공시
   useEffect(() => {
     if (updatePost.success && updatePost.postData) {
       console.log("success change");
-      const failFunc = (prevData: Post, failMessage: string) => {
-        if (prevData) {
-          setPosts((prevPost: Post[]) => {
-            const newPost = prevPost.map((post) => {
-              if (
-                post.username === prevData?.username &&
-                post.date === prevData?.date
-              ) {
-                return prevData;
-              }
-              return post;
-            });
-            return newPost ? newPost : prevPost;
-          });
-        }
-        window.alert(failMessage);
-      };
       switch (updatePost.type) {
         case "update": {
-          const updatePostId = `${updatePost.postData?.username}-${updatePost.postData?.date}`;
-          let prevData: Post | undefined = posts.find(
-            (post) => `${post.username}-${post.date}` === updatePostId
-          );
-
           setPosts((prevPost: Post[]) => {
             const newPost = prevPost.map((post) => {
               if (
@@ -87,19 +124,6 @@ export default function PostList() {
               return prevPost;
             }
           });
-
-          if (prevData) {
-            console.log(prevData);
-            PostServices.updatePost(updatePost.postData).then((success) => {
-              console.log(success);
-              if (!success && prevData) {
-                failFunc(
-                  prevData,
-                  "포스트를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
-                );
-              }
-            });
-          }
           break;
         }
         case "add": {
@@ -136,80 +160,12 @@ export default function PostList() {
                 window.alert(
                   "포스트를 제거 중에 오류가 발생했습니다. 다시 시도해주세요."
                 );
+              } else {
+                prevData?.images.forEach((image) => {
+                  FileServices.removeImage(image);
+                });
               }
             });
-          }
-          break;
-        }
-        case "postLike":
-        case "postLikeRemove":
-        case "postDislike":
-        case "postDislikeRemove": {
-          let prevData: Post | undefined = posts.find(
-            (post) =>
-              post.username === updatePost.postData?.username &&
-              post.date === updatePost.postData?.date
-          );
-          const updatePostId = `${updatePost.postData?.username}-${updatePost.postData?.date}`;
-          setPosts((prevPost: Post[]) => {
-            const newPost = prevPost.map((post) => {
-              if (
-                post.username === updatePost.postData?.username &&
-                post.date === updatePost.postData?.date
-              ) {
-                return updatePost.postData;
-              }
-              return post;
-            });
-            return newPost ? newPost : prevPost;
-          });
-          switch (updatePost.type) {
-            case "postLike": {
-              LikeServices.postLike(updatePostId).then((success) => {
-                if (!success && prevData) {
-                  failFunc(
-                    prevData,
-                    "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
-                  );
-                }
-              });
-              break;
-            }
-            case "postLikeRemove": {
-              LikeServices.postLikeRemove(updatePostId).then((success) => {
-                if (!success && prevData) {
-                  failFunc(
-                    prevData,
-                    "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
-                  );
-                }
-              });
-              break;
-            }
-            case "postDislike": {
-              LikeServices.postDislike(updatePostId).then((success) => {
-                if (!success && prevData) {
-                  failFunc(
-                    prevData,
-                    "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
-                  );
-                }
-              });
-              break;
-            }
-            case "postDislikeRemove": {
-              LikeServices.postDislikeRemove(updatePostId).then((success) => {
-                if (!success && prevData) {
-                  failFunc(
-                    prevData,
-                    "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
-                  );
-                }
-              });
-              break;
-            }
-            default:
-              break;
           }
           break;
         }
@@ -256,6 +212,7 @@ export default function PostList() {
                 key={postId}
                 data={elem}
                 setUpdatePost={setUpdatePost}
+                setUpdateLike={setUpdateLike}
               />
             );
           })

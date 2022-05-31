@@ -3,7 +3,7 @@ import styles from "./ImageSlide.module.scss";
 import { useCallback, useEffect } from "react";
 
 interface PropsType {
-  images: string[] | null;
+  images: string[];
   index?: number;
   setIndex?: (index: number) => void;
   type?: string;

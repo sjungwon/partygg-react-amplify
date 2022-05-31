@@ -1,4 +1,11 @@
-import { useCallback, useContext, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Card, Dropdown } from "react-bootstrap";
 import styles from "./PostElement.module.scss";
 import {
@@ -11,19 +18,52 @@ import { FaRegComment, FaComment } from "react-icons/fa";
 import ImageSlide from "../ImageSlide";
 import { Post } from "../../types/post.type";
 import { UserDataContext } from "../../context/UserDataContextProvider";
-import PostServices from "../../services/PostServices";
-import { UpdatePost } from "./PostList";
+import { UpdateLikeData, UpdatePost } from "./PostList";
 import PostRemoveModal from "./PostRemoveModal";
+import LikeServices from "../../services/LikeServices";
+import FileServices from "../../services/FileServices";
+import { ImageKeys } from "../../types/file.type";
 
 interface PropsType {
   data: Post;
   setUpdatePost: (data: any) => void;
+  setUpdateLike: (data: UpdateLikeData) => void;
 }
 
-export default function PostElement({ data, setUpdatePost }: PropsType) {
+export default function PostElement({
+  data,
+  setUpdatePost,
+  setUpdateLike,
+}: PropsType) {
   const { username } = useContext(UserDataContext);
+  const postId = useMemo(() => `${data.username}-${data.date}`, [data]);
+  const [images, setImages] = useState<string[]>([]);
 
-  const images = data.images;
+  const getImageAsync = useCallback(async (imageKeys: ImageKeys[]) => {
+    if (imageKeys.length && imageKeys[0].resizedKey.includes("http")) {
+      const prevImage = imageKeys.map((imageKey) => imageKey.resizedKey);
+      setImages(prevImage);
+      return;
+    }
+
+    const imageURLArr = await Promise.all(
+      imageKeys.map(async (imageKey) => {
+        return await FileServices.getImage(imageKey, "resized");
+      })
+    );
+    const filteredURL = imageURLArr.map((imageURL) =>
+      imageURL ? imageURL : ""
+    );
+    setImages(filteredURL);
+  }, []);
+
+  useEffect(() => {
+    if (data.images.length) {
+      setTimeout(() => {
+        getImageAsync(data.images);
+      }, 1000);
+    }
+  }, [data.images, data.images.length, getImageAsync]);
 
   //댓글 보기 관련 함수
   const [showComment, setShowComment] = useState<boolean>(false);
@@ -35,7 +75,7 @@ export default function PostElement({ data, setUpdatePost }: PropsType) {
   //하위 컴포넌트인 댓글 컴포넌트로 전달할 Ref 생성
   const headerRef = useRef<HTMLDivElement>(null);
 
-  //좋아요, 싫어요 redux 함수
+  //싫어요 클릭 함수
   const dislikeClick = useCallback(async () => {
     if (!username) {
       window.alert("로그인이 필요합니다.");
@@ -44,22 +84,33 @@ export default function PostElement({ data, setUpdatePost }: PropsType) {
     //서버에서 알아서 좋아요 있으면 제거하고 싫어요 추가함
 
     const currentDislike = data.dislikes.includes(username);
-    const newPost = {
-      ...data,
-      likes: data.likes.filter((user) => user !== username),
-      dislikes: currentDislike
-        ? data.dislikes.filter((user) => user !== username)
-        : [...data.dislikes, username],
-    };
-    setUpdatePost(
-      (prev: UpdatePost): UpdatePost => ({
-        ...prev,
-        postData: newPost,
-        success: true,
-        type: currentDislike ? "postDislikeRemove" : "postDislike",
-      })
-    );
-  }, [data, setUpdatePost, username]);
+    if (currentDislike) {
+      setUpdateLike({ postId, type: "postDislikeRemove" });
+      LikeServices.postDislikeRemove(postId).then((success) => {
+        if (!success) {
+          setUpdateLike({ postId, type: "postDislike" });
+          window.alert(
+            "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
+          );
+        }
+      });
+    } else {
+      const currentLike = data.likes.includes(username);
+      setUpdateLike({ postId, type: "postDislike" });
+      LikeServices.postDislike(postId).then((success) => {
+        if (!success) {
+          if (currentLike) {
+            setUpdateLike({ postId, type: "postLike" });
+          } else {
+            setUpdateLike({ postId, type: "postDislikeRemove" });
+          }
+          window.alert(
+            "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
+          );
+        }
+      });
+    }
+  }, [data.dislikes, data.likes, postId, setUpdateLike, username]);
 
   const likeClick = useCallback(async () => {
     if (!username) {
@@ -68,23 +119,33 @@ export default function PostElement({ data, setUpdatePost }: PropsType) {
     }
     //서버에서 알아서 좋아요 있으면 제거하고 싫어요 추가함
     const currentLike = data.likes.includes(username);
-
-    const newPost = {
-      ...data,
-      likes: currentLike
-        ? data.likes.filter((user) => user !== username)
-        : [...data.likes, username],
-      dislikes: data.dislikes.filter((user) => user !== username),
-    };
-    setUpdatePost(
-      (prev: UpdatePost): UpdatePost => ({
-        ...prev,
-        postData: newPost,
-        success: true,
-        type: currentLike ? "postLikeRemove" : "postLike",
-      })
-    );
-  }, [data, setUpdatePost, username]);
+    if (currentLike) {
+      setUpdateLike({ postId, type: "postLikeRemove" });
+      LikeServices.postLikeRemove(postId).then((success) => {
+        if (!success) {
+          setUpdateLike({ postId, type: "postLike" });
+          window.alert(
+            "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
+          );
+        }
+      });
+    } else {
+      const currentDislikes = data.dislikes.includes(username);
+      setUpdateLike({ postId, type: "postLike" });
+      LikeServices.postLike(postId).then((success) => {
+        if (!success) {
+          if (currentDislikes) {
+            setUpdateLike({ postId, type: "postDislike" });
+          } else {
+            setUpdateLike({ postId, type: "postLikeRemove" });
+          }
+          window.alert(
+            "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
+          );
+        }
+      });
+    }
+  }, [data.dislikes, data.likes, postId, setUpdateLike, username]);
 
   //포스트 제거, 제거 확인 모달 관련 데이터
 
@@ -226,7 +287,7 @@ export default function PostElement({ data, setUpdatePost }: PropsType) {
         ) : null}
       </Card.Header>
       <Card.Body className={`${styles.card_body}`}>
-        {images ? (
+        {images.length > 0 ? (
           images.length === 1 ? (
             <img
               src={images[0]}

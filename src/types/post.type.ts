@@ -1,4 +1,5 @@
 import { UserResource } from "./db.type";
+import { ImageKeys } from "./file.type";
 import { Profile } from "./profile.type";
 
 //db 저장 형태
@@ -13,7 +14,7 @@ export interface Post extends PostStruct, UserResource {
   //username : string;
   //sort key
   date: string;
-  images: string[] | null;
+  images: ImageKeys[];
   likes: string[];
   dislikes: string[];
   // comments: Comment[];
@@ -35,18 +36,26 @@ export interface LastEvaluatedKey {
 
 export type GetPostReqData = Post[];
 
+export interface LastEvaluatedKeyForAll extends LastEvaluatedKey {
+  forall: string;
+}
+
+export interface LastEvaluatedKeyForGame extends LastEvaluatedKey {
+  game: string;
+}
+
 export interface GetPostResData {
   data: Post[];
-  lastEvaluatedKey?: LastEvaluatedKey;
+  lastEvaluatedKey?: LastEvaluatedKeyForAll;
 }
 
 export interface GetGamePostResData {
   data: Post[];
-  lastEvaluatedKey?: LastEvaluatedKey;
+  lastEvaluatedKey?: LastEvaluatedKeyForGame;
 }
 
 export interface AddPostReqData extends PostStruct {
-  images: string[] | null;
+  images: ImageKeys[];
 }
 
 export interface AddPostReqBodyData extends AddPostReqData, UserResource {}

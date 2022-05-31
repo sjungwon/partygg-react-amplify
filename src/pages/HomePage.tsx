@@ -79,7 +79,7 @@ export default function HomePage() {
       game: "리그 오브 레전드",
       profile: currentProfile,
       text: "hi123",
-      images: null,
+      images: [],
     };
     PostServices.addPost(newPost);
   };
@@ -101,9 +101,10 @@ export default function HomePage() {
   };
 
   const getNextPostByGame = async () => {
-    PostServices.getNextPostByGame("메이플", {
+    PostServices.getNextPostByGame({
       username,
       date: "2022-05-23 03:54:14 am 802",
+      game: "메이플",
     });
   };
 
@@ -121,7 +122,7 @@ export default function HomePage() {
       game: "리그 오브 레전드",
       profile: currentProfile,
       text: "hi 123",
-      images: null,
+      images: [],
       likes: [],
       dislikes: [],
       comments: [],
@@ -140,7 +141,7 @@ export default function HomePage() {
     const image = await Promise.all(
       Array.from(files).map((file) => {
         const name = file.name;
-        return FileServices.putPostImage(name, file);
+        return FileServices.putPostImage(file);
       })
     );
     console.log(image);
@@ -157,7 +158,7 @@ export default function HomePage() {
     const image = await Promise.all(
       Array.from(files).map((file) => {
         const name = file.name;
-        return FileServices.putProfileImage(name, file);
+        return FileServices.putProfileImage(file);
       })
     );
     console.log(image);
