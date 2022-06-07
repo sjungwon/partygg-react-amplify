@@ -80,6 +80,38 @@
           "read"
         ]
       }
+    },
+    "/comments": {
+      "name": "/comments",
+      "lambdaFunction": "partyggCommentLamda",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
+    },
+    "/subcomments": {
+      "name": "/subcomments",
+      "lambdaFunction": "partyggSubcommentLamda",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
     }
   }
 }

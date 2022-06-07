@@ -8,64 +8,40 @@ import { UserDataContext } from "../../context/UserDataContextProvider";
 import PostForm from "./PostForm";
 import { Post } from "../../types/post.type";
 import { Profile } from "../../types/profile.type";
-import { UpdatePost } from "./PostList";
 
 interface Props {
-  updatePost: UpdatePost;
-  setUpdatePost: (data: any) => void;
+  prevData: {
+    setMode?: (mode: "" | "modify") => void;
+    postData?: Post;
+    setPostData: (newPost: any) => void;
+    imageURLs?: string[];
+  };
 }
 
-const initialProfile: Profile = {
-  username: "",
-  game: "",
-  nickname: "",
-  date: "",
-  profileImage: "",
-};
-
 //prevData에 따라 수정, 추가 상태 결정
-export default function AddPostElement({ updatePost, setUpdatePost }: Props) {
+export default function AddPostElement({ prevData }: Props) {
   //프로필 데이터 사용
-  const { profileArr, username } = useContext(UserDataContext);
-  const [currentProfile, setCurrentProfile] = useState<Profile>(initialProfile);
+  const {
+    profileArr,
+    username,
+    currentProfile: defaultProfile,
+  } = useContext(UserDataContext);
+  const [currentProfile, setCurrentProfile] = useState<Profile>(defaultProfile);
 
-  //기본 프로필 이름
-  const defaultNickname = useMemo(() => {
-    if (!username) {
-      return "로그인이 필요합니다.";
-    }
-
-    return "게임 프로필을 추가해주세요.";
-  }, [username]);
-
-  console.log("add render");
-
+  //prevData가 있으면 해당 데이터의 프로필로 현재 프로필 변경, 없으면 첫번째 프로필로 설정
   useEffect(() => {
-    if (!profileArr.length) {
-      setCurrentProfile(initialProfile);
-    }
-  }, [profileArr]);
-
-  //prevData가 있으면 해당 데이터의 프로필로 현재 프로필 변경
-  useEffect(() => {
-    console.log("change profile");
-    if (updatePost.postData) {
-      console.log(updatePost);
+    if (prevData.postData) {
       const index = profileArr.findIndex(
-        (profile) =>
-          profile.nickname === (updatePost.postData as Post).profile.nickname
+        (profile) => profile.nickname === prevData.postData?.profile.nickname
       );
       setCurrentProfile(index > -1 ? profileArr[index] : profileArr[0]);
       return;
-    } else {
-      if (profileArr.length > 0) {
-        setCurrentProfile(profileArr[0]);
-      }
     }
-  }, [profileArr, updatePost, updatePost.postData]);
+    setCurrentProfile(defaultProfile);
+  }, [defaultProfile, prevData, profileArr]);
 
   //prevData 유무에 따라 form을 바로 보여줄 지 결정
-  const [show, setShow] = useState(!!updatePost.postData);
+  const [show, setShow] = useState(!!prevData.setMode);
 
   //form 열고 닫는 함수
   const open = useCallback(() => {
@@ -75,17 +51,6 @@ export default function AddPostElement({ updatePost, setUpdatePost }: Props) {
   const close = useCallback(() => {
     setShow(false);
   }, []);
-
-  const postForm = useMemo(() => {
-    return (
-      <PostForm
-        close={close}
-        updatePost={updatePost}
-        setUpdatePost={setUpdatePost}
-        currentProfile={currentProfile}
-      />
-    );
-  }, [close, currentProfile, setUpdatePost, updatePost]);
 
   return (
     <Card className={styles.card}>
@@ -100,7 +65,7 @@ export default function AddPostElement({ updatePost, setUpdatePost }: Props) {
           alt="profile"
         />
         <Card.Title className={styles.card_header_title}>
-          {currentProfile.nickname ? currentProfile.nickname : defaultNickname}
+          {currentProfile.nickname ? currentProfile.nickname : ""}
         </Card.Title>
         <div className={styles.card_header_right}>
           <ProfileSelector
@@ -113,7 +78,12 @@ export default function AddPostElement({ updatePost, setUpdatePost }: Props) {
           </Button>
         </div>
       </Card.Header>
-      {show ? postForm : null}
+      <PostForm
+        show={show}
+        close={close}
+        prevData={prevData}
+        currentProfile={currentProfile}
+      />
     </Card>
   );
 }

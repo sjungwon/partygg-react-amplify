@@ -40,15 +40,11 @@ function resizeKey(key) {
   return `public/resized/${key}`;
 }
 
-function fullsizeKey(key) {
-  return `public/fullsize/${key}`;
-}
-
 async function resize(bucketName, key) {
   console.log(key);
-  if (!key.includes("uploads")) return;
+  if (!key.includes("fullsize")) return;
 
-  const originalPhotoName = key.replace("public/uploads/", "");
+  const originalPhotoName = key.replace("public/fullsize/", "");
 
   const typeMatch = originalPhotoName.match(/\.([^.]*)$/);
   if (!typeMatch) {
@@ -77,25 +73,10 @@ async function resize(bucketName, key) {
     return new Error(`photo resize error`);
   }
 
-  console.log(resizeKey(originalPhotoName), fullsizeKey(originalPhotoName));
-
-  await Promise.all([
-    S3.putObject({
-      Body: resizedImage,
-      Bucket: bucketName,
-      Key: resizeKey(originalPhotoName),
-    }).promise(),
-
-    S3.putObject({
-      Body: originalPhoto,
-      Bucket: bucketName,
-      Key: fullsizeKey(originalPhotoName),
-    }).promise(),
-  ]);
-
-  await S3.deleteObject({
+  await S3.putObject({
+    Body: resizedImage,
     Bucket: bucketName,
-    Key: key,
+    Key: resizeKey(originalPhotoName),
   }).promise();
 }
 

@@ -20,7 +20,7 @@
       "function": {
         "partyggProfileLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggProfileLamda-452b7363624f39696332-build.zip"
+          "s3Key": "amplify-builds/partyggProfileLamda-554a6d6b536f5a522f7a-build.zip"
         },
         "partyggLikeLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
@@ -32,7 +32,7 @@
         },
         "partyggPostLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggPostLamda-2f545452306f426b6e49-build.zip"
+          "s3Key": "amplify-builds/partyggPostLamda-494d594c63325557696b-build.zip"
         },
         "partyggDislikeLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
@@ -40,7 +40,15 @@
         },
         "S3Trigger8322dec8": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/S3Trigger8322dec8-6b517470383837614d71-build.zip"
+          "s3Key": "amplify-builds/S3Trigger8322dec8-36494a38387a53414b35-build.zip"
+        },
+        "partyggSubcommentLamda": {
+          "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
+          "s3Key": "amplify-builds/partyggSubcommentLamda-67614a65754b33565543-build.zip"
+        },
+        "partyggCommentLamda": {
+          "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
+          "s3Key": "amplify-builds/partyggCommentLamda-564f422f766849683330-build.zip"
         }
       }
     }

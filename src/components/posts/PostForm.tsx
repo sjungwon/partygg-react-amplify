@@ -1,28 +1,32 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button, Card, CloseButton } from "react-bootstrap";
+import { Button, Card } from "react-bootstrap";
 import styles from "./PostForm.module.scss";
 import ImageSlide from "../ImageSlide";
 import AddImageModal from "../AddImageModal";
 import { MdOutlinePhotoSizeSelectActual } from "react-icons/md";
 import PostServices from "../../services/PostServices";
 import { Profile } from "../../types/profile.type";
-import { initialUpdatePost, UpdatePost } from "./PostList";
 import FileServices from "../../services/FileServices";
 import { addImageResData, ImageKeys } from "../../types/file.type";
 import { AddPostReqData, Post } from "../../types/post.type";
 
 interface PropsType {
+  show: boolean;
   close: () => void;
-  updatePost: UpdatePost;
-  setUpdatePost: (data: any) => void;
   currentProfile: Profile;
+  prevData: {
+    setMode?: (mode: "" | "modify") => void;
+    postData?: Post;
+    setPostData: (newPost: any) => void;
+    imageURLs?: string[];
+  };
 }
 
 export default function PostForm({
+  show,
   close,
-  updatePost,
-  setUpdatePost,
   currentProfile,
+  prevData,
 }: PropsType) {
   //기본 form 데이터 -> 이미지, 텍스트, 프로필
   const [images, setImages] = useState<string[]>([]);
@@ -87,44 +91,29 @@ export default function PostForm({
   );
 
   const cancleModify = useCallback(() => {
-    if (updatePost.postData) {
-      setUpdatePost(initialUpdatePost);
+    if (prevData.setMode) {
+      prevData.setMode("");
     }
-  }, [updatePost, setUpdatePost]);
+    close();
+  }, [close, prevData]);
 
-  const getImageAsync = useCallback(async (imageKeys: ImageKeys[]) => {
-    if (imageKeys.length && imageKeys[0].resizedKey.includes("http")) {
-      const prevImage = imageKeys.map((imageKey) => imageKey.resizedKey);
-      setImages(prevImage);
-      return;
-    }
-
-    const imageURLArr = await Promise.all(
-      imageKeys.map(async (imageKey) => {
-        return await FileServices.getImage(imageKey, "resized");
-      })
-    );
-    const filteredURL = imageURLArr.map((imageURL) =>
-      imageURL ? imageURL : ""
-    );
-    setImages(filteredURL);
-  }, []);
+  const [postImageKeys, setPostImageKeys] = useState<ImageKeys[]>([]);
 
   useEffect(() => {
-    if (updatePost.postData) {
-      const imageKeys = updatePost.postData.images;
-      if (imageKeys.length) {
-        getImageAsync(imageKeys);
+    if (prevData.postData) {
+      setCurrentTextByte(calcByte(prevData.postData.text));
+      setPostImageKeys(prevData.postData.images);
+      if (prevData.imageURLs) {
+        setImages(prevData.imageURLs);
       }
-      setCurrentTextByte(calcByte(updatePost.postData.text));
     }
-  }, [calcByte, getImageAsync, updatePost.postData]);
+  }, [calcByte, prevData]);
 
   const [loading, setLoading] = useState<boolean>(false);
 
   //제출 버튼 눌렀을 때 사용할 함수
   const submit = useCallback(async () => {
-    const text = textRef?.current?.value;
+    const text = textRef?.current?.value.trim();
     if (text || images.length) {
       setLoading(true);
       const data = {
@@ -133,80 +122,43 @@ export default function PostForm({
         game: currentProfile.game,
       };
       //포스트 수정
-      if (updatePost.postData) {
-        const prevData = { ...updatePost.postData };
+      if (prevData.setMode && prevData.postData) {
         let newData: Post = {
-          ...updatePost.postData,
+          ...prevData.postData,
           ...data,
         };
         if (files) {
-          const tempImages: ImageKeys[] = images.map((url) => ({
-            fullsizeKey: url,
-            resizedKey: url,
-          }));
-          const uiData: Post = {
-            ...newData,
-            images: tempImages,
-          };
-          setUpdatePost((prev: UpdatePost) => ({
-            ...prev,
-            postData: uiData,
-            success: true,
-            type: "update",
-          }));
-          Promise.all(
+          const imageKeys = await Promise.all(
             files.map(async (file) => {
               const key = await FileServices.putPostImage(file);
               return key;
             })
-          ).then((imageKeys) => {
-            //이미지 추가에 오류가 발생한 경우
-            if (imageKeys.includes(null)) {
-              window.alert("포스트를 수정중에 오류가 발생했습니다.");
-              setUpdatePost((prev: UpdatePost) => ({
-                ...prev,
-                postData: prevData,
-                success: true,
-                type: "update",
-              }));
-            } else {
-              //이미지 추가가 정상적으로 동작한 경우
-              newData = {
-                ...newData,
-                images: [
-                  ...prevData.images,
-                  ...(imageKeys as addImageResData[]),
-                ],
-              };
-              PostServices.updatePost(newData).then((success) => {
-                if (!success) {
-                  window.alert(
-                    "포스트를 수정하는데 오류가 발생했습니다. 다시 시도해주세요."
-                  );
-                  setUpdatePost((prev: UpdatePost) => ({
-                    ...prev,
-                    postData: prevData,
-                    success: true,
-                    type: "update",
-                  }));
-                }
-              });
-            }
-          });
-        }
-        PostServices.updatePost(newData).then((success) => {
-          if (!success) {
+          );
+
+          if (imageKeys.includes(null)) {
             window.alert(
-              "포스트를 수정하는데 오류가 발생했습니다. 다시 시도해주세요."
+              "포스트를 수정중에 오류가 발생했습니다. 다시 시도해주세요."
             );
-            setUpdatePost((prev: UpdatePost) => ({
-              ...prev,
-              postData: prevData,
-              success: true,
-              type: "update",
-            }));
+            setLoading(false);
+            return;
           }
-        });
+
+          newData = {
+            ...newData,
+            images: [...postImageKeys, ...(imageKeys as addImageResData[])],
+          };
+        }
+        const success = await PostServices.updatePost(newData);
+        if (!success) {
+          window.alert(
+            "포스트를 수정하는데 오류가 발생했습니다. 다시 시도해주세요."
+          );
+          setLoading(false);
+          return;
+        }
+
+        prevData.setPostData(newData);
+        prevData.setMode("");
       } else {
         //post 추가
         let newData: AddPostReqData = {
@@ -231,6 +183,7 @@ export default function PostForm({
             window.alert(
               "포스트를 추가하는데 오류가 발생했습니다. 다시 시도해주세요."
             );
+            setLoading(false);
             return;
           }
           newData = {
@@ -243,35 +196,19 @@ export default function PostForm({
           window.alert(
             "포스트를 추가하는데 오류가 발생했습니다. 다시 시도해주세요."
           );
+          setLoading(false);
           return;
         }
-        const tempImages: ImageKeys[] = images.map((url) => ({
-          fullsizeKey: url,
-          resizedKey: url,
-        }));
-        const uiPost = {
-          ...post,
-          images: tempImages,
-        };
-        setUpdatePost(
-          (prev: UpdatePost): UpdatePost => ({
-            ...prev,
-            postData: uiPost,
-            success: true,
-            type: "add",
-          })
-        );
+        prevData.setPostData(post);
       }
+      setLoading(false);
       close();
     }
-  }, [
-    close,
-    currentProfile,
-    files,
-    images,
-    setUpdatePost,
-    updatePost.postData,
-  ]);
+  }, [close, currentProfile, files, images.length, postImageKeys, prevData]);
+
+  if (!show) {
+    return null;
+  }
 
   return (
     <>
@@ -286,8 +223,9 @@ export default function PostForm({
             postImages={images}
             setPostImage={setImages}
             setPostFiles={setFiles}
+            postImageKeys={postImageKeys}
+            setPostImageKeys={setPostImageKeys}
           />
-          {updatePost.postData ? null : <CloseButton onClick={close} />}
         </div>
         {images.length ? <ImageSlide images={images} /> : null}
         <textarea
@@ -296,7 +234,7 @@ export default function PostForm({
           autoFocus
           onChange={calcCurrentByte}
           placeholder="500Byte 이하로 작성 가능합니다."
-          defaultValue={updatePost.postData ? updatePost.postData.text : ""}
+          defaultValue={prevData.postData ? prevData.postData.text : ""}
         />
         <div className={styles.card_body_textarea_length}>
           <span className={styles.card_body_textarea_cur}>
@@ -310,15 +248,13 @@ export default function PostForm({
           <Button onClick={submit} size="sm" disabled={loading}>
             {loading ? "등록중..." : "등록"}
           </Button>
-          {updatePost.postData ? (
-            <Button
-              onClick={cancleModify}
-              size="sm"
-              className={styles.card_body_cancle_btn}
-            >
-              취소
-            </Button>
-          ) : null}
+          <Button
+            onClick={cancleModify}
+            size="sm"
+            className={styles.card_body_cancle_btn}
+          >
+            취소
+          </Button>
         </div>
       </Card.Body>
     </>

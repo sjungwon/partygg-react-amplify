@@ -11,7 +11,7 @@ interface PropsType {
   className?: string;
 }
 
-export default function PostRemoveModal({
+export default function RemoveConfirmModal({
   show,
   close,
   remove,

@@ -18,18 +18,18 @@ AWS.config.update({ region: process.env.TABLE_REGION });
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
-let tableName = "partyggProfileTable";
+let tableName = "partyggSubcommentTable";
 if (process.env.ENV && process.env.ENV !== "NONE") {
   tableName = tableName + "-" + process.env.ENV;
 }
 
 const userIdPresent = false; // TODO: update in case is required to use that definition
-const partitionKeyName = "username";
+const partitionKeyName = "commentId";
 const partitionKeyType = "S";
 const sortKeyName = "date";
 const sortKeyType = "S";
 const hasSortKey = sortKeyName !== "";
-const path = "/profiles";
+const path = "/subcomments";
 const UNAUTH = "UNAUTH";
 const hashKeyPath = "/:" + partitionKeyName;
 const sortKeyPath = hasSortKey ? "/:" + sortKeyName : "";
@@ -85,8 +85,6 @@ app.get(path + hashKeyPath, function (req, res) {
     TableName: tableName,
     KeyConditions: condition,
   };
-
-  console.log(req.apiGateway.event.identity);
 
   dynamodb.query(queryParams, (err, data) => {
     if (err) {
@@ -150,10 +148,51 @@ app.get(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
   });
 });
 
+//post나 comment에서 subcomment 가져간 후에 추가 subcomment 가져갈 때 사용
+/********************************
+ * HTTP Get method for list objects *
+ ********************************/
+
+app.get(path + hashKeyPath + sortKeyPath, function (req, res) {
+  const lastEvaluatedKey = {
+    commentId: req.params[partitionKeyName],
+    date: req.params[sortKeyName],
+  };
+
+  let params = {
+    TableName: tableName,
+    KeyConditionExpression: "commentId = :c",
+    ExpressionAttributeValues: {
+      ":c": req.params[partitionKeyName],
+    },
+    ExclusiveStartKey: {
+      ...lastEvaluatedKey,
+    },
+    ScanIndexForward: false,
+    Limit: 6,
+  };
+
+  let queryParams = {
+    TableName: tableName,
+    ...params,
+  };
+
+  dynamodb.query(queryParams, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({ error: "Could not load items: " + err });
+    } else {
+      res.json({
+        data: data.Items ? data.Items : [],
+        lastEvaluatedKey: data.LastEvaluatedKey,
+      });
+    }
+  });
+});
+
 /************************************
  * HTTP put method for insert object *
  *************************************/
-
 app.put(path, function (req, res) {
   if (userIdPresent) {
     req.body["userId"] =
@@ -179,16 +218,56 @@ app.put(path, function (req, res) {
  *************************************/
 
 app.post(path, function (req, res) {
-  const params = {};
   if (userIdPresent) {
     req.body["userId"] =
       req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
+  }
+
+  const date = moment().format("YYYY-MM-DD HH:mm:ss SSS");
+
+  let putItemParams = {
+    TableName: tableName,
+    Item: {
+      ...req.body,
+      date,
+    },
+  };
+  dynamodb.put(putItemParams, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({ error: err, url: req.url, body: req.body });
+    } else {
+      res.json({ success: "post call succeed!", url: req.url, data: data });
+    }
+  });
+});
+
+/************************************
+ * HTTP post method for update object *
+ *************************************/
+
+app.post(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
+  const params = {};
+
+  if (userIdPresent && req.apiGateway) {
+    params[partitionKeyName] =
+      req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
   } else {
-    params[partitionKeyName] = req.body[partitionKeyName];
     try {
       params[partitionKeyName] = convertUrlType(
-        req.body[partitionKeyName],
+        req.params[partitionKeyName],
         partitionKeyType
+      );
+    } catch (err) {
+      res.statusCode = 500;
+      res.json({ error: "Wrong column type " + err });
+    }
+  }
+  if (hasSortKey) {
+    try {
+      params[sortKeyName] = convertUrlType(
+        req.params[sortKeyName],
+        sortKeyType
       );
     } catch (err) {
       res.statusCode = 500;
@@ -198,34 +277,25 @@ app.post(path, function (req, res) {
 
   let getItemParams = {
     TableName: tableName,
-    KeyConditionExpression: "#user = :u",
-    FilterExpression: "game = :g AND nickname = :n",
-    ExpressionAttributeNames: {
-      "#user": "username",
-    },
-    ExpressionAttributeValues: {
-      ":u": req.body["username"],
-      ":g": req.body["game"],
-      ":n": req.body["nickname"],
-    },
+    Key: params,
   };
 
-  dynamodb.query(getItemParams, (err, data) => {
+  dynamodb.get(getItemParams, (err, data) => {
     if (err) {
       res.statusCode = 500;
-      res.json({ error: "Could not load items: " + err.message });
+      res.json({ error: err, url: req.url, body: req.body });
     } else {
-      console.log(data);
-      if (data.Count) {
-        res.statusCode = 409;
-        res.json({ error: "Data already exists profile" });
-      } else {
-        const date = moment().format("YYYY-MM-DD HH:mm:ss SSS");
+      if (data.Item) {
+        if (data.Item.username !== req.body.username) {
+          res.statusCode = 500;
+          res.json({ error: "update error", url: req.url, body: req.body });
+          return;
+        }
         let putItemParams = {
           TableName: tableName,
           Item: {
+            ...data.Item,
             ...req.body,
-            date,
           },
         };
         dynamodb.put(putItemParams, (err, data) => {
@@ -236,39 +306,14 @@ app.post(path, function (req, res) {
             res.json({
               success: "post update succeed!",
               url: req.url,
-              data: data,
+              data: putItemParams.Item,
             });
           }
         });
+      } else {
+        res.statusCode = 500;
+        res.json({ error: "update error", url: req.url, body: req.body });
       }
-    }
-  });
-});
-
-/************************************
- * HTTP post method for update object *
- *************************************/
-app.post(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
-  const username = req.params[partitionKeyName];
-  if (username !== req.body[partitionKeyName]) {
-    res.statusCode = 403;
-    res.json({ error: "Unauthorized update profiles" });
-    return;
-  }
-
-  let putItemParams = {
-    TableName: tableName,
-    Item: {
-      ...req.body,
-    },
-  };
-
-  dynamodb.put(putItemParams, (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.json({ error: err, url: req.url, body: req.body });
-    } else {
-      res.json({ success: "post update succeed!", url: req.url, data: data });
     }
   });
 });
@@ -310,37 +355,12 @@ app.delete(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
     TableName: tableName,
     Key: params,
   };
-
-  const username = req.params[partitionKeyName];
-
-  dynamodb.get(removeItemParams, (err, data) => {
+  dynamodb.delete(removeItemParams, (err, data) => {
     if (err) {
       res.statusCode = 500;
       res.json({ error: err, url: req.url });
     } else {
-      if (data.Item) {
-        console.log(data.Item.username);
-        if (data.Item.username !== username) {
-          res.statusCode = 403;
-          res.json({ error: "Unauthorized Delete" });
-        } else {
-          dynamodb.delete(removeItemParams, (err, data) => {
-            if (err) {
-              res.statusCode = 500;
-              res.json({ error: err, url: req.url });
-            } else {
-              res.json({
-                success: "delete call succeed!",
-                url: req.url,
-                data: data,
-              });
-            }
-          });
-        }
-      } else {
-        res.statusCode = 500;
-        res.json({ error: "Could not load items: " + err.message });
-      }
+      res.json({ url: req.url, data: data });
     }
   });
 });

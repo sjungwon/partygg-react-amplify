@@ -1,0 +1,65 @@
+@import "../../scss/variables";
+
+.add_comment{
+  padding-left: .5rem;
+}
+
+.add_comment_border{
+  padding-left: .5rem;
+}
+
+.add_comment_header{
+  display: flex;
+  align-items: center;
+  margin: .2rem;
+}
+
+.add_comment_nickname{
+  
+  padding: .5rem;
+  padding-left: 0;
+  font-size: 0.825rem;
+  font-weight: 500;
+  color: black;
+}
+
+.add_comment_username{
+  font-size: .775rem;
+}
+
+.add_comment_textArea{
+  resize: none;
+  width: 95%;
+  border-radius: .5rem;
+  padding: .5rem;
+  &:focus{
+    border: none;
+    outline: .13rem solid $primary-blue;
+  }
+}
+
+.add_comment_submit{
+  margin: .5rem 0;
+  border: 1px solid $primary-blue;
+  border-radius: .25rem;
+  font-size: .9rem;
+  color: white;
+  background-color: $primary-blue;
+  &:disabled{
+    background-color: $primary-blue-disabled;
+    border-color : $primary-blue-disabled;
+  }
+  &:hover{
+    background-color: $primary-blue-hover;
+  }
+  &:active{
+    background-color: $primary-blue-hover;
+  }
+}
+
+.add_comment_need_login{
+  width: 70%;
+  font-size: .9rem;
+  margin: 1rem 0;
+  color: $primary-blue;
+}

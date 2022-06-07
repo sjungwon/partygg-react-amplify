@@ -1,6 +1,9 @@
 /* Amplify Params - DO NOT EDIT
 	ENV
 	REGION
+	STORAGE_PARTYGGCOMMENTTABLE_ARN
+	STORAGE_PARTYGGCOMMENTTABLE_NAME
+	STORAGE_PARTYGGCOMMENTTABLE_STREAMARN
 	STORAGE_PARTYGGDISLIKETABLE_ARN
 	STORAGE_PARTYGGDISLIKETABLE_NAME
 	STORAGE_PARTYGGDISLIKETABLE_STREAMARN
@@ -13,6 +16,9 @@
 	STORAGE_PARTYGGPOSTTABLE_ARN
 	STORAGE_PARTYGGPOSTTABLE_NAME
 	STORAGE_PARTYGGPOSTTABLE_STREAMARN
+	STORAGE_PARTYGGSUBCOMMENTTABLE_ARN
+	STORAGE_PARTYGGSUBCOMMENTTABLE_NAME
+	STORAGE_PARTYGGSUBCOMMENTTABLE_STREAMARN
 Amplify Params - DO NOT EDIT */ /*
 Copyright 2017 - 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
@@ -36,11 +42,16 @@ const dynamodb = new AWS.DynamoDB.DocumentClient();
 let tableName = "partyggPostTable";
 let likeTableName = "partyggLikeTable";
 let dislikeTableName = "partyggDislikeTable";
+let commentTableName = "partyggCommentTable";
+let subcommentTableName = "partyggSubcommentTable";
 if (process.env.ENV && process.env.ENV !== "NONE") {
   tableName = tableName + "-" + process.env.ENV;
   likeTableName = likeTableName + "-" + process.env.ENV;
   dislikeTableName = dislikeTableName + "-" + process.env.ENV;
+  commentTableName = commentTableName + "-" + process.env.ENV;
+  subcommentTableName = subcommentTableName + "-" + process.env.ENV;
 }
+
 const gameIndexName = "game-date-index";
 const allIndexName = "forall-date-index";
 
@@ -80,61 +91,90 @@ const convertUrlType = (param, type) => {
   }
 };
 
-const getLikeDataFromDb = (params) => {
-  return dynamodb.query(params).promise();
-};
-
 // add likes, dislike data to Post
-const addLikeData = (postList) => {
-  return Promise.all(
-    postList.map(async (post) => {
-      let params = {
-        KeyConditionExpression: "postId = :p",
-        ExpressionAttributeValues: {
-          ":p": `${post.username}-${post.date}`,
-        },
-      };
-      const likeParam = {
-        TableName: likeTableName,
-        ScanIndexForward: false,
-        ...params,
-      };
-      let likes = [];
-      const likeDb = await getLikeDataFromDb(likeParam);
-      if (likeDb.Items) {
-        likes = likeDb.Items.map((item) => item.username);
-      } else {
-        likes = likeDb;
-      }
+const addAdditionalData = async (post) => {
+  let params = {
+    KeyConditionExpression: "postId = :p",
+    ExpressionAttributeValues: {
+      ":p": `${post.username}/${post.date}`,
+    },
+  };
+  const likeParam = {
+    TableName: likeTableName,
+    ScanIndexForward: false,
+    ...params,
+  };
+  let likes = [];
+  const likeDb = await dynamodb.query(likeParam).promise();
+  if (likeDb.Items) {
+    likes = likeDb.Items.map((item) => item.username);
+  } else {
+    likes = likeDb;
+  }
 
-      const dislikeParam = {
-        TableName: dislikeTableName,
-        ScanIndexForward: false,
-        ...params,
-      };
-      let dislikes = [];
-      const dislikeDb = await getLikeDataFromDb(dislikeParam);
-      if (dislikeDb.Items) {
-        dislikes = dislikeDb.Items.map((item) => item.username);
-      } else {
-        dislikes = dislikeDb;
-      }
+  const dislikeParam = {
+    TableName: dislikeTableName,
+    ScanIndexForward: false,
+    ...params,
+  };
+  let dislikes = [];
+  const dislikeDb = await dynamodb.query(dislikeParam).promise();
+  if (dislikeDb.Items) {
+    dislikes = dislikeDb.Items.map((item) => item.username);
+  } else {
+    dislikes = dislikeDb;
+  }
 
-      return {
-        ...post,
-        likes,
-        dislikes,
-      };
-    })
-  );
-};
-
-const removeLikeDataFromDb = (params) => {
-  return dynamodb.delete(params).promise();
+  //comment & subcomment 6개씩만 추가
+  const commentParam = {
+    TableName: commentTableName,
+    ...params,
+    ScanIndexForward: false,
+    Limit: 6,
+  };
+  let comments = [];
+  const commentDb = await dynamodb.query(commentParam).promise();
+  if (commentDb.Items) {
+    comments = await Promise.all(
+      commentDb.Items.map(async (comment) => {
+        let params = {
+          KeyConditionExpression: "commentId = :c",
+          ExpressionAttributeValues: {
+            ":c": `${comment.postId}/${comment.date}`,
+          },
+        };
+        const subcommentParams = {
+          TableName: subcommentTableName,
+          ...params,
+          ScanIndexForward: false,
+          Limit: 6,
+        };
+        const subcommentList = await dynamodb.query(subcommentParams);
+        if (subcommentList.Items) {
+          return {
+            ...comment,
+            subcomments: subcommentList.Items,
+            subcommentsLastEvaluatedKey: subcommentList.LastEvaluatedKey,
+          };
+        } else {
+          return {
+            ...comment,
+            subcomments: [],
+          };
+        }
+      })
+    );
+  }
+  return {
+    ...post,
+    likes,
+    dislikes,
+    comments,
+    commentsLastEvaluatedKey: commentDb.LastEvaluatedKey,
+  };
 };
 
 //like list를 받아서 promiseall
-//post를 받아서 map
 const removeLikeData = (likeList, tableNameParam) => {
   return Promise.all(
     likeList.map(async (like) => {
@@ -146,15 +186,51 @@ const removeLikeData = (likeList, tableNameParam) => {
         },
       };
       console.log(like, params);
-      const likeDb = await removeLikeDataFromDb(params);
+      const likeDb = await dynamodb.delete(params).promise();
 
       return likeDb;
     })
   );
 };
 
+//comment list를 받아서 promiseall 반환
+const removeCommentData = (commentList, tableNameParam) => {
+  return Promise.all(
+    commentList.map(async (comment) => {
+      let params = {
+        TableName: tableNameParam,
+        Key: {
+          postId: comment.postId,
+          date: comment.date,
+        },
+      };
+      const commentDb = await dynamodb.delete(params).promise();
+
+      return commentDb;
+    })
+  );
+};
+
+//subcomment list를 받아서 promiseall 반환
+const removeSubcommentData = (subcommentList, tableNameParam) => {
+  return Promise.all(
+    subcommentList.map(async (subcomment) => {
+      let params = {
+        TableName: tableNameParam,
+        Key: {
+          commentId: subcomment.commentId,
+          date: subcomment.date,
+        },
+      };
+      const commentDb = await dynamodb.delete(params).promise();
+
+      return commentDb;
+    })
+  );
+};
+
 /********************************
- * HTTP Get method for first page of game objects *
+ * HTTP Get method for first page of game obejct *
  ********************************/
 app.get(path + "/game" + gameKeyPath, function (req, res) {
   console.log("req for first page of game post");
@@ -189,23 +265,27 @@ app.get(path + "/game" + gameKeyPath, function (req, res) {
     Limit: 6,
   };
 
-  console.log(queryParams);
-
   dynamodb.query(queryParams, async (err, data) => {
     if (err) {
       res.statusCode = 500;
       res.json({ error: "Could not load items: " + err });
     } else {
       if (data.Items) {
-        try {
-          const newItem = await addLikeData(data.Items);
-          res.json({ data: newItem, LastEvaluatedKey: data.LastEvaluatedKey });
-        } catch (error) {
-          res.statusCode = 500;
-          res.json({ error: "Could not load Items: " + err });
-        }
+        const newItem = await Promise.all(
+          data.Items.map(async (item) => {
+            return await addAdditionalData(item);
+          })
+        );
+        res.json({ data: newItem, lastEvaluatedKey: data.LastEvaluatedKey });
+        // try {
+        //   const newItem = await addAdditionalData(data.Items);
+        //   res.json({ data: newItem, lastEvaluatedKey: data.LastEvaluatedKey });
+        // } catch (error) {
+        //   res.statusCode = 500;
+        //   res.json({ error: "Could not load Items: " + err });
+        // }
       } else {
-        res.json({ data: data, LastEvaluatedKey: data.LastEvaluatedKey });
+        res.json({ data: data, lastEvaluatedKey: data.LastEvaluatedKey });
       }
     }
   });
@@ -214,7 +294,6 @@ app.get(path + "/game" + gameKeyPath, function (req, res) {
 /********************************
  * HTTP Get method for next page of game objects *
  ********************************/
-//수정해야함 -> lastEvaluated  key 값 확인 후 수정
 app.get(
   path + "/game" + gameKeyPath + hashKeyPath + sortKeyPath,
   function (req, res) {
@@ -246,18 +325,27 @@ app.get(
         res.json({ error: "Could not load items: " + err });
       } else {
         if (data.Items) {
-          try {
-            const newItem = await addLikeData(data.Items);
-            res.json({
-              data: newItem,
-              LastEvaluatedKey: data.LastEvaluatedKey,
-            });
-          } catch (error) {
-            res.statusCode = 500;
-            res.json({ error: "Could not load Items: " + err });
-          }
+          const newItem = await Promise.all(
+            data.Items.map(async (item) => {
+              return await addAdditionalData(item);
+            })
+          );
+          res.json({
+            data: newItem,
+            lastEvaluatedKey: data.LastEvaluatedKey,
+          });
+          // try {
+          //   const newItem = await addAdditionalData(data.Items);
+          //   res.json({
+          //     data: newItem,
+          //     lastEvaluatedKey: data.LastEvaluatedKey,
+          //   });
+          // } catch (error) {
+          //   res.statusCode = 500;
+          //   res.json({ error: "Could not load Items: " + err });
+          // }
         } else {
-          res.json({ data: data, LastEvaluatedKey: data.LastEvaluatedKey });
+          res.json({ data: data, lastEvaluatedKey: data.LastEvaluatedKey });
         }
       }
     });
@@ -265,7 +353,7 @@ app.get(
 );
 
 /********************************
- * HTTP Get method for first page of user object filter by game*
+ * HTTP Get method for first page of user object filter by game
  ********************************/
 app.get(
   path + "/user" + hashKeyPath + "/game" + gameKeyPath,
@@ -294,20 +382,28 @@ app.get(
         res.statusCode = 500;
         res.json({ error: "Could not load items: " + err });
       } else {
-        console.log(data);
         if (data.Items) {
-          try {
-            const newItem = await addLikeData(data.Items);
-            res.json({
-              data: newItem,
-              lastEvaluatedKey: data.LastEvaluatedKey,
-            });
-          } catch (error) {
-            res.statusCode = 500;
-            res.json({ error: "Could not load Items: " + err });
-          }
+          const newItem = await Promise.all(
+            data.Items.map(async (item) => {
+              return await addAdditionalData(item);
+            })
+          );
+          res.json({
+            data: newItem,
+            lastEvaluatedKey: data.LastEvaluatedKey,
+          });
+          // try {
+          //   const newItem = await addAdditionalData(data.Items);
+          //   res.json({
+          //     data: newItem,
+          //     lastEvaluatedKey: data.LastEvaluatedKey,
+          //   });
+          // } catch (error) {
+          //   res.statusCode = 500;
+          //   res.json({ error: "Could not load Items: " + err });
+          // }
         } else {
-          res.json({ data: data, LastEvaluatedKey: data.LastEvaluatedKey });
+          res.json({ data: data, lastEvaluatedKey: data.LastEvaluatedKey });
         }
       }
     });
@@ -315,9 +411,8 @@ app.get(
 );
 
 /********************************
- * HTTP Get method for next page of user object filter by game*
+ * HTTP Get method for next page of user object filter by game
  ********************************/
-//lastEvaluted key 값 보고 수정해야함
 app.get(
   path + "/user" + hashKeyPath + "/game" + gameKeyPath + sortKeyName,
   function (req, res) {
@@ -358,20 +453,28 @@ app.get(
         res.statusCode = 500;
         res.json({ error: "Could not load items: " + err });
       } else {
-        console.log(data);
         if (data.Items) {
-          try {
-            const newItem = await addLikeData(data.Items);
-            res.json({
-              data: newItem,
-              lastEvaluatedKey: data.LastEvaluatedKey,
-            });
-          } catch (error) {
-            res.statusCode = 500;
-            res.json({ error: "Could not load Items: " + err });
-          }
+          const newItem = await Promise.all(
+            data.Items.map(async (item) => {
+              return await addAdditionalData(item);
+            })
+          );
+          res.json({
+            data: newItem,
+            lastEvaluatedKey: data.LastEvaluatedKey,
+          });
+          // try {
+          //   const newItem = await addAdditionalData(data.Items);
+          //   res.json({
+          //     data: newItem,
+          //     lastEvaluatedKey: data.LastEvaluatedKey,
+          //   });
+          // } catch (error) {
+          //   res.statusCode = 500;
+          //   res.json({ error: "Could not load Items: " + err });
+          // }
         } else {
-          res.json({ data: data, LastEvaluatedKey: data.LastEvaluatedKey });
+          res.json({ data: data, lastEvaluatedKey: data.LastEvaluatedKey });
         }
       }
     });
@@ -379,7 +482,7 @@ app.get(
 );
 
 /********************************
- * HTTP Get method for first page of user object*
+ * HTTP Get method for first page of user object
  ********************************/
 app.get(path + "/user" + hashKeyPath, function (req, res) {
   console.log("req for first page of user post");
@@ -404,20 +507,28 @@ app.get(path + "/user" + hashKeyPath, function (req, res) {
       res.statusCode = 500;
       res.json({ error: "Could not load items: " + err });
     } else {
-      console.log(data);
       if (data.Items) {
-        try {
-          const newItem = await addLikeData(data.Items);
-          res.json({
-            data: newItem,
-            lastEvaluatedKey: data.LastEvaluatedKey,
-          });
-        } catch (error) {
-          res.statusCode = 500;
-          res.json({ error: "Could not load Items: " + err });
-        }
+        const newItem = await Promise.all(
+          data.Items.map(async (item) => {
+            return await addAdditionalData(item);
+          })
+        );
+        res.json({
+          data: newItem,
+          lastEvaluatedKey: data.LastEvaluatedKey,
+        });
+        // try {
+        //   const newItem = await addAdditionalData(data.Items);
+        //   res.json({
+        //     data: newItem,
+        //     lastEvaluatedKey: data.LastEvaluatedKey,
+        //   });
+        // } catch (error) {
+        //   res.statusCode = 500;
+        //   res.json({ error: "Could not load Items: " + err });
+        // }
       } else {
-        res.json({ data: data, LastEvaluatedKey: data.LastEvaluatedKey });
+        res.json({ data: data, lastEvaluatedKey: data.LastEvaluatedKey });
       }
     }
   });
@@ -458,20 +569,88 @@ app.get(path + "/user" + hashKeyPath + sortKeyPath, function (req, res) {
       res.statusCode = 500;
       res.json({ error: "Could not load items: " + err });
     } else {
-      console.log(data);
       if (data.Items) {
+        const newItem = await Promise.all(
+          data.Items.map(async (item) => {
+            return await addAdditionalData(item);
+          })
+        );
+        res.json({
+          data: newItem,
+          lastEvaluatedKey: data.LastEvaluatedKey,
+        });
+        // try {
+        //   const newItem = await addAdditionalData(data.Items);
+        //   res.json({
+        //     data: newItem,
+        //     lastEvaluatedKey: data.LastEvaluatedKey,
+        //   });
+        // } catch (error) {
+        //   res.statusCode = 500;
+        //   res.json({ error: "Could not load Items: " + err });
+        // }
+      } else {
+        res.json({ data: data, lastEvaluatedKey: data.LastEvaluatedKey });
+      }
+    }
+  });
+});
+
+/*****************************************
+ * HTTP Get method for get single object *
+ *****************************************/
+
+app.get(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
+  console.log("get post object");
+  const params = {};
+  if (userIdPresent && req.apiGateway) {
+    params[partitionKeyName] =
+      req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
+  } else {
+    try {
+      params[partitionKeyName] = convertUrlType(
+        req.params[partitionKeyName],
+        partitionKeyType
+      );
+    } catch (err) {
+      res.statusCode = 500;
+      res.json({ error: "Wrong column type " + err });
+    }
+  }
+  if (hasSortKey) {
+    try {
+      params[sortKeyName] = convertUrlType(
+        req.params[sortKeyName],
+        sortKeyType
+      );
+    } catch (err) {
+      res.statusCode = 500;
+      res.json({ error: "Wrong column type " + err });
+    }
+  }
+
+  let getItemParams = {
+    TableName: tableName,
+    Key: params,
+  };
+
+  dynamodb.get(getItemParams, async (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({ error: "Could not load items: " + err.message });
+    } else {
+      if (data.Item) {
         try {
-          const newItem = await addLikeData(data.Items);
+          const newItem = await addAdditionalData(data.Item);
           res.json({
-            data: newItem,
-            lastEvaluatedKey: data.LastEvaluatedKey,
+            ...newItem,
           });
         } catch (error) {
           res.statusCode = 500;
           res.json({ error: "Could not load Items: " + err });
         }
       } else {
-        res.json({ data: data, LastEvaluatedKey: data.LastEvaluatedKey });
+        res.json(data);
       }
     }
   });
@@ -499,18 +678,18 @@ app.get(path, function (req, res) {
       res.statusCode = 500;
       res.json({ error: "Could not load items: " + err });
     } else {
-      console.log(data);
       if (data.Items) {
-        console.log("try to get like data");
-        try {
-          const newItem = await addLikeData(data.Items);
-          res.json({ data: newItem, lastEvaluatedKey: data.LastEvaluatedKey });
-        } catch (err) {
-          res.statusCode = 500;
-          res.json({ error: "Could not load Items: " + err });
-        }
+        const newItem = await Promise.all(
+          data.Items.map(async (item) => {
+            return await addAdditionalData(item);
+          })
+        );
+        res.json({
+          data: newItem,
+          lastEvaluatedKey: data.LastEvaluatedKey,
+        });
       } else {
-        res.json({ data: data, LastEvaluatedKey: data.LastEvaluatedKey });
+        res.json({ data: data, lastEvaluatedKey: data.LastEvaluatedKey });
       }
     }
   });
@@ -554,78 +733,27 @@ app.get(path + hashKeyPath + sortKeyPath, function (req, res) {
     } else {
       console.log(data);
       if (data.Items) {
-        try {
-          const newItem = await addLikeData(data.Items);
-          res.json({
-            data: newItem,
-            lastEvaluatedKey: data.LastEvaluatedKey,
-          });
-        } catch (error) {
-          res.statusCode = 500;
-          res.json({ error: "Could not load Items: " + err });
-        }
+        const newItem = await Promise.all(
+          data.Items.map(async (item) => {
+            return await addAdditionalData(item);
+          })
+        );
+        res.json({
+          data: newItem,
+          lastEvaluatedKey: data.LastEvaluatedKey,
+        });
+        // try {
+        //   const newItem = await addAdditionalData(data.Items);
+        //   res.json({
+        //     data: newItem,
+        //     lastEvaluatedKey: data.LastEvaluatedKey,
+        //   });
+        // } catch (error) {
+        //   res.statusCode = 500;
+        //   res.json({ error: "Could not load Items: " + err });
+        // }
       } else {
-        res.json({ data: data, LastEvaluatedKey: data.LastEvaluatedKey });
-      }
-    }
-  });
-});
-
-/*****************************************
- * HTTP Get method for get single object *
- *****************************************/
-
-app.get(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
-  const params = {};
-  if (userIdPresent && req.apiGateway) {
-    params[partitionKeyName] =
-      req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-  } else {
-    try {
-      params[partitionKeyName] = convertUrlType(
-        req.params[partitionKeyName],
-        partitionKeyType
-      );
-    } catch (err) {
-      res.statusCode = 500;
-      res.json({ error: "Wrong column type " + err });
-    }
-  }
-  if (hasSortKey) {
-    try {
-      params[sortKeyName] = convertUrlType(
-        req.params[sortKeyName],
-        sortKeyType
-      );
-    } catch (err) {
-      res.statusCode = 500;
-      res.json({ error: "Wrong column type " + err });
-    }
-  }
-
-  let getItemParams = {
-    TableName: tableName,
-    Key: params,
-  };
-
-  dynamodb.get(getItemParams, async (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.json({ error: "Could not load items: " + err.message });
-    } else {
-      if (data.Item) {
-        try {
-          const newItem = await addLikeData([data.Item]);
-          res.json({
-            ...newItem,
-          });
-        } catch (error) {
-          res.statusCode = 500;
-          res.json({ error: "Could not load Items: " + err });
-        }
-        res.json(data.Item);
-      } else {
-        res.json(data);
+        res.json({ data: data, lastEvaluatedKey: data.LastEvaluatedKey });
       }
     }
   });
@@ -647,7 +775,7 @@ app.post(path, function (req, res) {
       req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
   }
 
-  const date = moment().format("YYYY-MM-DD hh:mm:ss a SSS");
+  const date = moment().format("YYYY-MM-DD HH:mm:ss SSS");
 
   let putItemParams = {
     TableName: tableName,
@@ -792,15 +920,15 @@ app.delete(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
         let params = {
           KeyConditionExpression: "postId = :p",
           ExpressionAttributeValues: {
-            ":p": `${data.Item.username}-${data.Item.date}`,
+            ":p": `${data.Item.username}/${data.Item.date}`,
           },
         };
         try {
-          const likeParam = {
+          const likeParams = {
             TableName: likeTableName,
             ...params,
           };
-          const likeList = await dynamodb.query(likeParam).promise();
+          const likeList = await dynamodb.query(likeParams).promise();
           if (likeList.Items) {
             try {
               await removeLikeData(likeList.Items, likeTableName);
@@ -811,13 +939,14 @@ app.delete(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
                 error: err,
                 url: req.url,
               });
+              return;
             }
           }
-          const dislikeParam = {
+          const dislikeParams = {
             TableName: dislikeTableName,
             ...params,
           };
-          const dislikeList = await dynamodb.query(dislikeParam).promise();
+          const dislikeList = await dynamodb.query(dislikeParams).promise();
           if (dislikeList.Items) {
             try {
               await removeLikeData(dislikeList.Items, dislikeTableName);
@@ -828,6 +957,7 @@ app.delete(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
                 error: err,
                 url: req.url,
               });
+              return;
             }
           }
         } catch (err) {
@@ -837,17 +967,92 @@ app.delete(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
             error: err,
             url: req.url,
           });
+          return;
         }
         //comment & subcomment 제거
-        //post 제거
-        dynamodb.delete(removeItemParams, (err, data) => {
-          if (err) {
-            res.statusCode = 500;
-            res.json({ error: err, url: req.url });
-          } else {
-            res.json({ url: req.url, data: data });
+        try {
+          let params = {
+            KeyConditionExpression: "postId = :p",
+            ExpressionAttributeValues: {
+              ":p": `${data.Item.username}/${data.Item.date}`,
+            },
+          };
+          const commentParams = {
+            TableName: commentTableName,
+            ...params,
+          };
+          const commentList = await dynamodb.query(commentParams).promise();
+          if (commentList.Items) {
+            try {
+              await removeCommentData(commentList.Items, commentTableName);
+            } catch (err) {
+              res.statusCode = 500;
+              res.json({
+                title: "remove dislike failed",
+                error: err,
+                url: req.url,
+              });
+              return;
+            }
+            for (const comment of commentList.Items) {
+              let params = {
+                KeyConditionExpression: "commentId = :c",
+                ExpressionAttributeValues: {
+                  ":c": `${comment.postId}/${comment.date}`,
+                },
+              };
+              const commentParams = {
+                TableName: subcommentTableName,
+                ...params,
+              };
+              try {
+                const subcommentList = await dynamodb.query(commentParams);
+                if (subcommentList.Items) {
+                  try {
+                    await removeSubcommentData(
+                      subcommentList.Items,
+                      subcommentTableName
+                    );
+                  } catch (err) {
+                    res.statusCode = 500;
+                    res.json({
+                      title: "remove subcomment failed",
+                      error: err,
+                      url: req.url,
+                    });
+                    return;
+                  }
+                }
+              } catch (err) {
+                res.statusCode = 500;
+                res.json({
+                  title: "remove subcomment failed",
+                  error: err,
+                  url: req.url,
+                });
+                return;
+              }
+            }
           }
-        });
+        } catch (err) {
+          res.statusCode = 500;
+          res.json({
+            title: "remove subcomment failed",
+            error: err,
+            url: req.url,
+          });
+          return;
+        }
+        //post 제거
+        try {
+          await dynamodb.delete(removeItemParams).promise();
+          res.json({ url: req.url, data: data });
+        } catch (err) {
+          //에러시 에러 반환
+          res.statusCode = 500;
+          res.json({ error: err, url: req.url });
+          return;
+        }
       } else {
         res.json({ url: req.url, data: data });
       }

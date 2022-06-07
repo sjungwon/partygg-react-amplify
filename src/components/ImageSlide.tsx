@@ -2,6 +2,9 @@ import { Carousel } from "react-bootstrap";
 import styles from "./ImageSlide.module.scss";
 import { useCallback, useEffect } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
+import FileServices from "../services/FileServices";
+import { ImageKeys } from "../types/file.type";
+import axios from "axios";
 
 interface PropsType {
   images: string[];
@@ -34,6 +37,57 @@ export default function ImageSlide({
     }
   }, [setIndex, images, index]);
 
+  const loadError = useCallback(async (event: any) => {
+    const imageEl = event.target;
+    const origSrc: string = imageEl.src;
+
+    //key로 받아온 이미지가 아니면
+    if (!origSrc.includes("fullsize") || !origSrc.includes("resized")) {
+      imageEl.src = "";
+      return;
+    }
+
+    //fullsize도 실패한 경우 -> 이미지 깨짐처리
+    if (origSrc.includes("fullsize/")) {
+      imageEl.src = "";
+      return;
+    }
+
+    //key 다시 받아서 시도
+    const resizedKeySplit = origSrc.split("/");
+    const username = decodeURIComponent(resizedKeySplit[5]);
+    const imageName = decodeURIComponent(resizedKeySplit[6].split("?")[0]);
+    const key: ImageKeys = {
+      resizedKey: `resized/${username}/${imageName}`,
+      fullsizeKey: `fullsize/${username}/${imageName}`,
+    };
+    const resizedImageURL = await FileServices.getImage(key, "resized");
+    if (resizedImageURL) {
+      try {
+        await axios.get(resizedImageURL);
+        //성공시
+        imageEl.src = resizedImageURL;
+        return;
+      } catch {
+        //key 다시 받아도 실패한 경우
+        const fullsizeImageURL = await FileServices.getImage(key, "fullsize");
+        if (fullsizeImageURL) {
+          imageEl.src = fullsizeImageURL;
+        } else {
+          imageEl.src = "";
+        }
+      }
+    }
+
+    //key 다시 받아도 실패한 경우
+    const fullsizeImageURL = await FileServices.getImage(key, "fullsize");
+    if (fullsizeImageURL) {
+      imageEl.src = fullsizeImageURL;
+    } else {
+      imageEl.src = "";
+    }
+  }, []);
+
   return (
     <>
       <Carousel
@@ -42,6 +96,7 @@ export default function ImageSlide({
         className={type === "modal" ? styles.modal_slide : styles.slide}
         activeIndex={index}
         onSelect={handleSelect}
+        controls={images.length > 1}
       >
         {images?.map((img: string, i: number) => {
           return (
@@ -55,9 +110,14 @@ export default function ImageSlide({
                   }
                   src={img}
                   alt="inputImg"
+                  onError={loadError}
                 />
               ) : (
-                <LazyLoadImage className={styles.slide_item} src={img} />
+                <LazyLoadImage
+                  className={styles.slide_item}
+                  src={img}
+                  onError={loadError}
+                />
               )}
               {/* <img
                 className={

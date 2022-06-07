@@ -63,6 +63,30 @@
     "storagepartyggPostTableStreamArn": {
       "Type": "String",
       "Default": "storagepartyggPostTableStreamArn"
+    },
+    "storagepartyggCommentTableName": {
+      "Type": "String",
+      "Default": "storagepartyggCommentTableName"
+    },
+    "storagepartyggCommentTableArn": {
+      "Type": "String",
+      "Default": "storagepartyggCommentTableArn"
+    },
+    "storagepartyggCommentTableStreamArn": {
+      "Type": "String",
+      "Default": "storagepartyggCommentTableStreamArn"
+    },
+    "storagepartyggSubcommentTableName": {
+      "Type": "String",
+      "Default": "storagepartyggSubcommentTableName"
+    },
+    "storagepartyggSubcommentTableArn": {
+      "Type": "String",
+      "Default": "storagepartyggSubcommentTableArn"
+    },
+    "storagepartyggSubcommentTableStreamArn": {
+      "Type": "String",
+      "Default": "storagepartyggSubcommentTableStreamArn"
     }
   },
   "Conditions": {
@@ -153,6 +177,24 @@
             },
             "STORAGE_PARTYGGPOSTTABLE_STREAMARN": {
               "Ref": "storagepartyggPostTableStreamArn"
+            },
+            "STORAGE_PARTYGGCOMMENTTABLE_NAME": {
+              "Ref": "storagepartyggCommentTableName"
+            },
+            "STORAGE_PARTYGGCOMMENTTABLE_ARN": {
+              "Ref": "storagepartyggCommentTableArn"
+            },
+            "STORAGE_PARTYGGCOMMENTTABLE_STREAMARN": {
+              "Ref": "storagepartyggCommentTableStreamArn"
+            },
+            "STORAGE_PARTYGGSUBCOMMENTTABLE_NAME": {
+              "Ref": "storagepartyggSubcommentTableName"
+            },
+            "STORAGE_PARTYGGSUBCOMMENTTABLE_ARN": {
+              "Ref": "storagepartyggSubcommentTableArn"
+            },
+            "STORAGE_PARTYGGSUBCOMMENTTABLE_STREAMARN": {
+              "Ref": "storagepartyggSubcommentTableStreamArn"
             }
           }
         },
@@ -401,6 +443,56 @@
                     [
                       {
                         "Ref": "storagepartyggPostTableArn"
+                      },
+                      "index/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Get*",
+                "dynamodb:BatchGetItem",
+                "dynamodb:List*",
+                "dynamodb:Describe*",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:Delete*"
+              ],
+              "Resource": [
+                {
+                  "Ref": "storagepartyggCommentTableArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "storagepartyggCommentTableArn"
+                      },
+                      "index/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Delete*"
+              ],
+              "Resource": [
+                {
+                  "Ref": "storagepartyggSubcommentTableArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "storagepartyggSubcommentTableArn"
                       },
                       "index/*"
                     ]

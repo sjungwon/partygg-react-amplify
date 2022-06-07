@@ -18,6 +18,13 @@
         "read",
         "update",
         "delete"
+      ],
+      "partyggCommentTable": [
+        "read",
+        "delete"
+      ],
+      "partyggSubcommentTable": [
+        "delete"
       ]
     }
   }

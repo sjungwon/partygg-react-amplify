@@ -4,6 +4,7 @@ import ImageSlide from "./ImageSlide";
 import styles from "./AddImageModal.module.scss";
 import { BsTrash } from "react-icons/bs";
 import { AiOutlineFileAdd } from "react-icons/ai";
+import { ImageKeys } from "../types/file.type";
 
 interface PropsType {
   mdShow: boolean;
@@ -11,6 +12,8 @@ interface PropsType {
   postImages: string[];
   setPostImage: (value: string[]) => void;
   setPostFiles: (value: File[]) => void;
+  postImageKeys: ImageKeys[];
+  setPostImageKeys: (value: ImageKeys[]) => void;
 }
 
 export default function AddPostImageModal({
@@ -19,9 +22,12 @@ export default function AddPostImageModal({
   postImages,
   setPostImage,
   setPostFiles,
+  postImageKeys,
+  setPostImageKeys,
 }: PropsType) {
   //이미지 상태 데이터
   const [images, setImages] = useState<string[]>([]);
+  const [imageKeys, setImageKeys] = useState<ImageKeys[]>([]);
   const [files, setFiles] = useState<File[]>([]);
   //모달이 열린 상태에서
   //이미지가 변하면 해당 이미지로 설정 -> postImages는 props로 들어오는거라
@@ -29,8 +35,9 @@ export default function AddPostImageModal({
   useEffect(() => {
     if (mdShow) {
       setImages(postImages);
+      setImageKeys(postImageKeys);
     }
-  }, [mdShow, postImages]);
+  }, [mdShow, postImageKeys, postImages]);
 
   //이미지 인덱스 상태 데이터
   const [index, setIndex] = useState<number>(0);
@@ -65,15 +72,37 @@ export default function AddPostImageModal({
   }, [fileRef]);
 
   //현재 이미지 제거
-  const removeImages = (event: any): void => {
-    const newImages = images?.filter((elem, i) => {
-      if (i === index) {
-        return false;
+  //경우의 수
+  //이미 앞쪽 image가 있는 상태로 뒤에 file 추가
+  //앞쪽 image 지움 -> file엔 영향 없어야함
+  const removeImages = useCallback(
+    (event: any): void => {
+      console.log(index, imageKeys.length, files.length);
+      if (index !== 0) {
+        if (index < imageKeys.length) {
+          setImageKeys((prevImageKeys: ImageKeys[]) =>
+            prevImageKeys.filter((prevImage, i) => i !== index)
+          );
+        } else {
+          const fileIndex = index - imageKeys.length;
+          setFiles((prevFiles: File[]) =>
+            prevFiles.filter((elem, i) => i !== fileIndex)
+          );
+        }
+      } else {
+        if (imageKeys.length) {
+          setImageKeys((prevImageKeys: ImageKeys[]) =>
+            prevImageKeys.filter((prevImage, i) => i !== index)
+          );
+        } else {
+          setFiles((prevFiles: File[]) =>
+            prevFiles.filter((elem, i) => i !== index)
+          );
+        }
       }
-      return true;
-    });
-    if (!!newImages && newImages.length > 0) {
-      setImages(newImages);
+      setImages((prevImages: string[]) =>
+        prevImages.filter((elem, i) => i !== index)
+      );
       setIndex((index) => {
         if (index > 0) {
           return index - 1;
@@ -81,15 +110,15 @@ export default function AddPostImageModal({
           return index;
         }
       });
-    } else {
-      setImages([]);
-    }
-  };
+    },
+    [files.length, imageKeys.length, index]
+  );
 
   //상위 컴포넌트의 상태로 이미지 전달, 모달 닫음
   const submitImage = () => {
     setPostImage(images);
     setPostFiles(files);
+    setPostImageKeys(imageKeys);
     closeMd();
   };
 

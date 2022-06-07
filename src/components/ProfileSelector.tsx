@@ -5,14 +5,14 @@ import { Profile } from "../types/profile.type";
 
 interface PropsType {
   size?: "sm" | "lg";
-  setCurrentProfile: (profile: Profile) => void;
   disabled?: boolean;
+  setCurrentProfile: (profile: Profile) => void;
 }
 
 export default function ProfileSelector({
   size,
-  setCurrentProfile,
   disabled,
+  setCurrentProfile,
 }: PropsType) {
   //프로필 상태 데이터
   const { profileArr } = useContext(UserDataContext);

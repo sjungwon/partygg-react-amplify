@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useState } from "react";
+import React, { createContext, useCallback, useEffect, useState } from "react";
 import AuthServices from "../services/AuthServices";
 import ProfileServices from "../services/ProfileServices";
 import UserServices from "../services/UserServices";
@@ -9,6 +9,8 @@ interface UserDataContextType {
   setUsernameHandler: (username: string) => void;
   profileArr: Profile[];
   setProfileArrHandler: (profiles: Profile[]) => void;
+  currentProfile: Profile;
+  setCurrentProfileHandler: (profile: Profile) => void;
   checkLogin: () => void;
   logout: () => void;
 }
@@ -17,11 +19,27 @@ interface Props {
   children: React.ReactNode;
 }
 
+const initialProfile = {
+  username: "",
+  date: "",
+  nickname: "",
+  game: "",
+  profileImage: "",
+};
+
 export const UserDataContext = createContext<UserDataContextType>({
   username: "",
   setUsernameHandler: (username: string) => {},
   profileArr: [],
   setProfileArrHandler: (profiles: Profile[]) => {},
+  currentProfile: {
+    username: "",
+    date: "",
+    nickname: "",
+    game: "",
+    profileImage: "",
+  },
+  setCurrentProfileHandler: (profile: Profile) => {},
   checkLogin: () => {},
   logout: () => {},
 });
@@ -40,6 +58,12 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
     setProfileArr(profileArr);
   }, []);
 
+  const [currentProfile, setCurrentProfile] = useState<Profile>(initialProfile);
+
+  const setCurrentProfileHandler = useCallback((profile: Profile) => {
+    setCurrentProfile(profile);
+  }, []);
+
   const checkLogin = useCallback(async () => {
     try {
       const { username } = await UserServices.getUsernameWithRefresh();
@@ -48,7 +72,18 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
         const profiles = await ProfileServices.getProfiles();
         if (profiles) {
           setProfileArr(profiles);
+          setCurrentProfile(profiles[0]);
+        } else {
+          setCurrentProfile({
+            ...initialProfile,
+            nickname: "게임 프로필을 추가해주세요.",
+          });
         }
+      } else {
+        setCurrentProfile({
+          ...initialProfile,
+          nickname: "로그인이 필요합니다.",
+        });
       }
     } catch {}
   }, []);
@@ -72,6 +107,8 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
         setUsernameHandler,
         profileArr,
         setProfileArrHandler,
+        currentProfile,
+        setCurrentProfileHandler,
         checkLogin,
         logout,
       }}

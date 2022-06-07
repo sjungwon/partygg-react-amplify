@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PostList from "../components/posts/PostList";
 import { UserDataContext } from "../context/UserDataContextProvider";
@@ -33,7 +33,7 @@ export default function HomePage() {
     navigate("/login");
   };
 
-  const getUser = async () => {
+  const getUser = useCallback(async () => {
     try {
       const user = await UserServices.getUsername();
       console.log(user);
@@ -41,26 +41,26 @@ export default function HomePage() {
     } catch {
       console.log("");
     }
-  };
+  }, []);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     const response = await UserServices.getUsernameWithRefresh();
     console.log(response);
-  };
+  }, []);
 
-  const getProfile = async () => {
+  const getProfile = useCallback(async () => {
     await ProfileServices.getProfiles();
-  };
+  }, []);
 
-  const postProfile = async () => {
+  const postProfile = useCallback(async () => {
     await ProfileServices.postProfiles({
       nickname: "호벗1",
       game: "리그오브레전드",
       profileImage: "",
     });
-  };
+  }, []);
 
-  const updateProfile = async () => {
+  const updateProfile = useCallback(async () => {
     await ProfileServices.updateProfiles({
       nickname: "호벗123",
       game: "메이플스토리",
@@ -68,13 +68,13 @@ export default function HomePage() {
       username,
       date: "2022-05-14 03:30:50am 395",
     });
-  };
+  }, [username]);
 
-  const deleteProfile = async () => {
+  const deleteProfile = useCallback(async () => {
     await ProfileServices.deleteProfiles("2022-05-16 10:14:04pm 881");
-  };
+  }, []);
 
-  const addPost = async () => {
+  const addPost = useCallback(async () => {
     const newPost: AddPostReqData = {
       game: "리그 오브 레전드",
       profile: currentProfile,
@@ -82,41 +82,34 @@ export default function HomePage() {
       images: [],
     };
     PostServices.addPost(newPost);
-  };
+  }, [currentProfile]);
 
-  const getPost = async () => {
-    PostServices.getPost();
-  };
+  const getPost = useCallback(async () => {
+    PostServices.getPostIdList();
+  }, []);
 
-  const getNextPost = async () => {
-    PostServices.getNextPost({
-      username,
-      date: "2022-05-23 03:54:16 am 160",
-    });
-  };
-
-  const getPostByGame = async () => {
+  const getPostByGame = useCallback(async () => {
     const game = "메이플";
-    PostServices.getPostByGame(game);
-  };
+    PostServices.getPostIdListByGame(game);
+  }, []);
 
-  const getNextPostByGame = async () => {
-    PostServices.getNextPostByGame({
+  const getNextPostByGame = useCallback(async () => {
+    PostServices.getNextPostIdListByGame({
       username,
       date: "2022-05-23 03:54:14 am 802",
       game: "메이플",
     });
-  };
+  }, [username]);
 
-  const removePost = async () => {
+  const removePost = useCallback(async () => {
     const removeData = {
       username,
       date: "2022-05-17 01:29:10am 940",
     };
     PostServices.removePost(removeData);
-  };
+  }, [username]);
 
-  const updatePost = async () => {
+  const updatePost = useCallback(async () => {
     const updateData = {
       id: "id",
       game: "리그 오브 레전드",
@@ -130,14 +123,14 @@ export default function HomePage() {
       username: "호벗",
     };
     PostServices.updatePost(updateData);
-  };
+  }, [currentProfile]);
 
-  const likePost = async () => {
+  const likePost = useCallback(async () => {
     const postId = "리그 오브 레전드-2022-05-20 01:25:16am 440";
     LikeServices.postLike(postId);
-  };
+  }, []);
 
-  const addImage = async (files: FileList) => {
+  const addImage = useCallback(async (files: FileList) => {
     const image = await Promise.all(
       Array.from(files).map((file) => {
         const name = file.name;
@@ -145,16 +138,19 @@ export default function HomePage() {
       })
     );
     console.log(image);
-  };
+  }, []);
 
-  const imageUpload = async (event: any) => {
-    const files = event.target.files as FileList;
-    if (files.length > 0) {
-      await addImage(files);
-    }
-  };
+  const imageUpload = useCallback(
+    async (event: any) => {
+      const files = event.target.files as FileList;
+      if (files.length > 0) {
+        await addImage(files);
+      }
+    },
+    [addImage]
+  );
 
-  const addProfileImage = async (files: FileList) => {
+  const addProfileImage = useCallback(async (files: FileList) => {
     const image = await Promise.all(
       Array.from(files).map((file) => {
         const name = file.name;
@@ -162,14 +158,17 @@ export default function HomePage() {
       })
     );
     console.log(image);
-  };
+  }, []);
 
-  const profileUpload = async (event: any) => {
-    const files = event.target.files as FileList;
-    if (files.length > 0) {
-      await addProfileImage(files);
-    }
-  };
+  const profileUpload = useCallback(
+    async (event: any) => {
+      const files = event.target.files as FileList;
+      if (files.length > 0) {
+        await addProfileImage(files);
+      }
+    },
+    [addProfileImage]
+  );
 
   return (
     <div>
@@ -183,7 +182,6 @@ export default function HomePage() {
       <button onClick={updateProfile}>update profile</button>
       <button onClick={addPost}>add post</button>
       <button onClick={getPost}>get post</button>
-      <button onClick={getNextPost}>get next post</button>
       <button onClick={getPostByGame}>get post by game</button>
       <button onClick={getNextPostByGame}>get Next post by game</button>
       <button onClick={removePost}>remove Post</button>
@@ -199,6 +197,7 @@ export default function HomePage() {
         type="file"
         accept="image/jpg image/png image/jpeg"
       />
+
       <PostList />
     </div>
   );

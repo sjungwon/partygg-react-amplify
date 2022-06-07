@@ -11,9 +11,8 @@ export default class FileServices {
       const encodedUsername = encodeURIComponent(username);
       const encodedFilename = encodeURIComponent(file.name);
       const path = `${encodedUsername}/${encodedFilename}`;
-      const uploadKey = `uploads/${path}`;
-      await Storage.put(uploadKey, file);
       const fullsizeKey = `fullsize/${path}`;
+      await Storage.put(fullsizeKey, file);
       const resizedKey = `resized/${path}`;
       return {
         fullsizeKey,
@@ -32,8 +31,8 @@ export default class FileServices {
       const encodedUsername = encodeURIComponent(username);
       const encodedFilename = encodeURIComponent(file.name);
       const path = `profiles/${encodedUsername}/${encodedFilename}`;
-      await Storage.put(`uploads/${path}`, file);
       const fullsizeKey = `fullsize/${path}`;
+      await Storage.put(fullsizeKey, file);
       const resizedKey = `resized/${path}`;
       return {
         fullsizeKey,
@@ -66,7 +65,6 @@ export default class FileServices {
       await Storage.remove(keyObject.resizedKey);
       return true;
     } catch (err) {
-      console.log(err);
       return false;
     }
   }

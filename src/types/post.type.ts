@@ -2,7 +2,7 @@ import { UserResource } from "./db.type";
 import { ImageKeys } from "./file.type";
 import { Profile } from "./profile.type";
 
-//db 저장 형태
+//기본 post 구조
 export interface PostStruct {
   game: string;
   profile: Profile;
@@ -17,16 +17,8 @@ export interface Post extends PostStruct, UserResource {
   images: ImageKeys[];
   likes: string[];
   dislikes: string[];
-  // comments: Comment[];
-}
-
-export interface Comment extends PostStruct, UserResource {
-  date: string;
-  subComments: SubComment[];
-}
-
-export interface SubComment extends PostStruct, UserResource {
-  date: string;
+  comments: Comment[];
+  commentsLastEvaluatedKey?: CommentsLastEvaluatedKey;
 }
 
 export interface LastEvaluatedKey {
@@ -44,12 +36,12 @@ export interface LastEvaluatedKeyForGame extends LastEvaluatedKey {
   game: string;
 }
 
-export interface GetPostResData {
+export interface GetPostIdListResData {
   data: Post[];
   lastEvaluatedKey?: LastEvaluatedKeyForAll;
 }
 
-export interface GetGamePostResData {
+export interface GetGamePostIdListResData {
   data: Post[];
   lastEvaluatedKey?: LastEvaluatedKeyForGame;
 }
@@ -71,3 +63,49 @@ export interface UpdatePostReqData extends AddPostReqData, UserResource {
 export interface UpdatePostResData extends AddPostResData {}
 
 export interface RemovePostReqData extends LastEvaluatedKey {}
+
+//comment
+export interface Comment extends PostStruct, UserResource {
+  postId: string;
+  date: string;
+  subcomments: Subcomment[];
+  subcommentsLastEvaluatedKey?: SubcommentsLastEvaluatedKey;
+}
+
+export interface CommentsLastEvaluatedKey {
+  postId: string;
+  date: string;
+}
+
+export interface GetCommentsResData {
+  data: Comment[];
+  commentsLastEvaluatedKey?: CommentsLastEvaluatedKey;
+}
+
+export interface AddCommentReqData extends PostStruct {
+  postId: string;
+}
+
+export interface AddCommentReqBodyData
+  extends AddCommentReqData,
+    UserResource {}
+
+//subcomment
+export interface Subcomment extends PostStruct, UserResource {
+  commentId: string;
+  date: string;
+}
+
+export interface SubcommentsLastEvaluatedKey {
+  commentId: string;
+  date: string;
+}
+
+export interface GetSubcommentResData {
+  data: Subcomment[];
+  subcommentsLastEvaluatedKey?: SubcommentsLastEvaluatedKey;
+}
+
+export interface AddSubcommentReqData extends PostStruct {
+  commentId: string;
+}

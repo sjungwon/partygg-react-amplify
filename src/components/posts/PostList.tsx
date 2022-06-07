@@ -2,221 +2,111 @@ import styles from "./PostList.module.scss";
 import AddPostElement from "./AddPostElement";
 import PostElement from "./PostElement";
 import PostServices from "../../services/PostServices";
-import { useContext, useEffect, useState } from "react";
-import { UserDataContext } from "../../context/UserDataContextProvider";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Post } from "../../types/post.type";
-import FileServices from "../../services/FileServices";
-
-export interface UpdatePost {
-  postData: Post | null;
-  success: boolean;
-  type: "add" | "update" | "remove" | "";
-}
-
-export const initialUpdatePost: UpdatePost = {
-  postData: null,
-  success: false,
-  type: "",
-};
-
-export interface UpdateLikeData {
-  type:
-    | "postLike"
-    | "postLikeRemove"
-    | "postDislike"
-    | "postDislikeRemove"
-    | "";
-  postId: string;
-}
-
-export const initialUpdateLikeData: UpdateLikeData = {
-  type: "",
-  postId: "",
-};
 
 export default function PostList() {
   const [posts, setPosts] = useState<Post[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const { username } = useContext(UserDataContext);
 
-  useEffect(() => {
-    setLoading(true);
-    PostServices.getPost().then((postsData) => {
-      if (postsData) {
-        setPosts(postsData.data);
-      }
-      setLoading(false);
-    });
+  const removePost = useCallback((postId: string) => {
+    setPosts((prev: Post[]) =>
+      prev.filter(
+        (prevPost) => `${prevPost.username}/${prevPost.date}` !== postId
+      )
+    );
   }, []);
 
-  const [updateLike, setUpdateLike] = useState<UpdateLikeData>(
-    initialUpdateLikeData
+  useEffect(() => {
+    PostServices.init();
+  }, []);
+
+  const [addPostData, setAddPostData] = useState<Post | null>(null);
+
+  useEffect(() => {
+    if (addPostData) {
+      setPosts((prev: Post[]) => [addPostData, ...prev]);
+      setAddPostData(null);
+    }
+  }, [addPostData]);
+
+  const sendQuery = useCallback(async () => {
+    console.log("query");
+    const postIdList = await PostServices.getPostIdList();
+    if (postIdList) {
+      console.log(postIdList.lastEvaluatedKey);
+      setPosts((prev: Post[]) => [...prev, ...postIdList.data]);
+    }
+  }, []);
+
+  const loader = useRef<HTMLDivElement>(null);
+
+  const [page, setPage] = useState<number>(0);
+
+  useEffect(() => {
+    if (page) {
+      sendQuery();
+    }
+  }, [page, sendQuery]);
+
+  const handleObserver: IntersectionObserverCallback = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const target = entries[0];
+      if (target.isIntersecting) {
+        setPage((prev) => prev + 1);
+      }
+    },
+    []
   );
 
   useEffect(() => {
-    if (updateLike.type && updateLike.postId) {
-      setPosts((prevPosts: Post[]) => {
-        const newPosts = prevPosts.map((post) => {
-          const postId = `${post.username}-${post.date}`;
-          if (postId === updateLike.postId) {
-            switch (updateLike.type) {
-              case "postLike": {
-                return {
-                  ...post,
-                  likes: [...post.likes, username],
-                  dislikes: post.dislikes.filter((user) => user !== username),
-                };
-              }
-              case "postLikeRemove": {
-                return {
-                  ...post,
-                  likes: post.likes.filter((user) => user !== username),
-                };
-              }
-              case "postDislike": {
-                return {
-                  ...post,
-                  likes: post.likes.filter((user) => user !== username),
-                  dislikes: [...post.dislikes, username],
-                };
-              }
-              case "postDislikeRemove": {
-                return {
-                  ...post,
-                  dislikes: post.dislikes.filter((user) => user !== username),
-                };
-              }
-              default:
-                return post;
-            }
-          }
+    //IntersectionObserver에 전달하는 옵션
+    //root는 어떤 기준으로 타겟 요소와 기준 요소 사이의 intersection 변화를
+    //탐지할지 작성
+    //root는 가시성을 확인할 때 사용되는 뷰포트 요소
+    //대상 객체의 조상요소로 설정, 기본 값은 브라우저 뷰포트
+    //root: null -> 브라우저 뷰포트로 설정
+    //rootMargin -> root가 가진 여백 -> 시계방향으로 설정
+    //margin으로 기준 요소를 수축, 증가시켜서 교차성을 계산
+    //threshold -> 가시성을 퍼센티지로 나타냄 -> 얼마나 보여지면 콜백을 호출할 것인지 지정
+    console.log("set handler");
+    const option: IntersectionObserverInit = {
+      root: null,
+      rootMargin: "600px",
+      threshold: 0,
+    };
+    const observer = new IntersectionObserver(handleObserver, option);
+    if (loader.current) observer.observe(loader.current);
+  }, [handleObserver]);
 
-          return post;
-        });
+  const addPostComponent = useMemo(
+    () => <AddPostElement prevData={{ setPostData: setAddPostData }} />,
+    []
+  );
 
-        return newPosts ? newPosts : prevPosts;
-      });
-      setUpdateLike(initialUpdateLikeData);
+  const postListComponent = useMemo(() => {
+    if (!posts) {
+      return null;
     }
-  }, [updateLike, username]);
+    return posts.map((postId, i) => {
+      return (
+        <PostElement
+          key={`${postId.username}/${postId.date}`}
+          post={postId}
+          removePost={removePost}
+        />
+      );
+    });
+  }, [posts, removePost]);
 
-  const [updatePost, setUpdatePost] = useState<UpdatePost>(initialUpdatePost);
-
-  //포스트 수정,추가 성공시
-  useEffect(() => {
-    if (updatePost.success && updatePost.postData) {
-      console.log("success change");
-      switch (updatePost.type) {
-        case "update": {
-          setPosts((prevPost: Post[]) => {
-            const newPost = prevPost.map((post) => {
-              if (
-                post.username === updatePost.postData?.username &&
-                post.date === updatePost.postData?.date
-              ) {
-                return updatePost.postData;
-              }
-              return post;
-            });
-            if (newPost !== undefined) {
-              return newPost;
-            } else {
-              return prevPost;
-            }
-          });
-          break;
-        }
-        case "add": {
-          setPosts((prevPost: Post[]) => [
-            updatePost.postData as Post,
-            ...prevPost,
-          ]);
-          break;
-        }
-        case "remove": {
-          const removePostId = `${updatePost.postData?.username}-${updatePost.postData?.date}`;
-          let prevDataIndex: number = posts.findIndex(
-            (post) => `${post.username}-${post.date}` === removePostId
-          );
-          let prevData: Post | undefined = posts.find(
-            (post) => `${post.username}-${post.date}` === removePostId
-          );
-          setPosts((prevPost: Post[]) =>
-            prevPost.filter((post) => {
-              const postId = `${post.username}-${post.date}`;
-              return removePostId !== postId;
-            })
-          );
-          if (prevData) {
-            console.log(prevData);
-            PostServices.removePost(prevData).then((success) => {
-              console.log(success);
-              if (!success && prevData) {
-                setPosts((prevPosts: Post[]) => {
-                  const front = prevPosts.slice(0, prevDataIndex);
-                  const back = prevPosts.slice(prevDataIndex, prevPosts.length);
-                  return [...front, prevData, ...back] as Post[];
-                });
-                window.alert(
-                  "포스트를 제거 중에 오류가 발생했습니다. 다시 시도해주세요."
-                );
-              } else {
-                prevData?.images.forEach((image) => {
-                  FileServices.removeImage(image);
-                });
-              }
-            });
-          }
-          break;
-        }
-        default:
-          break;
-      }
-
-      setUpdatePost(initialUpdatePost);
-    }
-  }, [posts, updatePost.postData, updatePost.success, updatePost.type]);
-
-  //loading 중인 경우 = post를 가져오는 중 -> 서버 없을 때 setTimeout으로 구현해놨음
-  if (loading) {
-    return <div className={styles.container}>loading</div>;
-  }
-
+  //렌더
   //post가 있는 경우
   return (
-    <div className={styles.container}>
-      <AddPostElement
-        updatePost={initialUpdatePost}
-        setUpdatePost={setUpdatePost}
-      />
-      {posts
-        ? posts.map((elem) => {
-            const postId = `${elem.username}-${elem.date}`;
-
-            if (
-              updatePost.type === "update" &&
-              updatePost.postData &&
-              postId ===
-                `${updatePost.postData.username}-${updatePost.postData.date}`
-            ) {
-              return (
-                <AddPostElement
-                  key={postId}
-                  updatePost={updatePost}
-                  setUpdatePost={setUpdatePost}
-                />
-              );
-            }
-            return (
-              <PostElement
-                key={postId}
-                data={elem}
-                setUpdatePost={setUpdatePost}
-                setUpdateLike={setUpdateLike}
-              />
-            );
-          })
-        : null}
-    </div>
+    <>
+      <div className={styles.container}>
+        {addPostComponent}
+        {postListComponent}
+      </div>
+      <div ref={loader} className={styles.loader}></div>
+    </>
   );
 }
