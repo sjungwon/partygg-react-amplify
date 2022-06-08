@@ -44,8 +44,8 @@ export default function AddPostElement({ prevData }: Props) {
   const [show, setShow] = useState(!!prevData.setMode);
 
   //form 열고 닫는 함수
-  const open = useCallback(() => {
-    setShow(true);
+  const showHandler = useCallback(() => {
+    setShow((prev) => !prev);
   }, []);
 
   const close = useCallback(() => {
@@ -71,9 +71,13 @@ export default function AddPostElement({ prevData }: Props) {
           <ProfileSelector
             setCurrentProfile={setCurrentProfile}
             size="sm"
-            disabled={!username}
+            disabled={!username || !profileArr.length}
           />
-          <Button onClick={open} size="sm" disabled={!username}>
+          <Button
+            onClick={showHandler}
+            size="sm"
+            disabled={!username || !profileArr.length}
+          >
             <BsPlusLg />
           </Button>
         </div>

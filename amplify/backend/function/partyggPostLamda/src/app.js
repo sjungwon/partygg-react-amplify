@@ -93,7 +93,7 @@ const convertUrlType = (param, type) => {
 
 // add likes, dislike data to Post
 const addAdditionalData = async (post) => {
-  let params = {
+  const params = {
     KeyConditionExpression: "postId = :p",
     ExpressionAttributeValues: {
       ":p": `${post.username}/${post.date}`,
@@ -137,19 +137,16 @@ const addAdditionalData = async (post) => {
   if (commentDb.Items) {
     comments = await Promise.all(
       commentDb.Items.map(async (comment) => {
-        let params = {
+        const subcommentParams = {
+          TableName: subcommentTableName,
           KeyConditionExpression: "commentId = :c",
           ExpressionAttributeValues: {
             ":c": `${comment.postId}/${comment.date}`,
           },
-        };
-        const subcommentParams = {
-          TableName: subcommentTableName,
-          ...params,
           ScanIndexForward: false,
           Limit: 6,
         };
-        const subcommentList = await dynamodb.query(subcommentParams);
+        const subcommentList = await dynamodb.query(subcommentParams).promise();
         if (subcommentList.Items) {
           return {
             ...comment,

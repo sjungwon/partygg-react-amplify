@@ -7,6 +7,7 @@ import { Button, Modal } from "react-bootstrap";
 interface PropsType {
   show: boolean;
   close: () => void;
+  loading: boolean;
   remove: () => void;
   className?: string;
 }
@@ -14,6 +15,7 @@ interface PropsType {
 export default function RemoveConfirmModal({
   show,
   close,
+  loading,
   remove,
   className,
 }: PropsType) {
@@ -34,10 +36,20 @@ export default function RemoveConfirmModal({
       </Modal.Body>
 
       <Modal.Footer>
-        <Button variant="primary" size={"sm"} onClick={remove}>
-          삭제
+        <Button
+          variant="primary"
+          size={"sm"}
+          onClick={remove}
+          disabled={loading}
+        >
+          {loading ? "삭제 중..." : "삭제"}
         </Button>
-        <Button variant="secondary" size={"sm"} onClick={close}>
+        <Button
+          variant="secondary"
+          size={"sm"}
+          onClick={close}
+          disabled={loading}
+        >
           취소
         </Button>
       </Modal.Footer>

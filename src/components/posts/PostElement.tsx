@@ -216,20 +216,17 @@ export default function PostElement({ post, removePost }: PropsType) {
     setShowRemoveModal(true);
   }, []);
 
-  const sendRemovePost = useCallback(() => {
-    const prevData = postData;
-    if (prevData) {
-      PostServices.removePost(prevData).then((success) => {
-        if (!success) {
-          setPostData(prevData);
-          window.alert(
-            "포스트를 제거 중에 오류가 발생했습니다. 다시 시도해주세요."
-          );
-        } else {
-          removePost(postId);
-        }
-      });
+  const [removeLoading, setRemoveLoading] = useState<boolean>(false);
+  const sendRemovePost = useCallback(async () => {
+    setRemoveLoading(true);
+    const success = await PostServices.removePost(postData);
+    if (!success) {
+      window.alert("포스트 제거에 실패했습니다. 다시 시도해주세요.");
+      setRemoveLoading(false);
+      handleRemoveModalClose();
     }
+    removePost(postId);
+    setRemoveLoading(false);
     handleRemoveModalClose();
   }, [handleRemoveModalClose, postData, postId, removePost]);
 
@@ -405,6 +402,7 @@ export default function PostElement({ post, removePost }: PropsType) {
       <RemoveConfirmModal
         close={handleRemoveModalClose}
         show={showRemoveModal}
+        loading={removeLoading}
         remove={sendRemovePost}
         className={styles.card_remove_modal}
       />

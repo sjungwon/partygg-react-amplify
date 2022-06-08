@@ -1,24 +1,26 @@
 import styles from "./AddComment.module.scss";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import ProfileSelector from "../ProfileSelector";
-import { AddCommentReqData, Comment } from "../../types/post.type";
+import { AddSubcommentReqData, Subcomment } from "../../types/post.type";
 import { UserDataContext } from "../../context/UserDataContextProvider";
 import PostServices from "../../services/PostServices";
 import { Profile } from "../../types/profile.type";
 
 interface PropsType {
-  postId: string;
-  prevData?: {
-    comment: Comment;
-    setModeDefault: () => void;
-  };
-  commentsListHandler: (newComment: Comment, type: "modify" | "add") => void;
+  commentId: string;
+  prevData?: Subcomment;
+  setModeDefault: () => void;
+  subcommentsListHandler: (
+    newSubcomment: Subcomment,
+    type: "modify" | "add"
+  ) => void;
 }
 
-export default function AddComment({
-  postId,
+export default function AddSubcomment({
+  commentId,
   prevData,
-  commentsListHandler,
+  setModeDefault,
+  subcommentsListHandler,
 }: PropsType) {
   //유저 데이터 사용 -> 프로필, 이름
   const {
@@ -32,7 +34,7 @@ export default function AddComment({
   useEffect(() => {
     //수정인 경우 수정할 comment profile로 설정
     if (prevData) {
-      setCurrentProfile(prevData.comment.profile);
+      setCurrentProfile(prevData.profile);
     }
     //수정이 아닌 경우 = 댓글 추가인 경우
     //defaultProfile이 변경되면 defaultProfile로 설정
@@ -55,29 +57,31 @@ export default function AddComment({
     console.log(text);
     setLoading(true);
 
-    const submitData: AddCommentReqData = {
+    const submitData: AddSubcommentReqData = {
       profile: currentProfile,
       game: currentProfile.game,
-      postId,
+      commentId,
       text,
     };
+    console.log(submitData);
     if (!prevData) {
-      const newComment = await PostServices.addComments(submitData);
-      if (!newComment) {
+      const newSubcomment = await PostServices.addSubcomments(submitData);
+      if (!newSubcomment) {
         window.alert("댓글을 추가하는데 실패했습니다. 다시 시도해주세요.");
         setLoading(false);
         return;
       }
-      commentsListHandler(newComment, "add");
+      subcommentsListHandler(newSubcomment, "add");
       if (textAreaRef.current) {
         textAreaRef.current.value = "";
       }
       setLoading(false);
+      setModeDefault();
       return;
     }
 
-    const modifyComment = await PostServices.modifyComments({
-      ...prevData.comment,
+    const modifyComment = await PostServices.modifySubcomments({
+      ...prevData,
       ...submitData,
     });
     if (!modifyComment) {
@@ -85,15 +89,21 @@ export default function AddComment({
       setLoading(false);
       return;
     }
-    commentsListHandler(modifyComment, "modify");
-    prevData.setModeDefault();
+    subcommentsListHandler(modifyComment, "modify");
+    setModeDefault();
     setLoading(false);
-  }, [commentsListHandler, currentProfile, postId, prevData]);
+  }, [
+    commentId,
+    currentProfile,
+    prevData,
+    setModeDefault,
+    subcommentsListHandler,
+  ]);
 
   const textFocusControl = useCallback(
     (e: any) =>
       (e.currentTarget.selectionStart = e.currentTarget.selectionEnd =
-        prevData ? prevData.comment.text.length : 0),
+        prevData ? prevData.text.length : 0),
     [prevData]
   );
 
@@ -131,7 +141,7 @@ export default function AddComment({
       <textarea
         className={styles.add_comment_textArea}
         ref={textAreaRef}
-        defaultValue={prevData ? prevData.comment.text : ""}
+        defaultValue={prevData ? prevData.text : ""}
         autoFocus
         onFocus={textFocusControl}
       />
@@ -142,15 +152,14 @@ export default function AddComment({
       >
         {loading ? "등록 중..." : "등록"}
       </button>
-      {prevData ? (
-        <button
-          className={styles.add_comment_btn}
-          disabled={loading}
-          onClick={prevData.setModeDefault}
-        >
-          취소
-        </button>
-      ) : null}
+
+      <button
+        className={styles.add_comment_btn}
+        disabled={loading}
+        onClick={setModeDefault}
+      >
+        취소
+      </button>
     </div>
   );
 }

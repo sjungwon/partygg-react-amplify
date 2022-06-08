@@ -90,6 +90,10 @@ export interface AddCommentReqBodyData
   extends AddCommentReqData,
     UserResource {}
 
+export interface AddCommentResData extends AddCommentReqBodyData {
+  date: string;
+}
+
 //subcomment
 export interface Subcomment extends PostStruct, UserResource {
   commentId: string;
@@ -108,4 +112,12 @@ export interface GetSubcommentResData {
 
 export interface AddSubcommentReqData extends PostStruct {
   commentId: string;
+}
+
+export interface AddSubcommentReqBodyData
+  extends AddSubcommentReqData,
+    UserResource {}
+
+export interface AddSubcommentResData extends AddSubcommentReqBodyData {
+  date: string;
 }

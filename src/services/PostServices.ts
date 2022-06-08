@@ -2,10 +2,13 @@ import { API } from "aws-amplify";
 import {
   AddCommentReqBodyData,
   AddCommentReqData,
+  AddCommentResData,
   AddPostReqBodyData,
   AddPostReqData,
   AddPostResData,
+  AddSubcommentReqBodyData,
   AddSubcommentReqData,
+  AddSubcommentResData,
   Comment,
   CommentsLastEvaluatedKey,
   GetCommentsResData,
@@ -34,6 +37,7 @@ export default class PostServices {
   private static getDone: boolean = false;
 
   public static init() {
+    this.lastEvaluatedKeyForAll = undefined;
     this.getDone = false;
   }
 
@@ -98,7 +102,7 @@ export default class PostServices {
       if (!username) {
         return false;
       }
-      const response = await API.del(
+      await API.del(
         this.apiName,
         `${this.path}/object/${encodeURIComponent(
           username
@@ -281,31 +285,45 @@ export default class PostServices {
   }
 
   public static async addComments(
-    data: AddCommentReqData
+    addCommentData: AddCommentReqData
   ): Promise<Comment | null> {
     try {
       const { username } = await UserServices.getUsernameWithRefresh();
       const myInit: { body: AddCommentReqBodyData } = {
         body: {
-          ...data,
+          ...addCommentData,
           username,
         },
       };
       const response = await API.post(this.apiName, this.commentsPath, myInit);
-      return response.data;
+      const data: AddCommentResData = response.data;
+      return {
+        ...data,
+        subcomments: [],
+      };
     } catch (error) {
       console.log(error);
       return null;
     }
   }
 
-  public static async modifyComments(data: Comment): Promise<Comment | null> {
+  public static async modifyComments(
+    comment: Comment
+  ): Promise<Comment | null> {
     try {
+      const { username } = await UserServices.getUsernameWithRefresh();
       const path = `${this.commentsPath}/object/${encodeURIComponent(
-        data.postId
-      )}/${encodeURIComponent(data.date)}`;
-      const response = await API.post(this.apiName, path, data);
-      return response;
+        comment.postId
+      )}/${encodeURIComponent(comment.date)}`;
+      const myInit: { body: Comment } = {
+        body: {
+          ...comment,
+          username,
+        },
+      };
+      const response = await API.post(this.apiName, path, myInit);
+      const data: Comment = response.data;
+      return data;
     } catch (err) {
       console.log(err);
       return null;
@@ -341,33 +359,53 @@ export default class PostServices {
   }
 
   public static async addSubcomments(
-    data: AddSubcommentReqData
+    addSubcommentData: AddSubcommentReqData
   ): Promise<Subcomment | null> {
     try {
-      const response = await API.post(this.apiName, this.subcommentsPath, data);
-      return response.data;
+      const { username } = await UserServices.getUsernameWithRefresh();
+      const myInit: { body: AddSubcommentReqBodyData } = {
+        body: {
+          ...addSubcommentData,
+          username,
+        },
+      };
+      const response = await API.post(
+        this.apiName,
+        this.subcommentsPath,
+        myInit
+      );
+      const data: AddSubcommentResData = response.data;
+      return data;
     } catch (error) {
       console.log(error);
       return null;
     }
   }
 
-  public static async modifySubComments(
-    data: Subcomment
+  public static async modifySubcomments(
+    subcomment: Subcomment
   ): Promise<Subcomment | null> {
     try {
+      const { username } = await UserServices.getUsernameWithRefresh();
       const path = `${this.subcommentsPath}/object/${encodeURIComponent(
-        data.commentId
-      )}/${encodeURIComponent(data.date)}`;
-      const response = await API.post(this.apiName, path, data);
-      return response;
+        subcomment.commentId
+      )}/${encodeURIComponent(subcomment.date)}`;
+      const myInit: { body: AddSubcommentReqBodyData } = {
+        body: {
+          ...subcomment,
+          username,
+        },
+      };
+      const response = await API.post(this.apiName, path, myInit);
+      const data: Subcomment = response.data;
+      return data;
     } catch (err) {
       console.log(err);
       return null;
     }
   }
 
-  public static async deleteSubComments(data: Subcomment): Promise<boolean> {
+  public static async removeSubcomments(data: Subcomment): Promise<boolean> {
     try {
       const path = `${this.subcommentsPath}/object/${encodeURIComponent(
         data.commentId

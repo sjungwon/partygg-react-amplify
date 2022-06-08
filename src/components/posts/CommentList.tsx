@@ -35,6 +35,7 @@ export default function CommentList({
   const [renderLength, setRenderLength] = useState<number>(
     commentsData.data.length > 2 ? 3 : commentsData.data.length
   );
+  const [commentLoading, setCommentLoading] = useState<boolean>(false);
   const renderLengthHandler = useCallback(
     (type: "more" | "close") => {
       return async () => {
@@ -46,14 +47,20 @@ export default function CommentList({
         }
         if (renderLength >= comments.length) {
           if (lastEvaluatedKey) {
+            setCommentLoading(true);
             const extraComments = await PostServices.getNextComments(
               lastEvaluatedKey
             );
             if (extraComments) {
               setComments((prev) => [...prev, ...extraComments.data]);
               setLastEvaluatedKey(extraComments.commentsLastEvaluatedKey);
-              setRenderLength(comments.length + extraComments.data.length - 1);
+              setRenderLength((prev) =>
+                extraComments.data.length > 2
+                  ? prev + 3
+                  : prev + extraComments.data.length
+              );
             }
+            setCommentLoading(false);
           }
           return;
         } else {
@@ -96,16 +103,27 @@ export default function CommentList({
   //lastkey가 있으면 데이터를 가져오고 + 더보기를 보여줌
   //lastkey가 없으면 닫는거만 보여줌
 
-  const [addedComments, setAddedComments] = useState<Comment | null>(null);
   const commentsListHandler = useCallback(
-    (comment: Comment, type: "modify" | "add") => {
+    (comment: Comment, type: "modify" | "add" | "remove") => {
       if (type === "add") {
-        setAddedComments(comment);
+        setComments((prev) => [comment, ...prev]);
         setRenderLength((prev) => prev + 1);
         return;
       }
 
       const newCommentId = `${comment.postId}/${comment.date}`;
+
+      if (type === "remove") {
+        setComments((prev) =>
+          prev.filter((prevComment) => {
+            const commentId = `${prevComment.postId}/${prevComment.date}`;
+            return commentId !== newCommentId;
+          })
+        );
+        setRenderLength((prev) => (prev > 1 ? prev - 1 : prev));
+        return;
+      }
+
       setComments((prev) =>
         prev.map((prevComment) => {
           const commentId = `${prevComment.postId}/${prevComment.date}`;
@@ -119,12 +137,6 @@ export default function CommentList({
     },
     []
   );
-  useEffect(() => {
-    if (addedComments) {
-      setComments((prev) => [addedComments, ...prev]);
-      setAddedComments(null);
-    }
-  }, [addedComments]);
 
   //렌더
   //comment를 열지 않았을 때
@@ -142,6 +154,7 @@ export default function CommentList({
             comment={comments[0]}
             commentsListHandler={commentsListHandler}
             borderBottom={false}
+            parentShowComment={showComment}
           />
           {commentsNavigator}
         </Card.Footer>
@@ -163,25 +176,33 @@ export default function CommentList({
             comment={comment}
             commentsListHandler={commentsListHandler}
             borderBottom={true}
+            parentShowComment={showComment}
           />
         );
       })}
       <div className={styles.more_container}>
         {renderLength < comments.length || lastEvaluatedKey ? (
-          <div className={styles.more} onClick={renderLengthHandler("more")}>
-            {"더보기 "}
+          <button
+            className={styles.more}
+            onClick={renderLengthHandler("more")}
+            disabled={commentLoading}
+          >
+            {commentLoading ? "가져오는 중..." : "더보기 "}
             <span className={styles.more_icon}>
               <AiOutlineDownCircle />
             </span>
-          </div>
+          </button>
         ) : null}
         {renderLength > 3 ? (
-          <div className={styles.more} onClick={renderLengthHandler("close")}>
+          <button
+            className={styles.more}
+            onClick={renderLengthHandler("close")}
+          >
             {"닫기 "}
             <span className={styles.more_icon}>
               <AiOutlineUpCircle />
             </span>
-          </div>
+          </button>
         ) : null}
       </div>
       <div className={styles.direct} onClick={closeComments}>

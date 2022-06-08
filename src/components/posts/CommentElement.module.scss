@@ -1,27 +1,26 @@
 @import "../../scss/variables";
+@import "../../scss/mixin";
 
 .comment{
-  font-size: .9rem;
   padding: .25rem .5rem;
   color: $font-color-gray;
+  font-size: .85rem;
 }
 
 .comment_border{
-  font-size: .9rem;
+  font-size: .85rem;
   padding: .25rem .5rem;
   color: $font-color-gray;
   border-bottom: 1px dashed $primary-blue;
 }
 
-
 .comment_nickname{
   color: black;
   font-weight: 500;
-  font-size: .825rem;
 }
 
 .comment_username{
-  font-size: .775rem;
+  font-size: .78rem;
 }
 
 .comment_text{
@@ -29,7 +28,7 @@
 }
 
 .comment_date{
-  font-size: .775rem;
+  font-size: .725rem;
 }
 
 .blank{
@@ -54,16 +53,16 @@
   margin: 0 auto;
 }
 
-.more{
-  margin: .5rem;
-  font-size: .9rem;
-  color: $primary-blue;
-  width: 5rem;
-  cursor: pointer;
-  &:hover{
-    color: $primary-blue-hover;
-  }
-}
+// .more{
+//   margin: .5rem;
+//   font-size: .9rem;
+//   color: $primary-blue;
+//   width: 5rem;
+//   cursor: pointer;
+//   &:hover{
+//     color: $primary-blue-hover;
+//   }
+// }
 
 .comment_btns{
   display: flex;
@@ -71,17 +70,13 @@
 }
 
 .comment_btn{
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  @include btn_grey;
+  min-height: .8rem;
   height: 1rem;
-  width: 4rem;
-  border: 1px solid transparent;
-  border-radius: .25rem;
+  min-width: 4rem;
   padding: 1px 0;
   margin-right: .3rem;
-  background-color: rgba(176, 175, 175, 0.334);
-  font-size: .8rem;
+  font-size: .775rem;
   &_icon{
     color: $primary-orange;
   }

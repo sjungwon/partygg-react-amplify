@@ -1,21 +1,29 @@
 import styles from "./CommentElement.module.scss";
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { useCallback, useContext, useMemo, useState } from "react";
 import { FaRegComment, FaComment } from "react-icons/fa";
 import { BsTrash, BsPencilSquare } from "react-icons/bs";
 import { Comment } from "../../types/post.type";
 import { UserDataContext } from "../../context/UserDataContextProvider";
 import RemoveConfirmModal from "./RemoveConfirmModal";
+import PostServices from "../../services/PostServices";
+import AddComment from "./AddComment";
+import SubcommentList from "./SubcommentList";
 
 interface CommentElementProps {
   comment: Comment;
-  commentsListHandler: (comment: Comment, type: "add" | "modify") => void;
+  commentsListHandler: (
+    comment: Comment,
+    type: "add" | "modify" | "remove"
+  ) => void;
   borderBottom: boolean;
+  parentShowComment: boolean;
 }
 
 export default function CommentElement({
   comment,
   commentsListHandler,
   borderBottom,
+  parentShowComment,
 }: CommentElementProps) {
   //사용자 댓글인지 소유 확인
   const { username } = useContext(UserDataContext);
@@ -24,128 +32,72 @@ export default function CommentElement({
     [comment, username]
   );
 
-  // //대댓글 추가하려는지 확인
-  // const addSubCommentMode = useMemo(
-  //   () =>
-  //     formControl.mode === "add" &&
-  //     formControl.type === "subComment" &&
-  //     formControl.postId === postId &&
-  //     formControl.commentId === comment.id,
-  //   [
-  //     comment.id,
-  //     formControl.commentId,
-  //     formControl.mode,
-  //     formControl.postId,
-  //     formControl.type,
-  //     postId,
-  //   ]
-  // );
-
-  // //댓글 수정하려는 상태인지 확인
-  // const modifyMode = useMemo(
-  //   () =>
-  //     formControl.mode === "modify" &&
-  //     formControl.type === "comment" &&
-  //     formControl.postId === postId &&
-  //     formControl.commentId === comment.id,
-  //   [
-  //     comment.id,
-  //     formControl.commentId,
-  //     formControl.mode,
-  //     formControl.postId,
-  //     formControl.type,
-  //     postId,
-  //   ]
-  // );
-
-  // const addSubComment = useCallback(() => {
-  //   console.log("hi");
-  //   if (addSubCommentMode) {
-  //     setFormControl({
-  //       type: "",
-  //       mode: "",
-  //       postId: -1,
-  //     });
-  //   } else {
-  //     setFormControl({
-  //       type: "subComment",
-  //       mode: "add",
-  //       postId: postId,
-  //       commentId: comment.id,
-  //     });
-  //   }
-  // }, [addSubCommentMode, setFormControl, postId, comment.id]);
-
-  // const modify = useCallback(() => {
-  //   setFormControl({
-  //     type: "comment",
-  //     mode: "modify",
-  //     postId: postId,
-  //     commentId: comment.id,
-  //   });
-  // }, [comment.id, postId, setFormControl]);
-
   //삭제 확인 모달
   const [showRemoveModal, setShowRemoveModal] = useState(false);
+
   const handleRemoveModalClose = useCallback(() => {
     setShowRemoveModal(false);
   }, []);
+
   const handleRemoveModalOpen = useCallback(() => {
     setShowRemoveModal(true);
   }, []);
 
-  // //모달에 전달 -> 모달에서 제거 누르면 실행
-  // const removeComment = useCallback(() => {
-  //   dispatch(removeCommentThunk({ postId, commentId: comment.id }));
-  // }, [dispatch, comment, postId]);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  // //댓글 렌더 갯수 설정
-  // const { renderLength, renderMore, renderBase, renderAll, renderAfterAdd } =
-  //   useRenderLength({
-  //     baseLength: 1,
-  //     maxLength: comment.subComments.length,
-  //   });
+  //모달에 전달 -> 모달에서 제거 누르면 실행
+  const removeComment = useCallback(async () => {
+    setLoading(true);
+    const success = await PostServices.removeComments(comment);
+    if (!success) {
+      window.alert("댓글을 제거하는데 실패했습니다. 다시 시도해주세요.");
+      handleRemoveModalClose();
+      setLoading(false);
+      return;
+    }
+    commentsListHandler(comment, "remove");
+    setLoading(false);
+    handleRemoveModalClose();
+  }, [comment, commentsListHandler, handleRemoveModalClose]);
 
-  // //대댓글 추가 상태이면 대댓글 모두 보여줌
-  // useEffect(() => {
-  //   if (addSubCommentMode) {
-  //     renderAll();
-  //   }
-  // }, [addSubCommentMode, renderAll]);
+  const [addSubcomment, setAddSubcomment] = useState<boolean>(false);
 
-  // //렌더 설정 -> 아직 보여줄 댓글이 남아있으면 렌더 더함 -> 없으면 기본으로 돌아감
-  // const renderControl = useCallback(() => {
-  //   if (comment.subComments.length > renderLength) {
-  //     renderMore();
-  //   } else {
-  //     renderBase();
-  //   }
-  // }, [comment.subComments.length, renderLength, renderMore, renderBase]);
+  const addSubcommentHandler = useCallback(() => {
+    setAddSubcomment((prev) => !prev);
+  }, []);
 
-  // //댓글 수정 상태이면 하단 렌더
-  // if (modifyMode) {
-  //   return (
-  //     <div className={styles.comment}>
-  //       <AddComment
-  //         renderAfterAdd={renderAfterAdd}
-  //         formControl={formControl}
-  //         setFormControl={setFormControl}
-  //         prevData={comment}
-  //       />
-  //       {showComment && comment.subComments ? (
-  //         <SubCommentList
-  //           subComments={comment.subComments}
-  //           renderLength={renderLength}
-  //           renderControl={renderControl}
-  //           postId={postId}
-  //           commentId={comment.id}
-  //           formControl={formControl}
-  //           setFormControl={setFormControl}
-  //         />
-  //       ) : null}
-  //     </div>
-  //   );
-  // }
+  const [mode, setMode] = useState<"" | "modify">("");
+
+  const setModeModify = useCallback(() => {
+    setMode("modify");
+  }, []);
+
+  const setModeDefault = useCallback(() => {
+    setMode("");
+  }, []);
+
+  if (mode === "modify") {
+    return (
+      <div className={styles.comment_border}>
+        <AddComment
+          postId={comment.postId}
+          commentsListHandler={commentsListHandler}
+          prevData={{ comment, setModeDefault }}
+        />
+        {/* {showComment && comment.subComments ? (
+              <SubCommentList
+                subComments={comment.subComments}
+                renderLength={renderLength}
+                renderControl={renderControl}
+                postId={postId}
+                commentId={comment.id}
+                formControl={formControl}
+                setFormControl={setFormControl}
+              />
+            ) : null} */}
+      </div>
+    );
+  }
 
   //댓글 렌더
   return (
@@ -160,53 +112,49 @@ export default function CommentElement({
       <div className={styles.comment_date}>{`${
         comment.game
       } - ${comment.date.slice(0, comment.date.length - 4)}`}</div>
-      <div className={styles.comment_btns}>
-        {/* <button className={styles.comment_btn} onClick={addSubComment}>
-            {addSubCommentMode ? (
+      {parentShowComment ? (
+        <div className={styles.comment_btns}>
+          <button className={styles.comment_btn} onClick={addSubcommentHandler}>
+            {addSubcomment ? (
               <FaComment className={styles.comment_btn_icon} />
             ) : (
               <FaRegComment />
             )}{" "}
             <span>댓글</span>
-          </button> */}
-        {/* {checkUser ? (
-          <>
-            <button className={styles.comment_btn} onClick={modify}>
-              <BsPencilSquare /> <span>수정</span>
-            </button>
-            <button
-              className={styles.comment_btn}
-              onClick={handleRemoveModalOpen}
-            >
-              <BsTrash /> <span>제거</span>
-            </button>
-          </>
-        ) : null} */}
-      </div>
-      {/* {comment.subcomments ? (
-        <SubCommentList
-          subComments={comment.subcomments}
-          renderLength={renderLength}
-          renderControl={renderControl}
-          postId={postId}
-          commentId={comment.id}
-          formControl={formControl}
-          setFormControl={setFormControl}
+          </button>
+          {checkUser ? (
+            <>
+              <button className={styles.comment_btn} onClick={setModeModify}>
+                <BsPencilSquare /> <span>수정</span>
+              </button>
+              <button
+                className={styles.comment_btn}
+                onClick={handleRemoveModalOpen}
+              >
+                <BsTrash /> <span>삭제</span>
+              </button>
+            </>
+          ) : null}
+        </div>
+      ) : null}
+      {comment.subcomments && parentShowComment ? (
+        <SubcommentList
+          subcommentsData={{
+            data: comment.subcomments,
+            lastEvaluatedKey: comment.subcommentsLastEvaluatedKey,
+          }}
+          commentId={`${comment.postId}/${comment.date}`}
+          addSubcomment={addSubcomment}
+          setAddSubcomment={setAddSubcomment}
         />
-      ) : null} */}
-      {/* {addSubCommentMode ? (
-        <AddComment
-          renderAfterAdd={renderAfterAdd}
-          formControl={formControl}
-          setFormControl={setFormControl}
-        />
-      ) : null} */}
-      {/* <RemoveConfirmModal
+      ) : null}
+      <RemoveConfirmModal
         show={showRemoveModal}
         close={handleRemoveModalClose}
+        loading={loading}
         remove={removeComment}
         className={styles.comment_remove_modal}
-      /> */}
+      />
     </div>
   );
 }

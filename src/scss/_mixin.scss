@@ -6,3 +6,24 @@
   }
 }
 
+
+@mixin flex_center{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin btn_grey {
+  @include flex_center();
+  border: 1px solid transparent;
+  border-radius: .25rem;
+  background-color: rgba(176, 175, 175, 0.334);
+  text-align: center;
+  font-size: .825rem;
+  &_icon{
+    color: $primary-orange;
+  }
+  &:hover{
+    color: $font-color-gray;
+  }
+}

@@ -32,7 +32,7 @@
         },
         "partyggPostLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggPostLamda-494d594c63325557696b-build.zip"
+          "s3Key": "amplify-builds/partyggPostLamda-523854735654536c732b-build.zip"
         },
         "partyggDislikeLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
@@ -44,11 +44,11 @@
         },
         "partyggSubcommentLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggSubcommentLamda-67614a65754b33565543-build.zip"
+          "s3Key": "amplify-builds/partyggSubcommentLamda-35445670694a426f3947-build.zip"
         },
         "partyggCommentLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggCommentLamda-564f422f766849683330-build.zip"
+          "s3Key": "amplify-builds/partyggCommentLamda-3679306e4350306d5144-build.zip"
         }
       }
     }

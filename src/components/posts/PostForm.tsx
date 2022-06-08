@@ -202,6 +202,11 @@ export default function PostForm({
         prevData.setPostData(post);
       }
       setLoading(false);
+      setImages([]);
+      setFiles([]);
+      if (textRef.current) {
+        textRef.current.value = "";
+      }
       close();
     }
   }, [close, currentProfile, files, images.length, postImageKeys, prevData]);

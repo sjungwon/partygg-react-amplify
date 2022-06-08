@@ -42,7 +42,7 @@ export default function ImageSlide({
     const origSrc: string = imageEl.src;
 
     //key로 받아온 이미지가 아니면
-    if (!origSrc.includes("fullsize") || !origSrc.includes("resized")) {
+    if (!origSrc.includes("fullsize") && !origSrc.includes("resized")) {
       imageEl.src = "";
       return;
     }
