@@ -73,14 +73,19 @@ export default function CommentList({
     [comments.length, lastEvaluatedKey, renderLength]
   );
 
+  const [scrollHeight, setScrollHeight] = useState<number>(0);
+
   const openComments = useCallback(() => {
     setShowComment(true);
+    console.log(window.scrollY);
+    setScrollHeight(window.scrollY);
   }, [setShowComment]);
 
   const closeComments = useCallback(() => {
     renderLengthHandler("close")();
     setShowComment(false);
-  }, [renderLengthHandler, setShowComment]);
+    window.scrollTo(window.scrollX, scrollHeight);
+  }, [renderLengthHandler, scrollHeight, setShowComment]);
 
   const commentsNavigator = useMemo(
     () =>
