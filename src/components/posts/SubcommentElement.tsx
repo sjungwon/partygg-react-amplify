@@ -60,48 +60,6 @@ export default function SubcommentElement({
   const setModeDefault = useCallback(() => {
     setMode("");
   }, []);
-  // //redux & subcomment 수정, 제거
-  // const dispatch = useDispatch();
-  // const removeSubComment = useCallback(() => {
-  //   dispatch(
-  //     removeSubCommentThunk({ postId, commentId, subCommentId: subComment.id })
-  //   );
-  // }, [commentId, dispatch, postId, subComment.id]);
-
-  // const modifySubComment = useCallback(() => {
-  //   setFormControl({
-  //     type: "subComment",
-  //     mode: "modify",
-  //     postId,
-  //     commentId,
-  //     subCommentId: subComment.id,
-  //   });
-  // }, [commentId, postId, setFormControl, subComment.id]);
-
-  // //수정하려는 subcomment인지 확인 데이터
-  // const modifyMode = useMemo(
-  //   () =>
-  //     formControl.type === "subComment" &&
-  //     formControl.mode === "modify" &&
-  //     formControl.subCommentId === subComment.id,
-  //   [
-  //     formControl.mode,
-  //     formControl.subCommentId,
-  //     formControl.type,
-  //     subComment.id,
-  //   ]
-  // );
-
-  // //수정하려는 subcomment인 경우 addcomment
-  // if (modifyMode) {
-  //   return (
-  //     <AddComment
-  //       formControl={formControl}
-  //       setFormControl={setFormControl}
-  //       prevData={subComment}
-  //     />
-  //   );
-  // }
 
   if (mode === "modify") {
     return (

@@ -84,17 +84,17 @@ export default function CommentElement({
           commentsListHandler={commentsListHandler}
           prevData={{ comment, setModeDefault }}
         />
-        {/* {showComment && comment.subComments ? (
-              <SubCommentList
-                subComments={comment.subComments}
-                renderLength={renderLength}
-                renderControl={renderControl}
-                postId={postId}
-                commentId={comment.id}
-                formControl={formControl}
-                setFormControl={setFormControl}
-              />
-            ) : null} */}
+        {comment.subcomments ? (
+          <SubcommentList
+            subcommentsData={{
+              data: comment.subcomments,
+              lastEvaluatedKey: comment.subcommentsLastEvaluatedKey,
+            }}
+            commentId={`${comment.postId}/${comment.date}`}
+            addSubcomment={addSubcomment}
+            setAddSubcomment={setAddSubcomment}
+          />
+        ) : null}
       </div>
     );
   }

@@ -133,7 +133,6 @@ export default function HomePage() {
   const addImage = useCallback(async (files: FileList) => {
     const image = await Promise.all(
       Array.from(files).map((file) => {
-        const name = file.name;
         return FileServices.putPostImage(file);
       })
     );
@@ -153,7 +152,6 @@ export default function HomePage() {
   const addProfileImage = useCallback(async (files: FileList) => {
     const image = await Promise.all(
       Array.from(files).map((file) => {
-        const name = file.name;
         return FileServices.putProfileImage(file);
       })
     );

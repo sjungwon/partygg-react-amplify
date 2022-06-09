@@ -20,7 +20,7 @@ export default function ProfileSelector({
   //프로필 선택
   const select = useCallback(
     (eventKey: string | null) => {
-      if (eventKey !== null && profileArr) {
+      if (eventKey !== null && profileArr.length) {
         setCurrentProfile(profileArr[parseInt(eventKey)]);
       }
     },

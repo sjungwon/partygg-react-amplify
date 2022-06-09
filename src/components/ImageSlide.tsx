@@ -37,6 +37,11 @@ export default function ImageSlide({
     }
   }, [setIndex, images, index]);
 
+  //s3에 추가되기 전 이미지를 불러오기 오류나면 깨짐 처리
+  //s3 이미지면 lazy loading으로 url에 담긴 유저 권한이 유효기간을 넘겼을 수 있음
+  //다시 resized 이미지 url 받아와서 axios로 이미지 받을 수 있는지 확인
+  //실패하면 fullsize 이미지로 설정
+  //fullsize 이미지도 실패하면 깨짐 처리
   const loadError = useCallback(async (event: any) => {
     const imageEl = event.target;
     const origSrc: string = imageEl.src;
@@ -56,10 +61,11 @@ export default function ImageSlide({
     //key 다시 받아서 시도
     const resizedKeySplit = origSrc.split("/");
     const username = decodeURIComponent(resizedKeySplit[5]);
-    const imageName = decodeURIComponent(resizedKeySplit[6].split("?")[0]);
+    const date = decodeURIComponent(resizedKeySplit[6]);
+    const imageName = decodeURIComponent(resizedKeySplit[7].split("?")[0]);
     const key: ImageKeys = {
-      resizedKey: `resized/${username}/${imageName}`,
-      fullsizeKey: `fullsize/${username}/${imageName}`,
+      resizedKey: `resized/${username}/${date}/${imageName}`,
+      fullsizeKey: `fullsize/${username}/${date}/${imageName}`,
     };
     const resizedImageURL = await FileServices.getImage(key, "resized");
     if (resizedImageURL) {
@@ -77,14 +83,6 @@ export default function ImageSlide({
           imageEl.src = "";
         }
       }
-    }
-
-    //key 다시 받아도 실패한 경우
-    const fullsizeImageURL = await FileServices.getImage(key, "fullsize");
-    if (fullsizeImageURL) {
-      imageEl.src = fullsizeImageURL;
-    } else {
-      imageEl.src = "";
     }
   }, []);
 
@@ -119,13 +117,6 @@ export default function ImageSlide({
                   onError={loadError}
                 />
               )}
-              {/* <img
-                className={
-                  type === "modal" ? styles.modal_slide_item : styles.slide_item
-                }
-                src={img}
-                alt="inputImg"
-              /> */}
             </Carousel.Item>
           );
         })}

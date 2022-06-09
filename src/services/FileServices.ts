@@ -10,7 +10,8 @@ export default class FileServices {
       const { username } = await UserServices.getUsernameWithRefresh();
       const encodedUsername = encodeURIComponent(username);
       const encodedFilename = encodeURIComponent(file.name);
-      const path = `${encodedUsername}/${encodedFilename}`;
+      const encodedDate = encodeURIComponent(new Date().toLocaleString());
+      const path = `${encodedUsername}/${encodedDate}/${encodedFilename}`;
       const fullsizeKey = `fullsize/${path}`;
       await Storage.put(fullsizeKey, file);
       const resizedKey = `resized/${path}`;
@@ -30,7 +31,8 @@ export default class FileServices {
       const { username } = await UserServices.getUsernameWithRefresh();
       const encodedUsername = encodeURIComponent(username);
       const encodedFilename = encodeURIComponent(file.name);
-      const path = `profiles/${encodedUsername}/${encodedFilename}`;
+      const encodedDate = encodeURIComponent(new Date().toLocaleString());
+      const path = `profiles/${encodedUsername}/${encodedDate}/${encodedFilename}`;
       const fullsizeKey = `fullsize/${path}`;
       await Storage.put(fullsizeKey, file);
       const resizedKey = `resized/${path}`;

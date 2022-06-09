@@ -204,6 +204,7 @@ export default function PostForm({
       setLoading(false);
       setImages([]);
       setFiles([]);
+      setCurrentTextByte(0);
       if (textRef.current) {
         textRef.current.value = "";
       }

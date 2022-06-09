@@ -25,20 +25,11 @@ import { ImageKeys } from "../../types/file.type";
 import PostServices from "../../services/PostServices";
 import AddPostElement from "./AddPostElement";
 import CommentList, { CommentsData } from "./CommentList";
-import { Profile } from "../../types/profile.type";
 
 interface PropsType {
   post: Post;
   removePost: (value: string) => void;
 }
-
-const initialProfile: Profile = {
-  username: "",
-  game: "",
-  nickname: "",
-  date: "",
-  profileImage: "",
-};
 
 export default function PostElement({ post, removePost }: PropsType) {
   const { username } = useContext(UserDataContext);
@@ -224,6 +215,13 @@ export default function PostElement({ post, removePost }: PropsType) {
       window.alert("포스트 제거에 실패했습니다. 다시 시도해주세요.");
       setRemoveLoading(false);
       handleRemoveModalClose();
+    }
+    if (postData.images.length) {
+      await Promise.all(
+        postData.images.map(async (image) => {
+          return FileServices.removeImage(image);
+        })
+      );
     }
     removePost(postId);
     setRemoveLoading(false);
