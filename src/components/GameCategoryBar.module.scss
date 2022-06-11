@@ -9,6 +9,7 @@
 }
 
 .category_list_title{
+  position: relative;
   display: flex;
   align-items: center;
   max-height: 1.5rem;
@@ -26,6 +27,8 @@
 }
 
 .category_title_button{
+  position: absolute;
+  right: 0;
   @include btn_gray;
   width: 1.5rem;
   height: 1.5rem;
@@ -51,7 +54,7 @@
   font-size: .9rem;
   &_input{
     height: 100%;
-    width: 8rem;
+    width: 100%;
   }
   &_button{
     @include btn_gray;
