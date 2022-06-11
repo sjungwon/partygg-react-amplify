@@ -1,5 +1,4 @@
 import { useContext } from "react";
-import { Dropdown, DropdownButton } from "react-bootstrap";
 import { UserDataContext } from "../context/UserDataContextProvider";
 import styles from "./UserInfoBar.module.scss";
 

@@ -3,7 +3,6 @@ import styles from "./CommentList.module.scss";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { GoTriangleUp, GoTriangleDown } from "react-icons/go";
 import { AiOutlineDownCircle, AiOutlineUpCircle } from "react-icons/ai";
-import { FiMoreHorizontal } from "react-icons/fi";
 import CommentElement from "./CommentElement";
 import PostServices from "../../services/PostServices";
 import AddComment from "./AddComment";
@@ -35,6 +34,15 @@ export default function CommentList({
   const [renderLength, setRenderLength] = useState<number>(
     commentsData.data.length > 2 ? 3 : commentsData.data.length
   );
+
+  useEffect(() => {
+    if (!showComment) {
+      setRenderLength(
+        commentsData.data.length > 2 ? 3 : commentsData.data.length
+      );
+    }
+  }, [commentsData.data.length, showComment]);
+
   const [commentLoading, setCommentLoading] = useState<boolean>(false);
   const renderLengthHandler = useCallback(
     (type: "more" | "close") => {
@@ -84,7 +92,9 @@ export default function CommentList({
   const closeComments = useCallback(() => {
     renderLengthHandler("close")();
     setShowComment(false);
-    window.scrollTo(window.scrollX, scrollHeight);
+    setTimeout(() => {
+      window.scrollTo({ top: scrollHeight, behavior: "auto" });
+    });
   }, [renderLengthHandler, scrollHeight, setShowComment]);
 
   const commentsNavigator = useMemo(

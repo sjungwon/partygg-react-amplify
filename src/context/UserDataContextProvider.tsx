@@ -1,5 +1,4 @@
 import React, { createContext, useCallback, useState } from "react";
-import { useLocation } from "react-router-dom";
 import AuthServices from "../services/AuthServices";
 import ProfileServices from "../services/ProfileServices";
 import UserServices from "../services/UserServices";

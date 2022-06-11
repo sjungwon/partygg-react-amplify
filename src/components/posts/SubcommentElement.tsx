@@ -77,12 +77,33 @@ export default function SubcommentElement({
   //수정하려는 경우가 아니면 subcomment 렌더
   return (
     <div className={styles.subcomment}>
-      <div className={styles.subcomment_nickname}>
-        {subcomment.profile.nickname}
-        <span
-          className={styles.subcomment_username}
-        >{` (${subcomment.username})`}</span>
+      <div className={styles.subcomment_header}>
+        <img
+          src={
+            subcomment.profile.profileImage
+              ? subcomment.profile.profileImage
+              : "/default_profile.png"
+          }
+          className={styles.subcomment_header_img}
+          alt="profile"
+        />
+        {subcomment.profile.profileImage ? null : (
+          <a
+            href="https://www.flaticon.com/kr/free-icons/"
+            title="사용자 아이콘"
+            className={styles.subcomment_header_img_credit}
+          >
+            사용자 아이콘 제작자: Ongicon - Flaticon
+          </a>
+        )}
+        <div className={styles.subcomment_nickname}>
+          {subcomment.profile.nickname}
+          <span
+            className={styles.subcomment_username}
+          >{` (${subcomment.username})`}</span>
+        </div>
       </div>
+
       <div className={styles.subcomment_text}>{subcomment.text}</div>
       <div className={styles.subcomment_date}>
         {subcomment.game} - {subcomment.date}

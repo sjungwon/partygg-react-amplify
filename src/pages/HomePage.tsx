@@ -4,9 +4,7 @@ import GameCategoryBar from "../components/GameCategoryBar";
 import NavBar from "../components/NavBar";
 import PostList from "../components/posts/PostList";
 import UserInfoBar from "../components/UserInfoBar";
-import GameDataContextProvider, {
-  GameDataContext,
-} from "../context/GameDataContextProvider";
+import GameDataContextProvider from "../context/GameDataContextProvider";
 import { UserDataContext } from "../context/UserDataContextProvider";
 import styles from "./HomePage.module.scss";
 

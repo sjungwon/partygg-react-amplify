@@ -102,11 +102,31 @@ export default function CommentElement({
   //댓글 렌더
   return (
     <div className={borderBottom ? styles.comment_border : styles.comment}>
-      <div className={styles.comment_nickname}>
-        {comment.profile.nickname}
-        <span
-          className={styles.comment_username}
-        >{` (${comment.username})`}</span>
+      <div className={styles.comment_header}>
+        <img
+          src={
+            comment.profile.profileImage
+              ? comment.profile.profileImage
+              : "/default_profile.png"
+          }
+          className={styles.comment_header_img}
+          alt="profile"
+        />
+        {comment.profile.profileImage ? null : (
+          <a
+            href="https://www.flaticon.com/kr/free-icons/"
+            title="사용자 아이콘"
+            className={styles.comment_header_img_credit}
+          >
+            사용자 아이콘 제작자: Ongicon - Flaticon
+          </a>
+        )}
+        <div className={styles.comment_nickname}>
+          {comment.profile.nickname}
+          <span
+            className={styles.comment_username}
+          >{` (${comment.username})`}</span>
+        </div>
       </div>
       <div className={styles.comment_text}>{comment.text}</div>
       <div className={styles.comment_date}>{`${

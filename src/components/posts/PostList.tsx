@@ -2,17 +2,9 @@ import styles from "./PostList.module.scss";
 import AddPostElement from "./AddPostElement";
 import PostElement from "./PostElement";
 import PostServices from "../../services/PostServices";
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Post } from "../../types/post.type";
 import { useNavigate } from "react-router-dom";
-import { UserDataContext } from "../../context/UserDataContextProvider";
 
 interface Props {
   category: string;
@@ -59,33 +51,6 @@ export default function PostList({ category, searchParam }: Props) {
       setPosts((prev: Post[]) => [...prev, ...postIdList]);
     }
     return;
-    // if (!category && !searchParam) {
-    //   const postIdList = await PostServices.getPosts();
-    //   if (postIdList) {
-    //     console.log(postIdList.lastEvaluatedKey);
-    //     setPosts((prev: Post[]) => [...prev, ...postIdList.data]);
-    //   }
-    //   return;
-    // }
-
-    // //game 카테고리
-    // if (category === "games" && searchParam) {
-    //   const postList = await PostServices.getPostsByGame(searchParam);
-    //   if (postList) {
-    //     console.log(postList.lastEvaluatedKey);
-    //     setPosts((prev: Post[]) => [...prev, ...postList.data]);
-    //   }
-    //   return;
-    // }
-
-    // if (category === "usernames" && searchParam) {
-    //   const postList = await PostServices.getPostsByUser(searchParam);
-    //   if (postList) {
-    //     console.log(postList.lastEvaluatedKey);
-    //     setPosts((prev: Post[]) => [...prev, ...postList.data]);
-    //   }
-    //   return;
-    // }
   }, [category, searchParam]);
 
   const loader = useRef<HTMLDivElement>(null);

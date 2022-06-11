@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useContext, useMemo, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import GameServices from "../services/GameServices";
 import { AiOutlineUnorderedList, AiOutlineClose } from "react-icons/ai";
@@ -13,7 +6,6 @@ import { BsPlusLg } from "react-icons/bs";
 import styles from "./GameCategoryBar.module.scss";
 import { GameDataContext } from "../context/GameDataContextProvider";
 import TextValidServices from "../services/TextValidServices";
-import { Button } from "react-bootstrap";
 
 export default function GameCategoryBar() {
   const { games, setGamesHandler } = useContext(GameDataContext);

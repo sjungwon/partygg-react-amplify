@@ -1,4 +1,4 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext } from "react";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { UserDataContext } from "../context/UserDataContextProvider";
 import { Profile } from "../types/profile.type";

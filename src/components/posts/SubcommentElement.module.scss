@@ -4,12 +4,30 @@
 .subcomment{
   padding-left:  1rem;
   margin: .5rem 0;
-  border-left: 1px solid $primary-default;
+  border-left: 1px solid $primary-orange-border;
   color: $font-color-gray;
   font-size: .85rem;
   &:first-child{
     margin-top: 0;
   }
+}
+
+
+.subcomment_header{
+  display: flex;
+  align-items: center;
+}
+
+.subcomment_header_img{
+  height: 1.75rem;
+  width: 1.75rem;
+  margin-right: .25rem;
+  border-radius: 50%;
+  object-fit:cover;
+}
+
+.subcomment_header_img_credit{
+  display: none;
 }
 
 .subcomment_nickname{
