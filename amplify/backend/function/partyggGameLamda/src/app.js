@@ -56,39 +56,44 @@ const convertUrlType = (param, type) => {
 /********************************
  * HTTP Get method for list objects *
  ********************************/
-
-app.get(path + hashKeyPath, function (req, res) {
-  const condition = {};
-  condition[partitionKeyName] = {
-    ComparisonOperator: "EQ",
-  };
-
-  if (userIdPresent && req.apiGateway) {
-    condition[partitionKeyName]["AttributeValueList"] = [
-      req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH,
-    ];
-  } else {
-    try {
-      condition[partitionKeyName]["AttributeValueList"] = [
-        convertUrlType(req.params[partitionKeyName], partitionKeyType),
-      ];
-    } catch (err) {
-      res.statusCode = 500;
-      res.json({ error: "Wrong column type " + err });
-    }
-  }
-
+app.get(path, function (req, res) {
+  console.log("request for scan all games");
   let queryParams = {
     TableName: tableName,
-    KeyConditions: condition,
   };
 
-  dynamodb.query(queryParams, (err, data) => {
+  dynamodb.scan(queryParams, (err, data) => {
     if (err) {
       res.statusCode = 500;
       res.json({ error: "Could not load items: " + err });
     } else {
-      res.json(data.Items);
+      res.json({ data: data.Items, lastEvaluatedKey: data.LastEvaluatedKey });
+    }
+  });
+});
+
+/********************************
+ * HTTP Get method for list objects *
+ ********************************/
+app.get(path + hashKeyPath, function (req, res) {
+  console.log("request for scan more games");
+  const lastEvaluatedKey = {
+    name: req.params[partitionKeyName],
+  };
+
+  let queryParams = {
+    TableName: tableName,
+    ExclusiveStartKey: {
+      ...lastEvaluatedKey,
+    },
+  };
+
+  dynamodb.scan(queryParams, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({ error: "Could not load items: " + err });
+    } else {
+      res.json({ data: data.Items, lastEvaluatedKey: data.LastEvaluatedKey });
     }
   });
 });
@@ -172,7 +177,6 @@ app.put(path, function (req, res) {
 /************************************
  * HTTP post method for insert object *
  *************************************/
-
 app.post(path, function (req, res) {
   if (userIdPresent) {
     req.body["userId"] =
@@ -196,7 +200,6 @@ app.post(path, function (req, res) {
 /**************************************
  * HTTP remove method to delete object *
  ***************************************/
-
 app.delete(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
   const params = {};
   if (userIdPresent && req.apiGateway) {

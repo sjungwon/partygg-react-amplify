@@ -21,24 +21,24 @@ interface Props {
 //prevData에 따라 수정, 추가 상태 결정
 export default function AddPostElement({ prevData }: Props) {
   //프로필 데이터 사용
-  const {
-    profileArr,
-    username,
-    currentProfile: defaultProfile,
-  } = useContext(UserDataContext);
+  const { filteredProfileArr, currentProfile: defaultProfile } =
+    useContext(UserDataContext);
   const [currentProfile, setCurrentProfile] = useState<Profile>(defaultProfile);
-
+  console.log(defaultProfile);
   //prevData가 있으면 해당 데이터의 프로필로 현재 프로필 변경, 없으면 첫번째 프로필로 설정
   useEffect(() => {
     if (prevData.postData) {
-      const index = profileArr.findIndex(
-        (profile) => profile.nickname === prevData.postData?.profile.nickname
+      const post = prevData.postData;
+      const index = filteredProfileArr.findIndex(
+        (profile) => profile.nickname === post.profile.nickname
       );
-      setCurrentProfile(index > -1 ? profileArr[index] : profileArr[0]);
+      setCurrentProfile(
+        index > -1 ? filteredProfileArr[index] : filteredProfileArr[0]
+      );
       return;
     }
     setCurrentProfile(defaultProfile);
-  }, [defaultProfile, prevData, profileArr]);
+  }, [defaultProfile, filteredProfileArr, prevData]);
 
   //prevData 유무에 따라 form을 바로 보여줄 지 결정
   const [show, setShow] = useState(!!prevData.setMode);
@@ -68,15 +68,11 @@ export default function AddPostElement({ prevData }: Props) {
           {currentProfile.nickname ? currentProfile.nickname : ""}
         </Card.Title>
         <div className={styles.card_header_right}>
-          <ProfileSelector
-            setCurrentProfile={setCurrentProfile}
-            size="sm"
-            disabled={!username || !profileArr.length}
-          />
+          <ProfileSelector setCurrentProfile={setCurrentProfile} size="sm" />
           <Button
             onClick={showHandler}
             size="sm"
-            disabled={!username || !profileArr.length}
+            disabled={!filteredProfileArr.length}
           >
             <BsPlusLg />
           </Button>

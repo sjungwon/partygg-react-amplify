@@ -4,7 +4,7 @@
 div.card_footer{
   padding: 0 1.25rem;
   padding-top: .25rem;
-  border-top: 1px dashed $primary-orange;
+  border-top: 1px dashed $primary-default;
   font-size: .9rem;
 }
 
@@ -57,7 +57,7 @@ div.card_footer{
 }
 
 .more{
-  @include btn_grey;
+  @include btn_gray;
   margin: .25rem;
   padding: .1rem .2rem;
   padding-bottom: 0;
@@ -78,11 +78,11 @@ div.card_footer{
 }
 
 .border_line{
-  border-bottom: 1px dashed $primary-orange;
+  border-bottom: 1px dashed $primary-default;
 }
 
 .card_body_btn{
-  @include btn_grey;
+  @include btn_gray;
   height: 1rem;
   width: 4rem;
   padding: 1px 0;

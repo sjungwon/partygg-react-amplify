@@ -32,7 +32,7 @@ interface PropsType {
 }
 
 export default function PostElement({ post, removePost }: PropsType) {
-  const { username } = useContext(UserDataContext);
+  const { username, profileArr } = useContext(UserDataContext);
   const [images, setImages] = useState<string[]>([]);
   const [postData, setPostData] = useState<Post>(post);
   const postId = useMemo<string>(() => `${post.username}/${post.date}`, [post]);
@@ -233,13 +233,23 @@ export default function PostElement({ post, removePost }: PropsType) {
   const select = useCallback(
     (eventKey: any) => {
       if (eventKey === "1") {
-        setMode("modify");
+        if (
+          profileArr.find(
+            (profile) => profile.nickname === postData.profile.nickname
+          )
+        ) {
+          setMode("modify");
+        } else {
+          window.alert(
+            "해당 포스트의 프로필이 현재 존재하지 않아 수정할 수 없습니다."
+          );
+        }
       }
       if (eventKey === "2") {
         handleRemoveModalOpen();
       }
     },
-    [handleRemoveModalOpen]
+    [handleRemoveModalOpen, postData.profile.nickname, profileArr]
   );
 
   console.log(showComment);

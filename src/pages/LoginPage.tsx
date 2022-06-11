@@ -1,4 +1,11 @@
-import { useCallback, useContext, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import RegisterConfirmModal from "../components/RegisterConfirmModal";
@@ -16,8 +23,6 @@ export default function LoginPage() {
   const [mdShow, setMdShow] = useState<boolean>(false);
   const [btnDisabled, setbtnDisabled] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const navigate = useNavigate();
 
   const openModal = useCallback(() => {
     setMdShow(true);
@@ -65,7 +70,15 @@ export default function LoginPage() {
   const [loginUsername, setLoginUserName] = useState<string>("");
 
   //제출시 로그인 내역 전역 user 데이터에 설정
-  const { checkLogin } = useContext(UserDataContext);
+  const { checkLogin, username: loginUser } = useContext(UserDataContext);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (loginUser) {
+      navigate("/");
+    }
+  }, [loginUser, navigate]);
 
   //제출
   const click = async () => {
@@ -139,10 +152,10 @@ export default function LoginPage() {
           <div className={styles.login_card__bottom}>
             <Form>
               <Form.Group className="mb-3" controlId="formBasicEmail">
-                <Form.Label visuallyHidden={true}>닉네임</Form.Label>
+                <Form.Label visuallyHidden={true}>사용자 이름</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="닉네임을 입력해주세요."
+                  placeholder="사용자 이름을 입력해주세요."
                   bsPrefix={`${styles.input}`}
                   name="username"
                   value={username}

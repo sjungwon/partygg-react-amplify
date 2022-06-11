@@ -261,12 +261,14 @@ app.get(path + "/game" + gameKeyPath, function (req, res) {
     ScanIndexForward: false,
     Limit: 6,
   };
+  console.log(queryParams);
 
   dynamodb.query(queryParams, async (err, data) => {
     if (err) {
       res.statusCode = 500;
       res.json({ error: "Could not load items: " + err });
     } else {
+      console.log(data);
       if (data.Items) {
         const newItem = await Promise.all(
           data.Items.map(async (item) => {

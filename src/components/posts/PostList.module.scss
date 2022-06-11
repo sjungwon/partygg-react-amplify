@@ -1,10 +1,13 @@
 @import "../../scss/variables";
 
 .container{
-  margin: 0 auto;
-  width: 95%;
+  margin: 0;
+  width: 100%;
   min-width: 20rem;
-  background-color: $primary-orange-background;
+  max-width: 32rem;
+  background-color: $primary-default-background;
+  border-left: 1px solid $primary-default-border;
+  border-right: 1px solid $primary-default-border;
 }
 
 .loader{

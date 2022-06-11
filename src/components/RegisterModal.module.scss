@@ -7,15 +7,15 @@
   width: 100%;
   margin: 0 auto;
   margin-bottom: .5rem;
-  border: 1px solid $primary-orange-border;
+  border: 1px solid $primary-default-border;
   border-radius: .4rem;
   text-indent: .9rem;
   font-size: 1rem;
   transition: .15s;
   &:focus{
     outline: 0;
-    border: 1px solid $primary-orange;
-    box-shadow: $primary-orange-box-shadow;
+    border: 1px solid $primary-default;
+    box-shadow: $primary-default-box-shadow;
   }
 }
 .register_btn{

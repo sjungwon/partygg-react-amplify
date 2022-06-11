@@ -12,12 +12,12 @@ import {
   Comment,
   CommentsLastEvaluatedKey,
   GetCommentsResData,
-  GetGamePostIdListResData,
-  GetPostIdListResData,
+  GetGamePostsResData,
+  GetPostsResData,
   GetSubcommentResData,
-  LastEvaluatedKey,
-  LastEvaluatedKeyForAll,
-  LastEvaluatedKeyForGame,
+  LastEvaluatedKeyForPost,
+  LastEvaluatedKeyForAllPost,
+  LastEvaluatedKeyForGamePost,
   Post,
   RemovePostReqData,
   Subcomment,
@@ -32,12 +32,20 @@ export default class PostServices {
   private static path: string = "/posts";
   private static commentsPath: string = "/comments";
   private static subcommentsPath: string = "/subcomments";
-  private static lastEvaluatedKeyForAll: LastEvaluatedKeyForAll | undefined =
+  private static lastEvaluatedKeyForAll:
+    | LastEvaluatedKeyForAllPost
+    | undefined = undefined;
+  private static lastEvaluatedKeyForGame:
+    | LastEvaluatedKeyForGamePost
+    | undefined = undefined;
+  private static lastEvaluatedKeyForUser: LastEvaluatedKeyForPost | undefined =
     undefined;
   private static getDone: boolean = false;
 
   public static init() {
     this.lastEvaluatedKeyForAll = undefined;
+    this.lastEvaluatedKeyForGame = undefined;
+    this.lastEvaluatedKeyForUser = undefined;
     this.getDone = false;
   }
 
@@ -50,6 +58,7 @@ export default class PostServices {
       const myInit: { body: AddPostReqBodyData } = {
         body: {
           ...newPost,
+          nickname: newPost.profile.nickname,
           username,
         },
       };
@@ -70,21 +79,21 @@ export default class PostServices {
   public static async updatePost(postData: Post): Promise<Post | null> {
     try {
       const { username } = await UserServices.getUsernameWithRefresh();
-      const { game, profile, text, date, images } = postData;
+      const { game, profile, text, images, nickname } = postData;
       if (!username) {
         return null;
       }
       const updatePath = `${this.path}/object/${encodeURIComponent(
         username
-      )}/${encodeURIComponent(date)}`;
+      )}/${encodeURIComponent(postData.date)}`;
       const myInit: { body: UpdatePostReqData } = {
         body: {
-          date,
           game,
           profile,
           text,
           images,
           username,
+          nickname,
         },
       };
       const response = await API.post(this.apiName, updatePath, myInit);
@@ -116,9 +125,55 @@ export default class PostServices {
     }
   }
 
-  public static async getPostIdList(): Promise<GetPostIdListResData | null> {
+  public static async getPosts(
+    category: string,
+    searchParam: string
+  ): Promise<Post[] | null> {
     if (this.getDone) {
       return null;
+    }
+    if (category === "games" && searchParam) {
+      const path = this.lastEvaluatedKeyForGame
+        ? `${this.path}/game/${encodeURIComponent(
+            this.lastEvaluatedKeyForGame.game
+          )}/${encodeURIComponent(
+            this.lastEvaluatedKeyForGame.username
+          )}/${encodeURIComponent(this.lastEvaluatedKeyForGame.date)}`
+        : `${this.path}/game/${searchParam}`;
+      try {
+        const response: GetGamePostsResData = await API.get(
+          this.apiName,
+          path,
+          {}
+        );
+        if (!response.lastEvaluatedKey) {
+          this.getDone = true;
+        }
+        this.lastEvaluatedKeyForGame = response.lastEvaluatedKey;
+        return response.data;
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
+    }
+
+    if (category === "usernames" && searchParam) {
+      const path = this.lastEvaluatedKeyForUser
+        ? `${this.path}/user/${encodeURIComponent(
+            this.lastEvaluatedKeyForUser.username
+          )}/${encodeURIComponent(this.lastEvaluatedKeyForUser.date)}`
+        : `${this.path}/user/${searchParam}`;
+      try {
+        const response: GetPostsResData = await API.get(this.apiName, path, {});
+        if (!response.lastEvaluatedKey) {
+          this.getDone = true;
+        }
+        this.lastEvaluatedKeyForUser = response.lastEvaluatedKey;
+        return response.data;
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
     }
     const path = this.lastEvaluatedKeyForAll
       ? `${this.path}/${encodeURIComponent(
@@ -126,50 +181,41 @@ export default class PostServices {
         )}/${encodeURIComponent(this.lastEvaluatedKeyForAll.date)}`
       : this.path;
     try {
-      const response: GetPostIdListResData = await API.get(
-        this.apiName,
-        path,
-        {}
-      );
-      if (this.lastEvaluatedKeyForAll && !response.lastEvaluatedKey) {
+      const response: GetPostsResData = await API.get(this.apiName, path, {});
+      if (!response.lastEvaluatedKey) {
         this.getDone = true;
       }
       this.lastEvaluatedKeyForAll = response.lastEvaluatedKey;
-      return response;
+      return response.data;
     } catch (error) {
       console.log(error);
       return null;
     }
   }
 
-  public static async getPostIdListByGame(
+  public static async getPostsByGame(
     game: string
-  ): Promise<GetGamePostIdListResData | null> {
-    try {
-      const response: GetGamePostIdListResData = await API.get(
-        this.apiName,
-        `${this.path}/game/${encodeURIComponent(game)}`,
-        {}
-      );
-      return response;
-    } catch (error) {
-      console.log(error);
+  ): Promise<GetGamePostsResData | null> {
+    if (this.getDone) {
       return null;
     }
-  }
-
-  public static async getNextPostIdListByGame(
-    data: LastEvaluatedKeyForGame
-  ): Promise<GetGamePostIdListResData | null> {
+    const path = this.lastEvaluatedKeyForGame
+      ? `${this.path}/game/${encodeURIComponent(
+          this.lastEvaluatedKeyForGame.game
+        )}/${encodeURIComponent(
+          this.lastEvaluatedKeyForGame.username
+        )}/${encodeURIComponent(this.lastEvaluatedKeyForGame.date)}`
+      : `${this.path}/game/${game}`;
     try {
-      const path = `${this.path}/game/${encodeURIComponent(
-        data.game
-      )}/${encodeURIComponent(data.username)}/${encodeURIComponent(data.date)}`;
-      const response: GetGamePostIdListResData = await API.get(
+      const response: GetGamePostsResData = await API.get(
         this.apiName,
         path,
         {}
       );
+      if (!response.lastEvaluatedKey) {
+        this.getDone = true;
+      }
+      this.lastEvaluatedKeyForGame = response.lastEvaluatedKey;
       return response;
     } catch (error) {
       console.log(error);
@@ -177,16 +223,42 @@ export default class PostServices {
     }
   }
 
-  public static async getUserPostIdList(
+  // public static async getNextPostIdListByGame(
+  //   data: LastEvaluatedKeyForGame
+  // ): Promise<GetGamePostIdListResData | null> {
+  //   try {
+  //     const path = `${this.path}/game/${encodeURIComponent(
+  //       data.game
+  //     )}/${encodeURIComponent(data.username)}/${encodeURIComponent(data.date)}`;
+  //     const response: GetGamePostIdListResData = await API.get(
+  //       this.apiName,
+  //       path,
+  //       {}
+  //     );
+  //     return response;
+  //   } catch (error) {
+  //     console.log(error);
+  //     return null;
+  //   }
+  // }
+
+  public static async getPostsByUser(
     username: string
-  ): Promise<GetPostIdListResData | null> {
+  ): Promise<GetPostsResData | null> {
+    if (this.getDone) {
+      return null;
+    }
+    const path = this.lastEvaluatedKeyForUser
+      ? `${this.path}/user/${encodeURIComponent(
+          this.lastEvaluatedKeyForUser.username
+        )}/${encodeURIComponent(this.lastEvaluatedKeyForUser.date)}`
+      : `${this.path}/user/${username}`;
     try {
-      const path = `${this.path}/user/${encodeURIComponent(username)}`;
-      const response: GetPostIdListResData = await API.get(
-        this.apiName,
-        path,
-        {}
-      );
+      const response: GetPostsResData = await API.get(this.apiName, path, {});
+      if (!response.lastEvaluatedKey) {
+        this.getDone = true;
+      }
+      this.lastEvaluatedKeyForUser = response.lastEvaluatedKey;
       return response;
     } catch (error) {
       console.log(error);
@@ -194,38 +266,34 @@ export default class PostServices {
     }
   }
 
-  public static async getNextUserPostIdList(
-    data: LastEvaluatedKey
-  ): Promise<GetPostIdListResData | null> {
-    try {
-      const path = `${this.path}/user/${encodeURIComponent(
-        data.username
-      )}/${encodeURIComponent(data.date)}`;
-      const response: GetPostIdListResData = await API.get(
-        this.apiName,
-        path,
-        {}
-      );
-      return response;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  }
+  // public static async getNextUserPostIdList(
+  //   data: LastEvaluatedKeyForPost
+  // ): Promise<GetPostsResData | null> {
+  //   try {
+  //     const path = `${this.path}/user/${encodeURIComponent(
+  //       data.username
+  //     )}/${encodeURIComponent(data.date)}`;
+  //     const response: GetPostsResData = await API.get(
+  //       this.apiName,
+  //       path,
+  //       {}
+  //     );
+  //     return response;
+  //   } catch (error) {
+  //     console.log(error);
+  //     return null;
+  //   }
+  // }
 
   public static async getUserPostIdListByGame(
     username: string,
     game: string
-  ): Promise<GetPostIdListResData | null> {
+  ): Promise<GetPostsResData | null> {
     try {
       const path = `${this.path}/user/${encodeURIComponent(
         username
       )}/game/${encodeURIComponent(game)}`;
-      const response: GetPostIdListResData = await API.get(
-        this.apiName,
-        path,
-        {}
-      );
+      const response: GetPostsResData = await API.get(this.apiName, path, {});
       return response;
     } catch (error) {
       console.log(error);
@@ -235,17 +303,13 @@ export default class PostServices {
 
   public static async getNextUserPostIdListByGame(
     game: string,
-    data: LastEvaluatedKey
-  ): Promise<GetPostIdListResData | null> {
+    data: LastEvaluatedKeyForPost
+  ): Promise<GetPostsResData | null> {
     try {
       const path = `${this.path}/user/${encodeURIComponent(
         data.username
       )}/game/${encodeURIComponent(game)}/${encodeURIComponent(data.date)}`;
-      const response: GetPostIdListResData = await API.get(
-        this.apiName,
-        path,
-        {}
-      );
+      const response: GetPostsResData = await API.get(this.apiName, path, {});
       return response;
     } catch (error) {
       console.log(error);

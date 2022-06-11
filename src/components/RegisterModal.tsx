@@ -156,11 +156,11 @@ export default function RegisterModal({
           <Form>
             <Form.Group className="mb-3" controlId="formBasicUsername">
               <Form.Label>
-                닉네임 (8자 이하) <span style={{ color: "red" }}> *</span>
+                사용자 이름 (8자 이하) <span style={{ color: "red" }}> *</span>
               </Form.Label>
               <Form.Control
                 type="text"
-                placeholder="닉네임을 입력해주세요."
+                placeholder="사용자 이름을 입력해주세요."
                 bsPrefix={`${styles.input}`}
                 value={username}
                 onChange={verifyUsername}

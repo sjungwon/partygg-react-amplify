@@ -2,11 +2,35 @@ import styles from "./PostList.module.scss";
 import AddPostElement from "./AddPostElement";
 import PostElement from "./PostElement";
 import PostServices from "../../services/PostServices";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Post } from "../../types/post.type";
+import { useNavigate } from "react-router-dom";
+import { UserDataContext } from "../../context/UserDataContextProvider";
 
-export default function PostList() {
+interface Props {
+  category: string;
+  searchParam: string;
+}
+
+export default function PostList({ category, searchParam }: Props) {
+  const navigate = useNavigate();
+
   const [posts, setPosts] = useState<Post[]>([]);
+
+  useEffect(() => {
+    console.log("init");
+    PostServices.init();
+    return () => {
+      console.log("unmount");
+    };
+  }, [navigate]);
 
   const removePost = useCallback((postId: string) => {
     setPosts((prev: Post[]) =>
@@ -14,10 +38,6 @@ export default function PostList() {
         (prevPost) => `${prevPost.username}/${prevPost.date}` !== postId
       )
     );
-  }, []);
-
-  useEffect(() => {
-    PostServices.init();
   }, []);
 
   const [addPostData, setAddPostData] = useState<Post | null>(null);
@@ -31,12 +51,42 @@ export default function PostList() {
 
   const sendQuery = useCallback(async () => {
     console.log("query");
-    const postIdList = await PostServices.getPostIdList();
+    const postIdList = await PostServices.getPosts(
+      category,
+      searchParam ? searchParam : ""
+    );
     if (postIdList) {
-      console.log(postIdList.lastEvaluatedKey);
-      setPosts((prev: Post[]) => [...prev, ...postIdList.data]);
+      setPosts((prev: Post[]) => [...prev, ...postIdList]);
     }
-  }, []);
+    return;
+    // if (!category && !searchParam) {
+    //   const postIdList = await PostServices.getPosts();
+    //   if (postIdList) {
+    //     console.log(postIdList.lastEvaluatedKey);
+    //     setPosts((prev: Post[]) => [...prev, ...postIdList.data]);
+    //   }
+    //   return;
+    // }
+
+    // //game 카테고리
+    // if (category === "games" && searchParam) {
+    //   const postList = await PostServices.getPostsByGame(searchParam);
+    //   if (postList) {
+    //     console.log(postList.lastEvaluatedKey);
+    //     setPosts((prev: Post[]) => [...prev, ...postList.data]);
+    //   }
+    //   return;
+    // }
+
+    // if (category === "usernames" && searchParam) {
+    //   const postList = await PostServices.getPostsByUser(searchParam);
+    //   if (postList) {
+    //     console.log(postList.lastEvaluatedKey);
+    //     setPosts((prev: Post[]) => [...prev, ...postList.data]);
+    //   }
+    //   return;
+    // }
+  }, [category, searchParam]);
 
   const loader = useRef<HTMLDivElement>(null);
 
@@ -75,7 +125,12 @@ export default function PostList() {
       threshold: 0,
     };
     const observer = new IntersectionObserver(handleObserver, option);
-    if (loader.current) observer.observe(loader.current);
+    const savedLoader = loader.current;
+    if (savedLoader) observer.observe(savedLoader);
+    return () => {
+      console.log("clear handler");
+      if (savedLoader) observer.unobserve(savedLoader);
+    };
   }, [handleObserver]);
 
   const addPostComponent = useMemo(
@@ -105,8 +160,8 @@ export default function PostList() {
       <div className={styles.container}>
         {addPostComponent}
         {postListComponent}
+        <div ref={loader} className={styles.loader}></div>
       </div>
-      <div ref={loader} className={styles.loader}></div>
     </>
   );
 }

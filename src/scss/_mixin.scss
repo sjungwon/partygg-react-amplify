@@ -13,11 +13,11 @@
   align-items: center;
 }
 
-@mixin btn_grey {
+@mixin btn_gray {
   @include flex_center();
   border: 1px solid transparent;
   border-radius: .25rem;
-  background-color: rgba(176, 175, 175, 0.334);
+  background-color: $primary-default-btn-background;
   text-align: center;
   font-size: .825rem;
   &_icon{

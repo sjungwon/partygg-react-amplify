@@ -28,11 +28,11 @@
         },
         "partyggGameLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggGameLamda-71574e36724a63376d63-build.zip"
+          "s3Key": "amplify-builds/partyggGameLamda-515534756177586c5849-build.zip"
         },
         "partyggPostLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggPostLamda-523854735654536c732b-build.zip"
+          "s3Key": "amplify-builds/partyggPostLamda-54317665556d3970492b-build.zip"
         },
         "partyggDislikeLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",

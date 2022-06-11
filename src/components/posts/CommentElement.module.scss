@@ -39,9 +39,9 @@
   height: 1.5rem;
   font-size: 1.5rem;
   cursor: pointer;
-  color: $primary-orange;
+  color: $primary-default;
   &:hover{
-    color: $primary-orange-hover;
+    color: $primary-default-hover;
   }
 }
 
@@ -70,7 +70,7 @@
 }
 
 .comment_btn{
-  @include btn_grey;
+  @include btn_gray;
   min-height: .8rem;
   height: 1rem;
   min-width: 4rem;
@@ -78,7 +78,7 @@
   margin-right: .3rem;
   font-size: .775rem;
   &_icon{
-    color: $primary-orange;
+    color: $primary-default;
   }
   &:hover{
     color: $font-color-gray;

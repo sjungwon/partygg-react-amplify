@@ -20,6 +20,17 @@
         "fieldName": "date",
         "fieldType": "string"
       }
+    },
+    {
+      "name": "nickname-date-index",
+      "partitionKey": {
+        "fieldName": "nickname",
+        "fieldType": "string"
+      },
+      "sortKey": {
+        "fieldName": "date",
+        "fieldType": "string"
+      }
     }
   ],
   "triggerFunctions": []

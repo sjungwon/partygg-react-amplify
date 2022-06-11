@@ -13,6 +13,7 @@ function App() {
   const { checkLogin } = useContext(UserDataContext);
 
   useEffect(() => {
+    console.log("login check");
     checkLogin();
   }, [checkLogin]);
 
@@ -21,9 +22,11 @@ function App() {
       <ErrorBoundary FallbackComponent={ErrorPage}>
         <BrowserRouter>
           <Routes>
-            <Route path="*" element={<NotFoundPage />} />
             <Route path="/" element={<HomePage />} />
+            <Route path="/games/*" element={<HomePage />} />
+            <Route path="/usernames/*" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </BrowserRouter>
       </ErrorBoundary>

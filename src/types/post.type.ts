@@ -13,6 +13,7 @@ export interface Post extends PostStruct, UserResource {
   //partition key
   //username : string;
   //sort key
+  nickname: string;
   date: string;
   images: ImageKeys[];
   likes: string[];
@@ -21,48 +22,51 @@ export interface Post extends PostStruct, UserResource {
   commentsLastEvaluatedKey?: CommentsLastEvaluatedKey;
 }
 
-export interface LastEvaluatedKey {
+export interface LastEvaluatedKeyForPost {
   username: string;
   date: string;
 }
 
 export type GetPostReqData = Post[];
 
-export interface LastEvaluatedKeyForAll extends LastEvaluatedKey {
+export interface LastEvaluatedKeyForAllPost extends LastEvaluatedKeyForPost {
   forall: string;
 }
 
-export interface LastEvaluatedKeyForGame extends LastEvaluatedKey {
+export interface LastEvaluatedKeyForGamePost extends LastEvaluatedKeyForPost {
   game: string;
 }
 
-export interface GetPostIdListResData {
+export interface GetPostsResData {
   data: Post[];
-  lastEvaluatedKey?: LastEvaluatedKeyForAll;
+  lastEvaluatedKey?: LastEvaluatedKeyForAllPost;
 }
 
-export interface GetGamePostIdListResData {
+export interface GetGamePostsResData {
   data: Post[];
-  lastEvaluatedKey?: LastEvaluatedKeyForGame;
+  lastEvaluatedKey?: LastEvaluatedKeyForGamePost;
 }
 
 export interface AddPostReqData extends PostStruct {
   images: ImageKeys[];
 }
 
-export interface AddPostReqBodyData extends AddPostReqData, UserResource {}
+export interface AddPostReqBodyData extends AddPostReqData, UserResource {
+  nickname: string;
+}
 
 export interface AddPostResData extends AddPostReqData, UserResource {
+  nickname: string;
   date: string;
 }
 
 export interface UpdatePostReqData extends AddPostReqData, UserResource {
-  date: string;
+  nickname: string;
 }
 
 export interface UpdatePostResData extends AddPostResData {}
 
-export interface RemovePostReqData extends LastEvaluatedKey {}
+export interface RemovePostReqData extends LastEvaluatedKeyForPost {}
 
 //comment
 export interface Comment extends PostStruct, UserResource {

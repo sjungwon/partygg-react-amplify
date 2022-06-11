@@ -1,30 +1,29 @@
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useState } from "react";
 import { Dropdown, DropdownButton } from "react-bootstrap";
 import { UserDataContext } from "../context/UserDataContextProvider";
 import { Profile } from "../types/profile.type";
 
 interface PropsType {
   size?: "sm" | "lg";
-  disabled?: boolean;
   setCurrentProfile: (profile: Profile) => void;
 }
 
 export default function ProfileSelector({
   size,
-  disabled,
   setCurrentProfile,
 }: PropsType) {
   //프로필 상태 데이터
-  const { profileArr } = useContext(UserDataContext);
+  const { filteredProfileArr } = useContext(UserDataContext);
+
   console.log("selector render");
   //프로필 선택
   const select = useCallback(
     (eventKey: string | null) => {
-      if (eventKey !== null && profileArr.length) {
-        setCurrentProfile(profileArr[parseInt(eventKey)]);
+      if (eventKey !== null && filteredProfileArr.length) {
+        setCurrentProfile(filteredProfileArr[parseInt(eventKey)]);
       }
     },
-    [profileArr, setCurrentProfile]
+    [filteredProfileArr, setCurrentProfile]
   );
 
   return (
@@ -33,9 +32,9 @@ export default function ProfileSelector({
       title="프로필"
       onSelect={select}
       size={size}
-      disabled={disabled}
+      disabled={!filteredProfileArr.length}
     >
-      {profileArr?.map((profile, index) => {
+      {filteredProfileArr.map((profile, index) => {
         return (
           <Dropdown.Item key={profile.game + profile.nickname} eventKey={index}>
             {profile.game} - {profile.nickname}

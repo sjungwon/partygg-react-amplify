@@ -28,4 +28,13 @@ export default class TextValidServices {
       /^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$/i
     ).test(text);
   }
+
+  public static isIncludeSpecial(text: string): boolean {
+    return new RegExp(/[{}[\]/?.,;:|)*~`!^\-_+<>@#₩$%&\\=('"]/gi).test(text);
+  }
+
+  public static removeSpecial(text: string): string {
+    const reg = /[{}[\]/?.,;:|)*~`!^\-_+<>@#₩$%&\\=('"]/gi;
+    return text.replace(reg, "");
+  }
 }

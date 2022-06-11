@@ -2,12 +2,12 @@
 @import "../../scss/variables";
 
 div.card{
-  max-width: 26rem;
+  max-width: 28rem;
   min-height: 10rem; 
-  margin: 1.5rem auto;
-  box-shadow: $card-box-shadow;
+  margin: 2.5rem auto;
+  box-shadow: $card-box-shadow-bottom;
   border-radius: .5rem;
-  border: 1px solid $primary-orange-border;
+  border: 1px solid $primary-default-border;
 }
 
 div.card_header{
@@ -108,21 +108,10 @@ div.card_body{
   align-items: center;
   margin-top: 1rem;
   .card_body_btn{
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    @include btn_gray;
     width: calc(98%/3);
-    border: 1px solid transparent;
-    border-radius: .25rem;
     padding: 1px 0;
-    background-color: rgba(176, 175, 175, 0.334);
     font-size: .9rem;
-    &_icon{
-      color: $primary-orange;
-    }
-    &:hover{
-      color: $font-color-gray;
-    }
     &:nth-child(2){
       margin: 0 .5rem;
       span{

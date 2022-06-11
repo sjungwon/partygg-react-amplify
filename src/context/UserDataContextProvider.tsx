@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useState } from "react";
+import { useLocation } from "react-router-dom";
 import AuthServices from "../services/AuthServices";
 import ProfileServices from "../services/ProfileServices";
 import UserServices from "../services/UserServices";
@@ -11,6 +12,8 @@ interface UserDataContextType {
   setProfileArrHandler: (profiles: Profile[]) => void;
   currentProfile: Profile;
   setCurrentProfileHandler: (profile: Profile) => void;
+  filteredProfileArr: Profile[];
+  setFilteredProfileHandler: (gameName: string) => void;
   checkLogin: () => void;
   logout: () => void;
 }
@@ -40,6 +43,8 @@ export const UserDataContext = createContext<UserDataContextType>({
     profileImage: "",
   },
   setCurrentProfileHandler: (profile: Profile) => {},
+  filteredProfileArr: [],
+  setFilteredProfileHandler: (gameName: string) => {},
   checkLogin: () => {},
   logout: () => {},
 });
@@ -64,14 +69,47 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
     setCurrentProfile(profile);
   }, []);
 
+  const [filteredProfileArr, setFilteredProfileArr] = useState<Profile[]>([]);
+
+  const setFilteredProfileHandler = useCallback(
+    (gameName: string) => {
+      console.log(gameName, profileArr);
+      if (!username) {
+        return;
+      }
+      if (!gameName) {
+        setFilteredProfileArr(profileArr);
+        if (profileArr.length) {
+          setCurrentProfile(profileArr[0]);
+        }
+        return;
+      }
+      const filteredProfiles = profileArr.filter(
+        (profile) => profile.game === gameName
+      );
+      setFilteredProfileArr(filteredProfiles);
+      setCurrentProfile(
+        filteredProfiles.length
+          ? filteredProfiles[0]
+          : {
+              ...initialProfile,
+              nickname: "게임 프로필을 추가해주세요.",
+            }
+      );
+    },
+    [profileArr, username]
+  );
+
   const checkLogin = useCallback(async () => {
     try {
       const { username } = await UserServices.getUsernameWithRefresh();
+      console.log(username);
       if (username) {
         setUsername(username);
         const profiles = await ProfileServices.getProfiles();
         if (profiles && profiles.length) {
           setProfileArr(profiles);
+          setFilteredProfileArr(profiles);
           setCurrentProfile(profiles[0]);
         } else {
           setCurrentProfile({
@@ -93,6 +131,7 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
       await AuthServices.signOut();
       setUsername("");
       setProfileArr([]);
+      setFilteredProfileArr([]);
       setCurrentProfile({
         ...initialProfile,
         nickname: "로그인이 필요합니다.",
@@ -113,6 +152,8 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
         setProfileArrHandler,
         currentProfile,
         setCurrentProfileHandler,
+        filteredProfileArr,
+        setFilteredProfileHandler,
         checkLogin,
         logout,
       }}
