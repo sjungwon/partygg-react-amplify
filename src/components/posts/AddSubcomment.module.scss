@@ -15,29 +15,6 @@
   margin: .2rem;
 }
 
-.add_comment_header_img{
-  height: 1.75rem;
-  width: 1.75rem;
-  margin-right: .25rem;
-  border-radius: 50%;
-  object-fit:cover;
-}
-.add_comment_header_img_credit{
-  display: none;
-}
-
-.add_comment_nickname{
-  padding: .5rem;
-  padding-left: 0;
-  font-size: 0.825rem;
-  font-weight: 500;
-  color: black;
-}
-
-.add_comment_username{
-  font-size: .775rem;
-}
-
 .add_comment_textArea{
   resize: none;
   width: 95%;

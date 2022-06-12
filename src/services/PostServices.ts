@@ -129,6 +129,7 @@ export default class PostServices {
     category: string,
     searchParam: string
   ): Promise<Post[] | null> {
+    console.log(category, searchParam);
     if (this.getDone) {
       return null;
     }

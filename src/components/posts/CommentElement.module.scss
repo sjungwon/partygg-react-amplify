@@ -19,27 +19,6 @@
   align-items: center;
 }
 
-.comment_header_img{
-  height: 1.75rem;
-  width: 1.75rem;
-  margin-right: .25rem;
-  border-radius: 50%;
-  object-fit:cover;
-}
-
-.comment_header_img_credit{
-  display: none;
-}
-
-.comment_nickname{
-  color: black;
-  font-weight: 500;
-}
-
-.comment_username{
-  font-size: .78rem;
-}
-
 .comment_text{
   font-weight: 500;
 }

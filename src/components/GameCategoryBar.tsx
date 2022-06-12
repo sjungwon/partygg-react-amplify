@@ -89,7 +89,6 @@ export default function GameCategoryBar() {
     }
   }, []);
 
-  console.log(searchParam, games);
   return (
     <div className={styles.container}>
       <div className={styles.category_list_title}>

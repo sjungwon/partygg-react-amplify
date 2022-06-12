@@ -15,6 +15,10 @@ export interface Profile extends ProfileStruct, UserResource {
 
 export interface AddProfileReqData extends ProfileStruct {}
 
+export interface AddProfileResData {
+  data: Profile;
+}
+
 export interface UpdateProfileReqdata extends Profile {}
 
 export type GetProfilesResData = Profile[];

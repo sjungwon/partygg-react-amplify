@@ -5,6 +5,7 @@ import { AddCommentReqData, Comment } from "../../types/post.type";
 import { UserDataContext } from "../../context/UserDataContextProvider";
 import PostServices from "../../services/PostServices";
 import { Profile } from "../../types/profile.type";
+import ProfileBlock from "../ProfileBlock";
 
 interface PropsType {
   postId: string;
@@ -120,30 +121,7 @@ export default function AddComment({
   return (
     <div className={prevData ? styles.add_comment : styles.add_comment_border}>
       <div className={styles.add_comment_header}>
-        <img
-          src={
-            currentProfile.profileImage
-              ? currentProfile.profileImage
-              : "/default_profile.png"
-          }
-          className={styles.add_comment_header_img}
-          alt="profile"
-        />
-        {currentProfile.profileImage ? null : (
-          <a
-            href="https://www.flaticon.com/kr/free-icons/"
-            title="사용자 아이콘"
-            className={styles.add_comment_header_img_credit}
-          >
-            사용자 아이콘 제작자: Ongicon - Flaticon
-          </a>
-        )}
-        <div className={styles.add_comment_nickname}>
-          {currentProfile.nickname}
-          <span
-            className={styles.add_comment_username}
-          >{` (${username})`}</span>
-        </div>
+        <ProfileBlock profile={currentProfile} />
         <ProfileSelector size={"sm"} setCurrentProfile={setCurrentProfile} />
       </div>
       <textarea

@@ -1,6 +1,7 @@
 import { API } from "aws-amplify";
 import {
   AddProfileReqData,
+  AddProfileResData,
   GetProfilesResData,
   Profile,
   UpdateProfileReqdata,
@@ -29,7 +30,9 @@ export default class ProfileServices {
     }
   }
 
-  public static async postProfiles(data: AddProfileReqData): Promise<void> {
+  public static async addProfiles(
+    data: AddProfileReqData
+  ): Promise<Profile | null> {
     const path = "/profiles";
     try {
       const { username } = await UserServices.getUsernameWithRefresh();
@@ -41,14 +44,16 @@ export default class ProfileServices {
           profileImage: data.profileImage,
         },
       };
-      const profiles: GetProfilesResData = await API.post(
+      const response: AddProfileResData = await API.post(
         this.apiName,
         path,
         myInit
       );
-      console.log(profiles);
+      console.log(response);
+      return response.data;
     } catch (error) {
       console.log(error);
+      return null;
     }
   }
 

@@ -86,7 +86,7 @@ export default function PostList({ category, searchParam }: Props) {
     console.log("set handler");
     const option: IntersectionObserverInit = {
       root: null,
-      rootMargin: "600px",
+      rootMargin: "300px",
       threshold: 0,
     };
     const observer = new IntersectionObserver(handleObserver, option);

@@ -13,6 +13,7 @@ interface UserDataContextType {
   setCurrentProfileHandler: (profile: Profile) => void;
   filteredProfileArr: Profile[];
   setFilteredProfileHandler: (gameName: string) => void;
+  addProfileHandler: (profile: Profile) => void;
   checkLogin: () => void;
   logout: () => void;
 }
@@ -20,14 +21,6 @@ interface UserDataContextType {
 interface Props {
   children: React.ReactNode;
 }
-
-const initialProfile = {
-  username: "",
-  date: "",
-  nickname: "",
-  game: "",
-  profileImage: "",
-};
 
 export const UserDataContext = createContext<UserDataContextType>({
   username: "",
@@ -44,9 +37,18 @@ export const UserDataContext = createContext<UserDataContextType>({
   setCurrentProfileHandler: (profile: Profile) => {},
   filteredProfileArr: [],
   setFilteredProfileHandler: (gameName: string) => {},
+  addProfileHandler: (profile: Profile) => {},
   checkLogin: () => {},
   logout: () => {},
 });
+
+const initialProfile = {
+  username: "",
+  date: "",
+  nickname: "",
+  game: "",
+  profileImage: "",
+};
 
 const UserDataContextProvider: React.FC<Props> = ({ children }) => {
   const [username, setUsername] = useState("");
@@ -97,6 +99,19 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
       );
     },
     [profileArr, username]
+  );
+
+  const addProfileHandler = useCallback(
+    (profile: Profile) => {
+      setProfileArr((prev) => [profile, ...prev]);
+      if (
+        filteredProfileArr.length &&
+        filteredProfileArr[0].game === profile.game
+      ) {
+        setFilteredProfileArr((prev) => [profile, ...prev]);
+      }
+    },
+    [filteredProfileArr]
   );
 
   const checkLogin = useCallback(async () => {
@@ -153,6 +168,7 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
         setCurrentProfileHandler,
         filteredProfileArr,
         setFilteredProfileHandler,
+        addProfileHandler,
         checkLogin,
         logout,
       }}
