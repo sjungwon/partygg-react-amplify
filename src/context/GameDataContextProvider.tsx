@@ -1,16 +1,11 @@
-import React, {
-  createContext,
-  ReactNode,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, ReactNode, useCallback, useState } from "react";
 import GameServices from "../services/GameServices";
 import { GameType } from "../types/game.type";
 
 interface GameDataContextType {
   games: GameType[];
   setGamesHandler: (games: GameType[]) => void;
+  getGames: () => void;
 }
 
 interface propsType {
@@ -20,6 +15,7 @@ interface propsType {
 const initialGameDataContext: GameDataContextType = {
   games: [],
   setGamesHandler: (games: GameType[]) => {},
+  getGames: () => {},
 };
 
 export const GameDataContext = createContext(initialGameDataContext);
@@ -47,12 +43,8 @@ const GameDataContextProvider: React.FC<propsType> = ({ children }) => {
     }
   }, []);
 
-  useEffect(() => {
-    getGames();
-  }, [getGames]);
-
   return (
-    <GameDataContext.Provider value={{ games, setGamesHandler }}>
+    <GameDataContext.Provider value={{ games, setGamesHandler, getGames }}>
       {children}
     </GameDataContext.Provider>
   );

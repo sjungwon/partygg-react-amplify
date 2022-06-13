@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import RegisterConfirmModal from "../components/RegisterConfirmModal";
@@ -119,19 +112,6 @@ export default function LoginPage() {
     }
   };
 
-  //login 페이지 input 값 변경마다,
-  //즉 렌더마다 confirmModal이 계속 호출되는걸 방지
-  const confirmModal = useMemo(() => {
-    return (
-      <RegisterConfirmModal
-        mdShow={confirmModalShow}
-        modalClose={closeConfirmModal}
-        parentMdClose={() => {}}
-        username={loginUsername}
-      />
-    );
-  }, [closeConfirmModal, confirmModalShow, loginUsername]);
-
   const enterSubmit = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === "Enter") {
@@ -205,7 +185,13 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
-      {confirmModal}
+
+      <RegisterConfirmModal
+        mdShow={confirmModalShow}
+        modalClose={closeConfirmModal}
+        parentMdClose={() => {}}
+        username={loginUsername}
+      />
     </div>
   );
 }

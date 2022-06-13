@@ -113,7 +113,7 @@ export default function AddProfileModal({ show, close }: PropsType) {
   }, [addProfileHandler, closeWithInit, file, profileArr, selectedGames]);
 
   return (
-    <Modal backdrop="static" show={show} size="sm">
+    <Modal backdrop="static" show={show} size="sm" centered>
       <Modal.Header>
         <Modal.Title>프로필 추가</Modal.Title>
       </Modal.Header>
