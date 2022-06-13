@@ -25,6 +25,7 @@ import { ImageKeys } from "../../types/file.type";
 import PostServices from "../../services/PostServices";
 import AddPostElement from "./AddPostElement";
 import CommentList, { CommentsData } from "./CommentList";
+import useImgLoadError from "../../hooks/useImgLoadError";
 
 interface PropsType {
   post: Post;
@@ -62,12 +63,28 @@ export default function PostElement({ post, removePost }: PropsType) {
     setImages(filteredURL);
   }, []);
 
+  const [profileImage, setProfileImage] = useState<string>("");
+  const getProfileAsync = useCallback(async (imageKey: ImageKeys) => {
+    const profileURL = await FileServices.getImage(imageKey, "resized");
+    if (!profileURL) {
+      const fullsizeURL = await FileServices.getImage(imageKey, "fullsize");
+      if (!fullsizeURL) {
+        return;
+      }
+      setProfileImage(fullsizeURL);
+      return;
+    }
+    setProfileImage(profileURL);
+  }, []);
   //이미지 가져옴 + 수정 시 새로 가져옴
   useEffect(() => {
     if (postData && postData.images.length) {
       getImageAsync(postData.images);
     }
-  }, [getImageAsync, postData]);
+    if (postData && postData.profile.profileImage) {
+      getProfileAsync(postData.profile.profileImage);
+    }
+  }, [getImageAsync, getProfileAsync, postData]);
 
   //댓글 보기 관련 함수
   const [showComment, setShowComment] = useState<boolean>(false);
@@ -280,6 +297,7 @@ export default function PostElement({ post, removePost }: PropsType) {
     setTextMore((prev) => !prev);
   }, []);
 
+  const loadError = useImgLoadError();
   //렌더
   if (mode === "modify") {
     return (
@@ -297,13 +315,10 @@ export default function PostElement({ post, removePost }: PropsType) {
         </Card.Title>
         <div className={styles.card_header_profile}>
           <img
-            src={
-              postData.profile.profileImage
-                ? postData.profile.profileImage.resizedKey
-                : "/default_profile.png"
-            }
+            src={profileImage ? profileImage : "/default_profile.png"}
             className={styles.card_header_img}
             alt="profile"
+            onError={loadError}
           />
           {postData.profile.profileImage ? null : (
             <a

@@ -6,7 +6,10 @@ export default function useImgLoadError() {
   const loadError = useCallback(async (event: any) => {
     const imageEl = event.target;
     const origSrc: string = imageEl.src;
-    console.log(origSrc);
+    if (!origSrc) {
+      imageEl.src = "/error.png";
+    }
+
     //key로 받아온 이미지가 아니면
     if (!origSrc.includes("fullsize") && !origSrc.includes("resized")) {
       imageEl.src = "/error.png";
@@ -35,8 +38,6 @@ export default function useImgLoadError() {
         pivotIndex > 5 ? "profiles/" : ""
       }${username}/${date}/${imageName}`,
     };
-    console.log("load error", resizedKeySplit, key);
-
     const fullsizeImageURL = await FileServices.getImage(key, "fullsize");
     if (fullsizeImageURL) {
       imageEl.src = fullsizeImageURL;

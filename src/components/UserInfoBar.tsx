@@ -35,23 +35,28 @@ export default function UserInfoBar() {
           if (i === 0 || profileArr[i].game !== profileArr[i - 1].game) {
             return (
               <>
-                <div key={`game-${profile.game}`}>{profile.game}</div>
-                <div
+                <ul
+                  key={`game-${profile.game}`}
+                  className={styles.profile_category}
+                >
+                  {profile.game}
+                </ul>
+                <li
                   key={`${profile.game}-${profile.nickname}`}
                   className={styles.profile_container}
                 >
                   <ProfileBlock profile={profile} hideUsername />
-                </div>
+                </li>
               </>
             );
           }
           return (
-            <div
+            <li
               key={`${profile.game}-${profile.nickname}`}
               className={styles.profile_container}
             >
               <ProfileBlock profile={profile} hideUsername />
-            </div>
+            </li>
           );
         })}
       </div>

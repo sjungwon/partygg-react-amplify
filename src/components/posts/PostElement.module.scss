@@ -17,7 +17,7 @@ div.card_header{
     height: 1.5rem;
     margin: 0 auto;
     font-size: .95rem;
-    font-weight: 700;
+    font-weight: 500;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -39,7 +39,7 @@ div.card_header{
     .card_header_title{
       margin-bottom: .3rem;
       font-size: .9rem;
-      font-weight: 700;
+      font-weight: 400;
     }
     .card_header_username{
       font-size: .8rem;
@@ -79,7 +79,7 @@ div.card_header{
 div.card_body{
   padding: .5rem 1.3rem;
   font-size: .95rem;
-  font-weight: 500;
+  font-weight: 400;
   background-color: rgba(0,0,0,.03);
   .card_body_slide{
     display: block;
@@ -126,7 +126,7 @@ div.card_body{
       margin-left: .5rem;
     }
   }
-  .card_body_btn_badge{ color: $primary-blue; font-size: .9rem; font-weight: 900; }
+  .card_body_btn_badge{ color: $primary-blue; font-size: .9rem; font-weight: 600; }
 }
 
 @include mobile{
