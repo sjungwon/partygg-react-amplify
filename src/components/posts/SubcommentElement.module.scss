@@ -12,31 +12,9 @@
   }
 }
 
-
 .subcomment_header{
   display: flex;
   align-items: center;
-}
-
-.subcomment_header_img{
-  height: 1.75rem;
-  width: 1.75rem;
-  margin-right: .25rem;
-  border-radius: 50%;
-  object-fit:cover;
-}
-
-.subcomment_header_img_credit{
-  display: none;
-}
-
-.subcomment_nickname{
-  color: black;
-  font-weight: 500;
-}
-
-.subcomment_username{
-  font-size: .78rem;
 }
 
 .subcomment_text{

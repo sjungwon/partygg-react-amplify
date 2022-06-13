@@ -15,7 +15,6 @@ export default function ProfileSelector({
   //프로필 상태 데이터
   const { filteredProfileArr } = useContext(UserDataContext);
 
-  console.log("selector render");
   //프로필 선택
   const select = useCallback(
     (eventKey: string | null) => {

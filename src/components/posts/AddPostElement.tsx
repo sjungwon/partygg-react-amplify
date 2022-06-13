@@ -8,6 +8,8 @@ import { UserDataContext } from "../../context/UserDataContextProvider";
 import PostForm from "./PostForm";
 import { Post } from "../../types/post.type";
 import { Profile } from "../../types/profile.type";
+import useProfileImage from "../../hooks/useProfileImage";
+import useImgLoadError from "../../hooks/useImgLoadError";
 
 interface Props {
   prevData: {
@@ -24,7 +26,6 @@ export default function AddPostElement({ prevData }: Props) {
   const { filteredProfileArr, currentProfile: defaultProfile } =
     useContext(UserDataContext);
   const [currentProfile, setCurrentProfile] = useState<Profile>(defaultProfile);
-  console.log(defaultProfile);
   //prevData가 있으면 해당 데이터의 프로필로 현재 프로필 변경, 없으면 첫번째 프로필로 설정
   useEffect(() => {
     if (prevData.postData) {
@@ -52,27 +53,17 @@ export default function AddPostElement({ prevData }: Props) {
     setShow(false);
   }, []);
 
+  const profileImage = useProfileImage(currentProfile.profileImage);
+  const loadError = useImgLoadError();
   return (
     <Card className={styles.card}>
       <Card.Header className={styles.card_header}>
         <img
-          src={
-            currentProfile.profileImage
-              ? currentProfile.profileImage
-              : "/default_profile.png"
-          }
+          src={profileImage ? profileImage : "/default_profile.png"}
           className={styles.card_header_img}
           alt="profile"
+          onError={loadError}
         />
-        {currentProfile.profileImage ? null : (
-          <a
-            href="https://www.flaticon.com/kr/free-icons/"
-            title="사용자 아이콘"
-            className={styles.card_header_img_credit}
-          >
-            사용자 아이콘 제작자: Ongicon - Flaticon
-          </a>
-        )}
         <Card.Title className={styles.card_header_title}>
           {currentProfile.nickname ? currentProfile.nickname : ""}
         </Card.Title>

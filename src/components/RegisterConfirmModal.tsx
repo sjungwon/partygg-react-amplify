@@ -27,8 +27,6 @@ export default function RegisterConfirmModal({
     }
   };
 
-  console.log(username);
-
   const [codeErrorMessage, setCodeErrorMessage] = useState<string>("");
   const clickSubmit = useCallback(
     async (event: any) => {

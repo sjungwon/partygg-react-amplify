@@ -1,6 +1,49 @@
 @import "../scss/variables";
+@import "../scss/mixin";
+
+.hide{
+  display: none;
+}
 
 .container{
   min-width: 12rem;
-  max-width: 15rem;
+  max-width: 12rem;
+  padding: 1rem;
+  padding-bottom: 0;
+}
+
+.title_container{
+  position: relative;
+  display: flex;
+  align-items: center;
+  max-height: 1.5rem;
+  width: 100%;
+  min-height: 3rem;
+  min-width: 100%;
+  padding-bottom: .5rem;
+  font-size: 1.3rem;
+}
+
+.title{
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.title_btn_add{
+  position: absolute;
+  right: 0;
+  @include btn_gray;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  background-color: $primary-blue;
+  color: white;
+  &:hover{
+    background-color: $primary-blue-hover;
+    color: white;
+  }
+}
+.profile_container{
+  display: flex;
+  align-items: center;
 }

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import AuthServices from "../services/AuthServices";
 import TextValidServices from "../services/TextValidServices";
@@ -111,16 +111,7 @@ export default function RegisterModal({
   //가입 확인 모달 데이터
   const [registerUsername, setRegisterUsername] = useState<string>("");
   //가입 확인 모달
-  const confirmModal = useMemo(() => {
-    return (
-      <RegisterConfirmModal
-        mdShow={mdShow}
-        modalClose={modalClose}
-        parentMdClose={parentMdClose}
-        username={registerUsername}
-      />
-    );
-  }, [mdShow, modalClose, parentMdClose, registerUsername]);
+
   //회원가입 제출
   const submitSignUp = useCallback(async () => {
     try {
@@ -231,7 +222,12 @@ export default function RegisterModal({
           </Form>
         </Modal.Body>
       </Modal>
-      {confirmModal}
+      <RegisterConfirmModal
+        mdShow={mdShow}
+        modalClose={modalClose}
+        parentMdClose={parentMdClose}
+        username={registerUsername}
+      />
     </div>
   );
 }

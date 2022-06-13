@@ -97,20 +97,6 @@ export default function CommentList({
     });
   }, [renderLengthHandler, scrollHeight, setShowComment]);
 
-  const commentsNavigator = useMemo(
-    () =>
-      comments.length > 1 ? (
-        <div className={styles.direct} onClick={openComments}>
-          <div className={styles.direct_icon}>
-            <GoTriangleDown />
-          </div>
-        </div>
-      ) : (
-        <div className={styles.blank}></div>
-      ),
-    [comments.length, openComments]
-  );
-
   //더보기 누르면 comment를 더 가져오도록 설정
   //닫기를 누르면 다시 처음으로 돌아가는걸 원함
   //renderlength를 사용 -> 보여주는건 renderLength로 조절
@@ -171,7 +157,15 @@ export default function CommentList({
             borderBottom={false}
             parentShowComment={showComment}
           />
-          {commentsNavigator}
+          {comments.length > 1 ? (
+            <div className={styles.direct} onClick={openComments}>
+              <div className={styles.direct_icon}>
+                <GoTriangleDown />
+              </div>
+            </div>
+          ) : (
+            <div className={styles.blank}></div>
+          )}
         </Card.Footer>
       );
     }

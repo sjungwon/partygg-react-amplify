@@ -1,9 +1,10 @@
 import { UserResource } from "./db.type";
+import { ImageKeys } from "./file.type";
 
 export interface ProfileStruct {
   nickname: string;
   game: string;
-  profileImage: string;
+  profileImage: ImageKeys | undefined;
 }
 
 export interface Profile extends ProfileStruct, UserResource {

@@ -43,25 +43,28 @@ export default function AddPostImageModal({
   const [index, setIndex] = useState<number>(0);
 
   //파일 추가되면 크기 조절, state에 추가
-  const AddImages = async (event: any) => {
-    if (
-      (event.target as HTMLInputElement).files &&
-      (event.target as HTMLInputElement).files?.length
-    ) {
-      const files: FileList | null = (event.target as HTMLInputElement).files;
-      if (files) {
-        const fileArray = Array.from(files);
-        setFiles((prev) => [...prev, ...fileArray]);
-        const fileURLs = fileArray.map((file) => URL.createObjectURL(file));
-        setImages((prev) => [...prev, ...fileURLs]);
-        setIndex(
-          images.length + fileURLs.length > 1
-            ? images.length + fileURLs.length - 1
-            : 0
-        );
+  const AddImages = useCallback(
+    async (event: any) => {
+      if (
+        (event.target as HTMLInputElement).files &&
+        (event.target as HTMLInputElement).files?.length
+      ) {
+        const files: FileList | null = (event.target as HTMLInputElement).files;
+        if (files) {
+          const fileArray = Array.from(files);
+          setFiles((prev) => [...prev, ...fileArray]);
+          const fileURLs = fileArray.map((file) => URL.createObjectURL(file));
+          setImages((prev) => [...prev, ...fileURLs]);
+          setIndex(
+            images.length + fileURLs.length > 1
+              ? images.length + fileURLs.length - 1
+              : 0
+          );
+        }
       }
-    }
-  };
+    },
+    [images]
+  );
 
   //input file 태그
   const fileRef = useRef<HTMLInputElement>(null);
@@ -115,12 +118,20 @@ export default function AddPostImageModal({
   );
 
   //상위 컴포넌트의 상태로 이미지 전달, 모달 닫음
-  const submitImage = () => {
+  const submitImage = useCallback(() => {
     setPostImage(images);
     setPostFiles(files);
     setPostImageKeys(imageKeys);
     closeMd();
-  };
+  }, [
+    closeMd,
+    files,
+    imageKeys,
+    images,
+    setPostFiles,
+    setPostImage,
+    setPostImageKeys,
+  ]);
 
   return (
     <Modal show={mdShow} onHide={closeMd} backdrop="static">
@@ -130,7 +141,7 @@ export default function AddPostImageModal({
       <Modal.Body>
         <input
           type="file"
-          accept="image/jpg image/png image/jpeg"
+          accept="image/jpg,image/png,image/jpeg"
           onInput={AddImages}
           multiple
           className={styles.modal_body_file}

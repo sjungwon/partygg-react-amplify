@@ -6,6 +6,7 @@ import { BsPlusLg } from "react-icons/bs";
 import styles from "./GameCategoryBar.module.scss";
 import { GameDataContext } from "../context/GameDataContextProvider";
 import TextValidServices from "../services/TextValidServices";
+import { UserDataContext } from "../context/UserDataContextProvider";
 
 export default function GameCategoryBar() {
   const { games, setGamesHandler } = useContext(GameDataContext);
@@ -81,13 +82,18 @@ export default function GameCategoryBar() {
   }, [navigate]);
 
   const [showAdd, setShowAdd] = useState<boolean>(false);
+  const { username } = useContext(UserDataContext);
   const setShowAddHandler = useCallback(() => {
+    if (!username) {
+      window.alert("로그인이 필요합니다.");
+      return;
+    }
     setShowAdd((prev) => !prev);
     const gameText = gameInputRef.current;
     if (gameText) {
       gameText.value = "";
     }
-  }, []);
+  }, [username]);
 
   return (
     <div className={styles.container}>

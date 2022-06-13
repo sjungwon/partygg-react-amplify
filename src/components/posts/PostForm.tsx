@@ -22,6 +22,16 @@ interface PropsType {
   };
 }
 
+//post 문자열 데이터 크기 측정에 사용하는 함수
+const calcByte = (value: string) => {
+  const textByte = value
+    .split("")
+    .map((s) => s.charCodeAt(0))
+    .reduce((prev, c) => prev + (c === 10 ? 2 : c >> 7 ? 2 : 1), 0);
+
+  return textByte;
+};
+
 export default function PostForm({
   show,
   close,
@@ -46,49 +56,33 @@ export default function PostForm({
   //text 관련 데이터
   const [currentTextByte, setCurrentTextByte] = useState<number>(0);
 
-  //post를 수정하는 경우에도 사용 -> 이전 데이터가 있으면
-  //즉 수정하는 경우면 이전 데이터를 렌더에 설정
-
-  //post 문자열 데이터 크기 측정에 사용하는 함수
-  const calcByte = useCallback((value: string) => {
-    const textByte = value
-      .split("")
-      .map((s) => s.charCodeAt(0))
-      .reduce((prev, c) => prev + (c === 10 ? 2 : c >> 7 ? 2 : 1), 0);
-
-    return textByte;
-  }, []);
-
   //현재 입력되는 문자열 데이터의 크기를 측정
   //제한된 크기인 500바이트를 넘어가면 입력 무시함
-  const calcCurrentByte = useCallback(
-    (event: any) => {
-      const textArea = event.target as HTMLTextAreaElement;
-      const value = textArea.value;
+  const calcCurrentByte = useCallback((event: any) => {
+    const textArea = event.target as HTMLTextAreaElement;
+    const value = textArea.value;
 
-      const textByte = calcByte(value);
+    const textByte = calcByte(value);
 
-      if (textByte > 500) {
-        const over = textByte - 500;
-        let index = value.length - 1;
-        const findArray = value.split("").map((s) => s.charCodeAt(0));
-        let count = 0;
-        for (let i = value.length - 1; i >= 0; i--) {
-          index = i;
-          const cur = findArray[i];
-          count += cur === 10 ? 2 : cur >> 7 ? 2 : 1;
-          if (count >= over) {
-            break;
-          }
+    if (textByte > 500) {
+      const over = textByte - 500;
+      let index = value.length - 1;
+      const findArray = value.split("").map((s) => s.charCodeAt(0));
+      let count = 0;
+      for (let i = value.length - 1; i >= 0; i--) {
+        index = i;
+        const cur = findArray[i];
+        count += cur === 10 ? 2 : cur >> 7 ? 2 : 1;
+        if (count >= over) {
+          break;
         }
-        textArea.value = value.slice(0, index);
-        setCurrentTextByte(500);
-      } else {
-        setCurrentTextByte(textByte);
       }
-    },
-    [calcByte]
-  );
+      textArea.value = value.slice(0, index);
+      setCurrentTextByte(500);
+    } else {
+      setCurrentTextByte(textByte);
+    }
+  }, []);
 
   const cancleModify = useCallback(() => {
     if (prevData.setMode) {
@@ -107,7 +101,7 @@ export default function PostForm({
         setImages(prevData.imageURLs);
       }
     }
-  }, [calcByte, prevData]);
+  }, [prevData]);
 
   const [loading, setLoading] = useState<boolean>(false);
 

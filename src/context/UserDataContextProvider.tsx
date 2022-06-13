@@ -32,7 +32,7 @@ export const UserDataContext = createContext<UserDataContextType>({
     date: "",
     nickname: "",
     game: "",
-    profileImage: "",
+    profileImage: undefined,
   },
   setCurrentProfileHandler: (profile: Profile) => {},
   filteredProfileArr: [],
@@ -47,7 +47,27 @@ const initialProfile = {
   date: "",
   nickname: "",
   game: "",
-  profileImage: "",
+  profileImage: undefined,
+};
+
+const sortProfiles = (profileArr: Profile[]) => {
+  const sortedProfile = [...profileArr].sort((a, b) => {
+    if (a.game > b.game) {
+      return 1;
+    } else if (a.game < b.game) {
+      return -1;
+    } else {
+      console.log(a, b);
+      if (a.nickname < b.nickname) {
+        return -1;
+      } else if (a.nickname > b.nickname) {
+        return 1;
+      } else {
+        return 0;
+      }
+    }
+  });
+  return [...sortedProfile];
 };
 
 const UserDataContextProvider: React.FC<Props> = ({ children }) => {
@@ -61,7 +81,7 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
   const [profileArr, setProfileArr] = useState<Profile[]>([]);
 
   const setProfileArrHandler = useCallback((profileArr: Profile[]) => {
-    setProfileArr(profileArr);
+    setProfileArr(sortProfiles(profileArr));
   }, []);
 
   const [currentProfile, setCurrentProfile] = useState<Profile>(initialProfile);
@@ -103,12 +123,12 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
 
   const addProfileHandler = useCallback(
     (profile: Profile) => {
-      setProfileArr((prev) => [profile, ...prev]);
+      setProfileArr((prev) => sortProfiles([profile, ...prev]));
       if (
         filteredProfileArr.length &&
         filteredProfileArr[0].game === profile.game
       ) {
-        setFilteredProfileArr((prev) => [profile, ...prev]);
+        setFilteredProfileArr((prev) => sortProfiles([profile, ...prev]));
       }
     },
     [filteredProfileArr]
@@ -122,9 +142,10 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
         setUsername(username);
         const profiles = await ProfileServices.getProfiles();
         if (profiles && profiles.length) {
-          setProfileArr(profiles);
-          setFilteredProfileArr(profiles);
-          setCurrentProfile(profiles[0]);
+          const sortedProfile = sortProfiles(profiles);
+          setProfileArr(sortProfiles([...sortedProfile]));
+          setFilteredProfileArr(sortProfiles([...sortedProfile]));
+          setCurrentProfile(sortedProfile[0]);
         } else {
           setCurrentProfile({
             ...initialProfile,

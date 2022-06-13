@@ -1,128 +1,75 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { Dropdown, DropdownButton } from "react-bootstrap";
-import { GameDataContext } from "../context/GameDataContextProvider";
+import { useCallback, useContext, useState } from "react";
 import { UserDataContext } from "../context/UserDataContextProvider";
-import ProfileServices from "../services/ProfileServices";
-import TextValidServices from "../services/TextValidServices";
-import { AddProfileReqData, Profile } from "../types/profile.type";
 import ProfileBlock from "./ProfileBlock";
+import { AiOutlineClose } from "react-icons/ai";
+import { BsPlusLg } from "react-icons/bs";
 import styles from "./UserInfoBar.module.scss";
+import AddProfileModal from "./AddProfileModal";
 
 export default function UserInfoBar() {
-  const { username, profileArr, addProfileHandler } =
-    useContext(UserDataContext);
-  const { games } = useContext(GameDataContext);
-  const nicknameRef = useRef<HTMLInputElement>(null);
+  const { username, profileArr } = useContext(UserDataContext);
 
-  const [selectedGames, setSelectedGames] = useState<string>("");
-
-  const select = useCallback(
-    (eventKey: string | null) => {
-      if (eventKey !== null && games.length) {
-        const index = Number(eventKey);
-        setSelectedGames(games[index].name);
-      }
-    },
-    [games]
-  );
-
-  const [profileGameList, setProfileGameList] = useState<string[]>([]);
-
-  useEffect(() => {
-    if (profileArr.length) {
-      const gameList = profileArr.reduce((prev: string[], cur: Profile) => {
-        if (!prev.includes(cur.game)) {
-          return [...prev, cur.game];
-        }
-        return prev;
-      }, []);
-      setProfileGameList([...gameList].sort());
-    }
-  }, [profileArr]);
-
-  console.log(profileGameList);
-
-  const [loading, setLoading] = useState<boolean>(false);
-
-  const addProfile = useCallback(async () => {
-    if (!selectedGames) {
-      window.alert("게임을 선택해주세요.");
+  const [showAdd, setShowAdd] = useState<boolean>(false);
+  const setShowAddHandler = useCallback(() => {
+    if (!username) {
+      window.alert("로그인이 필요합니다.");
       return;
     }
-    const nickname = nicknameRef.current
-      ? nicknameRef.current.value.trim()
-      : "";
-    if (!nickname) return;
-    if (TextValidServices.isIncludeSpecial(nickname)) {
-      window.alert(
-        "닉네임에 특수문자를 사용할 수 없습니다. 다시 시도해주세요."
-      );
-      return;
-    }
-    const data: AddProfileReqData = {
-      nickname,
-      game: selectedGames,
-      profileImage: "",
-    };
-    setLoading(true);
-    const profile = await ProfileServices.addProfiles(data);
-    if (!profile) {
-      window.alert("프로필 추가에 실패했습니다. 다시 시도해주세요.");
-      return;
-    }
-    addProfileHandler(profile);
-    if (nicknameRef.current) {
-      nicknameRef.current.value = "";
-      setSelectedGames("");
-    }
-    setLoading(false);
-  }, [addProfileHandler, selectedGames]);
-
-  console.log(games);
+    setShowAdd((prev) => !prev);
+  }, [username]);
+  const close = useCallback(() => {
+    setShowAdd(false);
+  }, []);
 
   return (
     <div className={styles.container}>
-      <div>{username} 님의 게임 프로필</div>
-      <div>
-        <DropdownButton
-          id="dropdown-gameList"
-          title="게임"
-          onSelect={select}
-          size="sm"
-          disabled={!games.length}
-        >
-          {games.map((game, index) => {
-            return (
-              <Dropdown.Item key={game.name} eventKey={index}>
-                {game.name}
-              </Dropdown.Item>
-            );
-          })}
-        </DropdownButton>
-        <p>
-          {games.length
-            ? selectedGames
-              ? selectedGames
-              : "게임을 선택해주세요."
-            : "게임을 추가해주세요."}
-        </p>
-        <label>닉네임</label>
-        <input type="text" ref={nicknameRef} />
-        <button onClick={addProfile} disabled={loading}>
-          {loading ? "추가 중..." : "추가"}
+      <div className={styles.title_container}>
+        <h3 className={styles.title}>{username} 님의 프로필</h3>
+        <button className={styles.title_btn_add} onClick={setShowAddHandler}>
+          {showAdd ? <AiOutlineClose /> : <BsPlusLg />}
         </button>
       </div>
+      <AddProfileModal show={showAdd} close={close} />
       <div>
-        {profileArr.map((profile) => {
+        {profileArr.map((profile, i) => {
+          if (i === 0 || profileArr[i].game !== profileArr[i - 1].game) {
+            return (
+              <>
+                <div key={`game-${profile.game}`}>{profile.game}</div>
+                <div
+                  key={`${profile.game}-${profile.nickname}`}
+                  className={styles.profile_container}
+                >
+                  <ProfileBlock profile={profile} hideUsername />
+                </div>
+              </>
+            );
+          }
           return (
-            <div key={`${profile.game}-${profile.nickname}`}>
-              <ProfileBlock profile={profile} />
+            <div
+              key={`${profile.game}-${profile.nickname}`}
+              className={styles.profile_container}
+            >
+              <ProfileBlock profile={profile} hideUsername />
             </div>
           );
         })}
       </div>
-      <div>좋아요 표시한 포스트</div>
-      <div>싫어요 표시한 포스트</div>
+      <div>
+        <a
+          href="https://www.flaticon.com/kr/free-icons/"
+          title="사용자 아이콘"
+          className={styles.profile_img_credit}
+        >
+          사용자 아이콘 제작자: Ongicon - Flaticon
+        </a>
+        <a
+          href="https://www.flaticon.com/free-icons/warning"
+          title="warning icons"
+        >
+          Warning icons created by amonrat rungreangfangsai - Flaticon
+        </a>
+      </div>
     </div>
   );
 }

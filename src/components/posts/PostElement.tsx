@@ -252,64 +252,33 @@ export default function PostElement({ post, removePost }: PropsType) {
     [handleRemoveModalOpen, postData.profile.nickname, profileArr]
   );
 
-  console.log(showComment);
-
   //텍스트 제한 관련 데이터
   //텍스트 이미지있으면 100자 제한, 없으면 200자 제한
   const [textMore, setTextMore] = useState<boolean>(false);
-  const showTextLength = useMemo(() => {
-    if (postData && postData.images) {
-      return 100;
+  const [showTextLength, setShowTextLength] = useState<number>(0);
+
+  useEffect(() => {
+    if (textMore) {
+      setShowTextLength(postData.text.length);
     }
-    return 200;
-  }, [postData]);
+
+    if (postData.images.length) {
+      const length = postData.text.length < 100 ? postData.text.length : 100;
+      setShowTextLength(length);
+      return;
+    }
+
+    if (postData.text.length < 200) {
+      setShowTextLength(postData.text.length);
+      return;
+    }
+
+    setShowTextLength(200);
+  }, [postData, textMore]);
+
   const showMore = useCallback(() => {
     setTextMore((prev) => !prev);
   }, []);
-
-  //텍스트 글자 제한에 따라 텍스트 관련 뷰 데이터 메모이제이션
-  const textData = useMemo(() => {
-    if (!postData.text) {
-      return null;
-    }
-    if (textMore) {
-      return (
-        <>
-          {postData.text}
-          <span className={styles.card_body_text_more} onClick={showMore}>
-            {" "}
-            접기
-          </span>
-        </>
-      );
-    }
-
-    if ((postData.text.match(/[^\n]*\n[^\n]*/gi) || []).length > 10) {
-      return (
-        <>
-          {postData.text.split("\n").slice(0, 5).join("\n")}
-          <span className={styles.card_body_text_more} onClick={showMore}>
-            {" "}
-            더보기...
-          </span>
-        </>
-      );
-    }
-
-    if (postData.text.length > showTextLength) {
-      return (
-        <>
-          {postData.text.slice(0, showTextLength)}
-          <span className={styles.card_body_text_more} onClick={showMore}>
-            {" "}
-            더보기...
-          </span>
-        </>
-      );
-    }
-
-    return postData.text;
-  }, [postData, showMore, showTextLength, textMore]);
 
   //렌더
   if (mode === "modify") {
@@ -330,7 +299,7 @@ export default function PostElement({ post, removePost }: PropsType) {
           <img
             src={
               postData.profile.profileImage
-                ? postData.profile.profileImage
+                ? postData.profile.profileImage.resizedKey
                 : "/default_profile.png"
             }
             className={styles.card_header_img}
@@ -376,7 +345,16 @@ export default function PostElement({ post, removePost }: PropsType) {
       </Card.Header>
       <Card.Body className={`${styles.card_body}`}>
         {images.length > 0 ? <ImageSlide images={images} /> : null}
-        <Card.Text className={styles.card_body_text}>{textData}</Card.Text>
+        <Card.Text className={styles.card_body_text}>
+          {postData.text.slice(0, showTextLength)}
+          {(postData.images.length && postData.text.length > 100) ||
+          (!postData.images.length && postData.text.length > 200) ? (
+            <span className={styles.card_body_text_more} onClick={showMore}>
+              {textMore ? " 접기" : " 더보기"}
+              더보기...
+            </span>
+          ) : null}
+        </Card.Text>
         <div className={styles.card_body_buttons}>
           <button className={styles.card_body_btn} onClick={likeClick}>
             {postData.likes.includes(username) ? (

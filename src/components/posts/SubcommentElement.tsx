@@ -1,11 +1,12 @@
 import styles from "./SubcommentElement.module.scss";
-import { useCallback, useContext, useMemo, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { BsTrash, BsPencilSquare } from "react-icons/bs";
 import { Subcomment } from "../../types/post.type";
 import { UserDataContext } from "../../context/UserDataContextProvider";
 import RemoveConfirmModal from "./RemoveConfirmModal";
 import PostServices from "../../services/PostServices";
 import AddSubcomment from "./AddSubcomment";
+import ProfileBlock from "../ProfileBlock";
 
 interface CommentElementProps {
   subcomment: Subcomment;
@@ -21,10 +22,6 @@ export default function SubcommentElement({
 }: CommentElementProps) {
   //유저 관련 데이터
   const { username } = useContext(UserDataContext);
-  const checkUser = useMemo(
-    () => subcomment.username === username,
-    [subcomment, username]
-  );
 
   //삭제시 재확인 모달 관련 데이터
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -78,37 +75,13 @@ export default function SubcommentElement({
   return (
     <div className={styles.subcomment}>
       <div className={styles.subcomment_header}>
-        <img
-          src={
-            subcomment.profile.profileImage
-              ? subcomment.profile.profileImage
-              : "/default_profile.png"
-          }
-          className={styles.subcomment_header_img}
-          alt="profile"
-        />
-        {subcomment.profile.profileImage ? null : (
-          <a
-            href="https://www.flaticon.com/kr/free-icons/"
-            title="사용자 아이콘"
-            className={styles.subcomment_header_img_credit}
-          >
-            사용자 아이콘 제작자: Ongicon - Flaticon
-          </a>
-        )}
-        <div className={styles.subcomment_nickname}>
-          {subcomment.profile.nickname}
-          <span
-            className={styles.subcomment_username}
-          >{` (${subcomment.username})`}</span>
-        </div>
+        <ProfileBlock profile={subcomment.profile} />
       </div>
-
       <div className={styles.subcomment_text}>{subcomment.text}</div>
       <div className={styles.subcomment_date}>
         {subcomment.game} - {subcomment.date}
       </div>
-      {checkUser ? (
+      {subcomment.username === username ? (
         <div className={styles.subcomment_btns}>
           <button className={styles.subcomment_btn} onClick={setModeModify}>
             <BsPencilSquare /> <span>수정</span>
