@@ -25,7 +25,7 @@ export default function AddComment({
   const {
     username,
     currentProfile: defaultProfile,
-    profileArr,
+    filteredProfileArr,
   } = useContext(UserDataContext);
 
   const [currentProfile, setCurrentProfile] = useState<Profile>(defaultProfile);
@@ -108,7 +108,7 @@ export default function AddComment({
     );
   }
 
-  if (!profileArr.length) {
+  if (!filteredProfileArr.length) {
     return (
       <div className={styles.add_comment_border}>
         <div className={styles.add_comment_need_login}>
