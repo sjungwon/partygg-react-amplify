@@ -1,0 +1,32 @@
+{
+  "lambdaLayers": [],
+  "permissions": {
+    "storage": {
+      "partyggGameTable": [
+        "read"
+      ],
+      "partyggLikeTable": [
+        "read",
+        "delete"
+      ],
+      "partyggDislikeTable": [
+        "read",
+        "delete"
+      ],
+      "partyggPostTable": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ],
+      "partyggCommentTable": [
+        "read",
+        "delete"
+      ],
+      "partyggSubcommentTable": [
+        "read",
+        "delete"
+      ]
+    }
+  }
+}

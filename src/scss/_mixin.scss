@@ -1,0 +1,29 @@
+@import "./variables";
+
+@mixin mobile {
+  @media (min-width: #{$breakpoint-mobile}) and (max-width: #{$breakpoint-tablet - 1px}) {
+    @content;
+  }
+}
+
+
+@mixin flex_center{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin btn_gray {
+  @include flex_center();
+  border: 1px solid transparent;
+  border-radius: .25rem;
+  background-color: $primary-default-btn-background;
+  text-align: center;
+  font-size: .825rem;
+  &_icon{
+    color: $primary-orange;
+  }
+  &:hover{
+    color: $font-color-gray;
+  }
+}

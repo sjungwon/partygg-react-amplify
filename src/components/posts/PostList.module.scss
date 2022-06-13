@@ -1,0 +1,16 @@
+@import "../../scss/variables";
+
+.container{
+  margin: 0;
+  width: 100%;
+  min-width: 20rem;
+  max-width: 32rem;
+  background-color: $primary-default-background;
+  border-left: 1px solid $primary-default-border;
+  border-right: 1px solid $primary-default-border;
+}
+
+.loader{
+  width: 100%;
+  background-color: red;
+}

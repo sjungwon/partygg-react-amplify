@@ -5,6 +5,7 @@ import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { Amplify } from "aws-amplify";
 import awsExports from "./aws-exports";
+import UserDataContextProvider from "./context/UserDataContextProvider";
 
 //Amplify 리소스 사용
 Amplify.configure(awsExports);
@@ -13,9 +14,11 @@ const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
-  <React.StrictMode>
+  // <React.StrictMode>
+  <UserDataContextProvider>
     <App />
-  </React.StrictMode>
+  </UserDataContextProvider>
+  // </React.StrictMode>
 );
 
 // If you want to start measuring performance in your app, pass a function

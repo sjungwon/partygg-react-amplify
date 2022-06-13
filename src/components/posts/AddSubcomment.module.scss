@@ -1,0 +1,54 @@
+@import "../../scss/variables";
+
+.add_comment{
+  padding-left: .5rem;
+}
+
+.add_comment_border{
+  padding-left: .5rem;
+  border-bottom: 1px dashed $primary-blue;
+}
+
+.add_comment_header{
+  display: flex;
+  align-items: center;
+  margin: .2rem;
+}
+
+.add_comment_textArea{
+  resize: none;
+  width: 95%;
+  border-radius: .5rem;
+  padding: .5rem;
+  &:focus{
+    border: none;
+    outline: .13rem solid $primary-blue;
+  }
+}
+
+.add_comment_btn{
+  margin: .5rem 0;
+  margin-right: .5rem;
+  border: 1px solid $primary-blue;
+  border-radius: .25rem;
+  font-size: .9rem;
+  color: white;
+  background-color: $primary-blue;
+  &:disabled{
+    background-color: $primary-blue-disabled;
+    border-color : $primary-blue-disabled;
+  }
+  &:hover{
+    background-color: $primary-blue-hover;
+  }
+  &:active{
+    background-color: $primary-blue-hover;
+  }
+}
+
+.add_comment_need_login{
+  width: 100%;
+  font-size: .9rem;
+  margin: 1rem 0;
+  color: $primary-blue;
+}
