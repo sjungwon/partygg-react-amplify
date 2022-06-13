@@ -13,10 +13,6 @@ export default function NavBar() {
     navigate("/login");
   }, [navigate]);
 
-  const goHome = useCallback(() => {
-    navigate("/");
-  }, [navigate]);
-
   const menuSelect = useCallback((eventKey: string | null) => {
     console.log(eventKey);
     if (eventKey) {
@@ -40,10 +36,10 @@ export default function NavBar() {
     <div className={styles.navbar}>
       <div className={styles.navbar_fixed}>
         <div className={styles.navbar_container}>
-          <div onClick={goHome} className={styles.navbar_title}>
+          <a href="/" className={styles.navbar_title}>
             <img src="/logo192.png" alt="logo" className={styles.navbar_logo} />
             <h1>PartyGG</h1>
-          </div>
+          </a>
           <div className={styles.navbar_search}>
             <DropdownButton
               id="dropdown-search-menu"
