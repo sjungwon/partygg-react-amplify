@@ -1,0 +1,14 @@
+{
+  "resourceName": "partyggProfileTable",
+  "tableName": "partyggProfileTable",
+  "partitionKey": {
+    "fieldName": "username",
+    "fieldType": "string"
+  },
+  "sortKey": {
+    "fieldName": "nickname",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}
