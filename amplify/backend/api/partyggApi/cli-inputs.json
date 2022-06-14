@@ -1,22 +1,6 @@
 {
   "version": 1,
   "paths": {
-    "/profiles": {
-      "name": "/profiles",
-      "lambdaFunction": "partyggProfileLamda",
-      "permissions": {
-        "setting": "protected",
-        "auth": [
-          "create",
-          "read",
-          "update",
-          "delete"
-        ],
-        "guest": [
-          "read"
-        ]
-      }
-    },
     "/games": {
       "name": "/games",
       "lambdaFunction": "partyggGameLamda",

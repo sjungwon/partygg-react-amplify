@@ -54,7 +54,6 @@ if (process.env.ENV && process.env.ENV !== "NONE") {
 
 const gameIndexName = "game-date-index";
 const allIndexName = "forall-date-index";
-const nicknameIndexName = "nickname-date-index";
 
 const userIdPresent = false; // TODO: update in case is required to use that definition
 const partitionKeyName = "username";

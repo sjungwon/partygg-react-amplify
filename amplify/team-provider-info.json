@@ -20,7 +20,7 @@
       "function": {
         "partyggProfileLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggProfileLamda-357867346a6d47366658-build.zip"
+          "s3Key": "amplify-builds/partyggProfileLamda-2b34772b68357a474443-build.zip"
         },
         "partyggLikeLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",

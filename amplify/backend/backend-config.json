@@ -1,9 +1,5 @@
 {
   "storage": {
-    "partyggProfileTable": {
-      "service": "DynamoDB",
-      "providerPlugin": "awscloudformation"
-    },
     "partyggGameTable": {
       "service": "DynamoDB",
       "providerPlugin": "awscloudformation"
@@ -42,28 +38,13 @@
     "partyggSubcommentTable": {
       "service": "DynamoDB",
       "providerPlugin": "awscloudformation"
+    },
+    "partyggProfileTable": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
     }
   },
   "function": {
-    "partyggProfileLamda": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "storage",
-          "resourceName": "partyggProfileTable",
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
-          "attributeEnvMap": {
-            "Name": "TABLE_NAME",
-            "Arn": "TABLE_ARN"
-          }
-        }
-      ]
-    },
     "partyggGameLamda": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -242,6 +223,25 @@
           }
         }
       ]
+    },
+    "partyggProfileLamda": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "partyggProfileTable",
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "attributeEnvMap": {
+            "Name": "TABLE_NAME",
+            "Arn": "TABLE_ARN"
+          }
+        }
+      ]
     }
   },
   "auth": {
@@ -278,14 +278,6 @@
       "service": "API Gateway",
       "providerPlugin": "awscloudformation",
       "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "partyggProfileLamda",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        },
         {
           "category": "function",
           "resourceName": "partyggGameLamda",
