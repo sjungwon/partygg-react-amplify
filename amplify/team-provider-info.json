@@ -1,0 +1,56 @@
+{
+  "dev": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-partyggreactamplify-dev-30140-authRole",
+      "UnauthRoleArn": "arn:aws:iam::165161938819:role/amplify-partyggreactamplify-dev-30140-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::165161938819:role/amplify-partyggreactamplify-dev-30140-authRole",
+      "Region": "ap-northeast-2",
+      "DeploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
+      "UnauthRoleName": "amplify-partyggreactamplify-dev-30140-unauthRole",
+      "StackName": "amplify-partyggreactamplify-dev-30140",
+      "StackId": "arn:aws:cloudformation:ap-northeast-2:165161938819:stack/amplify-partyggreactamplify-dev-30140/e55d4d90-dd1d-11ec-b3ce-0ab12bb1c150",
+      "AmplifyAppId": "dltr9601tbnay",
+      "APIGatewayAuthURL": "https://s3.amazonaws.com/amplify-partyggreactamplify-dev-30140-deployment/amplify-cfn-templates/api/APIGatewayAuthStack.json"
+    },
+    "categories": {
+      "auth": {
+        "undefined": {},
+        "partyggreactamplify": {}
+      },
+      "function": {
+        "partyggProfileLamda": {
+          "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
+          "s3Key": "amplify-builds/partyggProfileLamda-357867346a6d47366658-build.zip"
+        },
+        "partyggLikeLamda": {
+          "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
+          "s3Key": "amplify-builds/partyggLikeLamda-64687343387643665647-build.zip"
+        },
+        "partyggGameLamda": {
+          "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
+          "s3Key": "amplify-builds/partyggGameLamda-515534756177586c5849-build.zip"
+        },
+        "partyggPostLamda": {
+          "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
+          "s3Key": "amplify-builds/partyggPostLamda-54317665556d3970492b-build.zip"
+        },
+        "partyggDislikeLamda": {
+          "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
+          "s3Key": "amplify-builds/partyggDislikeLamda-466c434472614f685571-build.zip"
+        },
+        "S3Trigger8322dec8": {
+          "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
+          "s3Key": "amplify-builds/S3Trigger8322dec8-36494a38387a53414b35-build.zip"
+        },
+        "partyggSubcommentLamda": {
+          "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
+          "s3Key": "amplify-builds/partyggSubcommentLamda-35445670694a426f3947-build.zip"
+        },
+        "partyggCommentLamda": {
+          "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
+          "s3Key": "amplify-builds/partyggCommentLamda-3679306e4350306d5144-build.zip"
+        }
+      }
+    }
+  }
+}

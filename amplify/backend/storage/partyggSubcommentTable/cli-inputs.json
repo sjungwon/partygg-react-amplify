@@ -1,0 +1,14 @@
+{
+  "resourceName": "partyggSubcommentTable",
+  "tableName": "partyggSubcommentTable",
+  "partitionKey": {
+    "fieldName": "commentId",
+    "fieldType": "string"
+  },
+  "sortKey": {
+    "fieldName": "date",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}

@@ -1,0 +1,14 @@
+{
+  "resourceName": "partyggCommentTable",
+  "tableName": "partyggCommentTable",
+  "partitionKey": {
+    "fieldName": "postId",
+    "fieldType": "string"
+  },
+  "sortKey": {
+    "fieldName": "date",
+    "fieldType": "string"
+  },
+  "gsi": [],
+  "triggerFunctions": []
+}
