@@ -5,6 +5,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import { BsPlusLg } from "react-icons/bs";
 import styles from "./UserInfoBar.module.scss";
 import AddProfileModal from "./AddProfileModal";
+import { BsPencilSquare, BsTrash } from "react-icons/bs";
 
 export default function UserInfoBar() {
   const { username, profileArr } = useContext(UserDataContext);
@@ -46,6 +47,9 @@ export default function UserInfoBar() {
                   className={styles.profile_container}
                 >
                   <ProfileBlock profile={profile} hideUsername />
+                  <div>
+                    <BsPencilSquare />
+                  </div>
                 </li>
               </>
             );
@@ -56,6 +60,12 @@ export default function UserInfoBar() {
               className={styles.profile_container}
             >
               <ProfileBlock profile={profile} hideUsername />
+              <div>
+                <BsPencilSquare />
+              </div>
+              <div>
+                <BsTrash />
+              </div>
             </li>
           );
         })}
