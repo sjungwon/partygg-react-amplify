@@ -63,7 +63,7 @@ export default class ProfileServices {
     const { username } = await UserServices.getUsernameWithRefresh();
     const path = `/profiles/object/${encodeURIComponent(
       username
-    )}/${encodeURIComponent(data.date)}`;
+    )}/${encodeURIComponent(data.id)}`;
     try {
       const myInit: { body: Profile } = {
         body: data,

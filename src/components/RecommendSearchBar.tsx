@@ -1,10 +1,4 @@
-import {
-  KeyboardEventHandler,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback, useContext, useState } from "react";
 import { GameDataContext } from "../context/GameDataContextProvider";
 import { getRegExp } from "korean-regexp";
 import styles from "./RecommendSearchBar.module.scss";

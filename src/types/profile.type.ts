@@ -11,7 +11,7 @@ export interface Profile extends ProfileStruct, UserResource {
   //partition key
   username: string;
   //sort key
-  date: string;
+  id: string;
 }
 
 export interface AddProfileReqData extends ProfileStruct {}
@@ -26,5 +26,5 @@ export type GetProfilesResData = Profile[];
 
 export interface RemoveProfileReqData {
   username: string;
-  nickname: string;
+  id: string;
 }

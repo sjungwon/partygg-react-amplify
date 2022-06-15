@@ -1,5 +1,5 @@
-import { useCallback, useContext, useRef, useState } from "react";
-import { Button, Dropdown, DropdownButton } from "react-bootstrap";
+import { useCallback, useContext } from "react";
+import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { UserDataContext } from "../context/UserDataContextProvider";
 import GameSearchRecommend from "./RecommendSearchBar";

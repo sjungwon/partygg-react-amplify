@@ -29,7 +29,7 @@ export const UserDataContext = createContext<UserDataContextType>({
   setProfileArrHandler: (profiles: Profile[]) => {},
   currentProfile: {
     username: "",
-    date: "",
+    id: "",
     nickname: "",
     game: "",
     profileImage: undefined,
@@ -42,9 +42,9 @@ export const UserDataContext = createContext<UserDataContextType>({
   logout: () => {},
 });
 
-const initialProfile = {
+const initialProfile: Profile = {
   username: "",
-  date: "",
+  id: "",
   nickname: "",
   game: "",
   profileImage: undefined,
