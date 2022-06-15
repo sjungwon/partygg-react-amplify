@@ -188,12 +188,13 @@ app.post(path, async function (req, res) {
     },
   };
 
+  console.log(putItemParams);
+
   const findParam = {
     TableName: tableName,
-    KeyConditionExpression: "username = :u and id = :i",
-    ExpressionAttributeValues: {
-      ":u": putItemParams.Item.username,
-      ":i": putItemParams.Item.id,
+    Key: {
+      username: putItemParams.Item.username,
+      id: putItemParams.Item.id,
     },
   };
   //중복 방지
@@ -202,7 +203,7 @@ app.post(path, async function (req, res) {
     try {
       const findIdRedundancy = await dynamodb.get(findParam).promise();
       if (findIdRedundancy.Item?.id) {
-        putItemParams.Item.id = uuidv4();
+        findParam.Key.id = putItemParams.Item.id = uuidv4();
         i++;
         continue;
       } else {
