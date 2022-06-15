@@ -96,6 +96,22 @@
           "read"
         ]
       }
+    },
+    "/profiles": {
+      "name": "/profiles",
+      "lambdaFunction": "partyggProfileLamda",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
     }
   }
 }
