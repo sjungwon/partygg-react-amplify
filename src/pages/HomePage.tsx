@@ -11,6 +11,7 @@ import styles from "./HomePage.module.scss";
 export default function HomePage() {
   const { category, searchParam }: { category: string; searchParam: string } =
     useCategory();
+  console.log("home", category, searchParam);
 
   const { setFilteredProfileHandler } = useContext(UserDataContext);
 
@@ -19,7 +20,7 @@ export default function HomePage() {
     if (category && !searchParam) {
       window.alert("잘못된 링크로 접속하셨습니다.");
       navigate(-1);
-    } else if (category && searchParam) {
+    } else if (category === "games" && searchParam) {
       setFilteredProfileHandler(decodeURI(searchParam));
     } else {
       setFilteredProfileHandler("");

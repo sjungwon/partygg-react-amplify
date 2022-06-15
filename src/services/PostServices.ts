@@ -24,6 +24,9 @@ import {
   SubcommentsLastEvaluatedKey,
   UpdatePostReqData,
   UpdatePostResData,
+  LastEvaluatedKeyForProfile,
+  GetProfilePostsResData,
+  GetUserPostsResData,
 } from "../types/post.type";
 import UserServices from "./UserServices";
 
@@ -40,12 +43,16 @@ export default class PostServices {
     | undefined = undefined;
   private static lastEvaluatedKeyForUser: LastEvaluatedKeyForPost | undefined =
     undefined;
+  private static lastEvaluatedKeyForProfile:
+    | LastEvaluatedKeyForProfile
+    | undefined = undefined;
   private static getDone: boolean = false;
 
   public static init() {
     this.lastEvaluatedKeyForAll = undefined;
     this.lastEvaluatedKeyForGame = undefined;
     this.lastEvaluatedKeyForUser = undefined;
+    this.lastEvaluatedKeyForProfile = undefined;
     this.getDone = false;
   }
 
@@ -164,11 +171,40 @@ export default class PostServices {
           )}/${encodeURIComponent(this.lastEvaluatedKeyForUser.date)}`
         : `${this.path}/user/${searchParam}`;
       try {
-        const response: GetPostsResData = await API.get(this.apiName, path, {});
+        const response: GetUserPostsResData = await API.get(
+          this.apiName,
+          path,
+          {}
+        );
         if (!response.lastEvaluatedKey) {
           this.getDone = true;
         }
         this.lastEvaluatedKeyForUser = response.lastEvaluatedKey;
+        return response.data;
+      } catch (error) {
+        console.log(error);
+        return null;
+      }
+    }
+
+    if (category === "profiles" && searchParam) {
+      const path = this.lastEvaluatedKeyForProfile
+        ? `${this.path}/profile/${encodeURIComponent(
+            this.lastEvaluatedKeyForProfile.profileId
+          )}/${encodeURIComponent(
+            this.lastEvaluatedKeyForProfile?.username
+          )}/${encodeURIComponent(this.lastEvaluatedKeyForProfile.date)}}`
+        : `${this.path}/profile/${searchParam}`;
+      try {
+        const response: GetProfilePostsResData = await API.get(
+          this.apiName,
+          path,
+          {}
+        );
+        if (!response.lastEvaluatedKey) {
+          this.getDone = true;
+        }
+        this.lastEvaluatedKeyForProfile = response.lastEvaluatedKey;
         return response.data;
       } catch (error) {
         console.log(error);
@@ -193,59 +229,85 @@ export default class PostServices {
     }
   }
 
-  public static async getPostsByGame(
-    game: string
-  ): Promise<GetGamePostsResData | null> {
-    if (this.getDone) {
-      return null;
-    }
-    const path = this.lastEvaluatedKeyForGame
-      ? `${this.path}/game/${encodeURIComponent(
-          this.lastEvaluatedKeyForGame.game
-        )}/${encodeURIComponent(
-          this.lastEvaluatedKeyForGame.username
-        )}/${encodeURIComponent(this.lastEvaluatedKeyForGame.date)}`
-      : `${this.path}/game/${game}`;
-    try {
-      const response: GetGamePostsResData = await API.get(
-        this.apiName,
-        path,
-        {}
-      );
-      if (!response.lastEvaluatedKey) {
-        this.getDone = true;
-      }
-      this.lastEvaluatedKeyForGame = response.lastEvaluatedKey;
-      return response;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  }
+  // public static async getPostsByGame(
+  //   game: string
+  // ): Promise<GetGamePostsResData | null> {
+  //   if (this.getDone) {
+  //     return null;
+  //   }
+  //   const path = this.lastEvaluatedKeyForGame
+  //     ? `${this.path}/game/${encodeURIComponent(
+  //         this.lastEvaluatedKeyForGame.game
+  //       )}/${encodeURIComponent(
+  //         this.lastEvaluatedKeyForGame.username
+  //       )}/${encodeURIComponent(this.lastEvaluatedKeyForGame.date)}`
+  //     : `${this.path}/game/${game}`;
+  //   try {
+  //     const response: GetGamePostsResData = await API.get(
+  //       this.apiName,
+  //       path,
+  //       {}
+  //     );
+  //     if (!response.lastEvaluatedKey) {
+  //       this.getDone = true;
+  //     }
+  //     this.lastEvaluatedKeyForGame = response.lastEvaluatedKey;
+  //     return response;
+  //   } catch (error) {
+  //     console.log(error);
+  //     return null;
+  //   }
+  // }
 
-  public static async getPostsByUser(
-    username: string
-  ): Promise<GetPostsResData | null> {
-    if (this.getDone) {
-      return null;
-    }
-    const path = this.lastEvaluatedKeyForUser
-      ? `${this.path}/user/${encodeURIComponent(
-          this.lastEvaluatedKeyForUser.username
-        )}/${encodeURIComponent(this.lastEvaluatedKeyForUser.date)}`
-      : `${this.path}/user/${username}`;
-    try {
-      const response: GetPostsResData = await API.get(this.apiName, path, {});
-      if (!response.lastEvaluatedKey) {
-        this.getDone = true;
-      }
-      this.lastEvaluatedKeyForUser = response.lastEvaluatedKey;
-      return response;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  }
+  // public static async getPostsByUser(
+  //   username: string
+  // ): Promise<Post[] | null> {
+  //   if (this.getDone) {
+  //     return null;
+  //   }
+  //   const path = this.lastEvaluatedKeyForUser
+  //     ? `${this.path}/user/${encodeURIComponent(
+  //         this.lastEvaluatedKeyForUser.username
+  //       )}/${encodeURIComponent(this.lastEvaluatedKeyForUser.date)}`
+  //     : `${this.path}/user/${username}`;
+  //   try {
+  //     const response: GetUserPostsResData = await API.get(this.apiName, path, {});
+  //     if (!response.lastEvaluatedKey) {
+  //       this.getDone = true;
+  //     }
+  //     this.lastEvaluatedKeyForUser = response.lastEvaluatedKey;
+  //     return response.data;
+  //   } catch (error) {
+  //     console.log(error);
+  //     return null;
+  //   }
+  // }
+
+  // public static async getPostByProfile(
+  //   profileId: string
+  // ): Promise<GetProfilePostsResData | null> {
+  //   if (this.getDone) {
+  //     return null;
+  //   }
+  //   const path = this.lastEvaluatedKeyForProfile
+  //     ? `${this.path}/profile/${encodeURIComponent(
+  //         this.lastEvaluatedKeyForProfile.profileId
+  //       )}/${encodeURIComponent(
+  //         this.lastEvaluatedKeyForProfile?.username
+  //       )}/${encodeURIComponent(this.lastEvaluatedKeyForProfile.date)}}`
+  //     : `${this.path}/profile/${profileId}`;
+  //   try{
+  //     const response: GetProfilePostsResData = await API.get(this.apiName,path,{});
+  //     if(!response.lastEvaluatedKey){
+  //       this.getDone = true;
+  //     }
+  //     this.lastEvaluatedKeyForProfile = response.lastEvaluatedKey;
+  //     return response;
+  //   }catch(error){
+  //     console.log(error);
+  //     return null;
+  //   }
+  // }
 
   public static async getUserPostIdListByGame(
     username: string,

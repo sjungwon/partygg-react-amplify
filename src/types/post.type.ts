@@ -37,6 +37,10 @@ export interface LastEvaluatedKeyForGamePost extends LastEvaluatedKeyForPost {
   game: string;
 }
 
+export interface LastEvaluatedKeyForProfile extends LastEvaluatedKeyForPost {
+  profileId: string;
+}
+
 export interface GetPostsResData {
   data: Post[];
   lastEvaluatedKey?: LastEvaluatedKeyForAllPost;
@@ -45,6 +49,16 @@ export interface GetPostsResData {
 export interface GetGamePostsResData {
   data: Post[];
   lastEvaluatedKey?: LastEvaluatedKeyForGamePost;
+}
+
+export interface GetUserPostsResData {
+  data: Post[];
+  lastEvaluatedKey?: LastEvaluatedKeyForPost;
+}
+
+export interface GetProfilePostsResData {
+  data: Post[];
+  lastEvaluatedKey?: LastEvaluatedKeyForProfile;
 }
 
 export interface AddPostReqData extends PostStruct {

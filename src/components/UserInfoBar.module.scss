@@ -59,3 +59,18 @@
   margin-left: .5rem;
   color: $font-color-gray;
 }
+
+.profile_block{
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  width: 100%;
+}
+.profile_btn{
+  @include btn_gray;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 4px;
+  margin-left: .25rem;
+  // background-color: $primary-default;
+}

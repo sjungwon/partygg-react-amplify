@@ -8,8 +8,13 @@ export default function useCategory() {
 
   useEffect(() => {
     const pathArr = location.pathname.split("/");
-    setCategory(pathArr[1]);
-    setSearchParam(pathArr.length > 2 ? pathArr[2] : "");
+    if (pathArr[1] === "posts") {
+      setCategory(pathArr[2]);
+      setSearchParam(pathArr.length > 3 ? pathArr[3] : "");
+      return;
+    }
+    setCategory("");
+    setSearchParam("");
   }, [location]);
 
   return { category, searchParam };

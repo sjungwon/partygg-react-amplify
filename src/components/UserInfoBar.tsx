@@ -6,6 +6,7 @@ import { BsPlusLg } from "react-icons/bs";
 import styles from "./UserInfoBar.module.scss";
 import AddProfileModal from "./AddProfileModal";
 import { BsPencilSquare, BsTrash } from "react-icons/bs";
+import { Link } from "react-router-dom";
 
 export default function UserInfoBar() {
   const { username, profileArr } = useContext(UserDataContext);
@@ -46,10 +47,18 @@ export default function UserInfoBar() {
                   key={`${profile.game}-${profile.nickname}`}
                   className={styles.profile_container}
                 >
-                  <ProfileBlock profile={profile} hideUsername />
-                  <div>
+                  <Link
+                    to={`/posts/profiles/${profile.id}`}
+                    className={styles.profile_block}
+                  >
+                    <ProfileBlock profile={profile} hideUsername />
+                  </Link>
+                  <button className={styles.profile_btn}>
                     <BsPencilSquare />
-                  </div>
+                  </button>
+                  <button className={styles.profile_btn}>
+                    <BsTrash />
+                  </button>
                 </li>
               </>
             );
@@ -59,13 +68,18 @@ export default function UserInfoBar() {
               key={`${profile.game}-${profile.nickname}`}
               className={styles.profile_container}
             >
-              <ProfileBlock profile={profile} hideUsername />
-              <div>
+              <Link
+                to={`/posts/profiles/${profile.id}`}
+                className={styles.profile_block}
+              >
+                <ProfileBlock profile={profile} hideUsername />
+              </Link>
+              <button className={styles.profile_btn}>
                 <BsPencilSquare />
-              </div>
-              <div>
+              </button>
+              <button className={styles.profile_btn}>
                 <BsTrash />
-              </div>
+              </button>
             </li>
           );
         })}

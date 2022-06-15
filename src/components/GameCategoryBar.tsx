@@ -97,7 +97,7 @@ export default function GameCategoryBar() {
 
         {games.map((game) => (
           <NavLink
-            to={`/games/${encodeURI(game.name)}`}
+            to={`/posts/games/${encodeURI(game.name)}`}
             className={({ isActive }) =>
               `${styles.category_item} ${isActive ? styles.active : ""}`
             }
