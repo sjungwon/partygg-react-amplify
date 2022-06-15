@@ -95,6 +95,7 @@ export default function AddProfileModal({ show, close }: PropsType) {
       const profileImage = await FileServices.putProfileImage(file);
       if (!profileImage) {
         window.alert("프로필 추가에 실패했습니다. 다시 시도해주세요.");
+        setLoading(false);
         return;
       }
       data = {
@@ -105,6 +106,7 @@ export default function AddProfileModal({ show, close }: PropsType) {
     const profile = await ProfileServices.addProfiles(data);
     if (!profile) {
       window.alert("프로필 추가에 실패했습니다. 다시 시도해주세요.");
+      setLoading(false);
       return;
     }
     addProfileHandler(profile);

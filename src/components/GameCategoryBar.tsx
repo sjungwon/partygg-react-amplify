@@ -1,5 +1,5 @@
-import { useCallback, useContext, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useCallback, useContext, useRef, useState } from "react";
+import { NavLink } from "react-router-dom";
 import GameServices from "../services/GameServices";
 import { AiOutlineUnorderedList, AiOutlineClose } from "react-icons/ai";
 import { BsPlusLg } from "react-icons/bs";
@@ -44,43 +44,6 @@ export default function GameCategoryBar() {
     }
   }, [games, setGamesHandler]);
 
-  const navigate = useNavigate();
-  const location = useLocation();
-  const {
-    path,
-    category,
-    searchParam,
-  }: { path: string; category: string; searchParam: string } = useMemo(() => {
-    const path = location.pathname;
-    const splitPath = path.split("/");
-    const category = splitPath[1];
-    const searchParam = splitPath.length > 2 ? splitPath[2] : "";
-    return {
-      path,
-      category,
-      searchParam,
-    };
-  }, [location]);
-
-  const categoryChange = useCallback(
-    (event: any) => {
-      const El = event.target as HTMLDivElement;
-      const queryParam = El.textContent;
-      console.log(queryParam);
-      const newPath = `/games/${queryParam}`;
-      const encodeNewPath = encodeURI(newPath);
-      console.log(path, newPath, encodeNewPath);
-      if (path !== encodeNewPath) {
-        navigate(`/games/${queryParam}`);
-      }
-    },
-    [navigate, path]
-  );
-
-  const categoryAll = useCallback(() => {
-    navigate("/");
-  }, [navigate]);
-
   const [showAdd, setShowAdd] = useState<boolean>(false);
   const { username } = useContext(UserDataContext);
   const setShowAddHandler = useCallback(() => {
@@ -122,25 +85,27 @@ export default function GameCategoryBar() {
           {<BsPlusLg />}
         </button>
       </div>
-      <ul className={styles.category_list}>
-        <li
-          onClick={categoryAll}
-          className={`${styles.category_item} ${category ? "" : styles.active}`}
+      <nav className={styles.category_list}>
+        <NavLink
+          to={"/"}
+          className={({ isActive }) =>
+            `${styles.category_item} ${isActive ? styles.active : ""}`
+          }
         >
-          <p className={styles.item_text}>전체 보기</p>
-        </li>
+          전체 보기
+        </NavLink>
+
         {games.map((game) => (
-          <li
-            key={game.name}
-            onClick={categoryChange}
-            className={`${styles.category_item} ${
-              searchParam === encodeURI(game.name) ? styles.active : ""
-            }`}
+          <NavLink
+            to={`/games/${encodeURI(game.name)}`}
+            className={({ isActive }) =>
+              `${styles.category_item} ${isActive ? styles.active : ""}`
+            }
           >
-            <p className={styles.item_text}>{game.name}</p>
-          </li>
+            {game.name}
+          </NavLink>
         ))}
-      </ul>
+      </nav>
     </div>
   );
 }
