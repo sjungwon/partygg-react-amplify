@@ -157,6 +157,7 @@ export default function PostForm({
         //post 추가
         let newData: AddPostReqData = {
           ...data,
+          profileId: data.profile.id,
           images: [],
         };
         if (files) {
@@ -181,7 +182,7 @@ export default function PostForm({
             return;
           }
           newData = {
-            ...data,
+            ...newData,
             images: imageKey as addImageResData[],
           };
         }

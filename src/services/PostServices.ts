@@ -58,7 +58,7 @@ export default class PostServices {
       const myInit: { body: AddPostReqBodyData } = {
         body: {
           ...newPost,
-          nickname: newPost.profile.nickname,
+          profileId: newPost.profile.id,
           username,
         },
       };
@@ -79,7 +79,7 @@ export default class PostServices {
   public static async updatePost(postData: Post): Promise<Post | null> {
     try {
       const { username } = await UserServices.getUsernameWithRefresh();
-      const { game, profile, text, images, nickname } = postData;
+      const { game, profile, text, images } = postData;
       if (!username) {
         return null;
       }
@@ -93,7 +93,7 @@ export default class PostServices {
           text,
           images,
           username,
-          nickname,
+          profileId: profile.id,
         },
       };
       const response = await API.post(this.apiName, updatePath, myInit);
@@ -223,25 +223,6 @@ export default class PostServices {
     }
   }
 
-  // public static async getNextPostIdListByGame(
-  //   data: LastEvaluatedKeyForGame
-  // ): Promise<GetGamePostIdListResData | null> {
-  //   try {
-  //     const path = `${this.path}/game/${encodeURIComponent(
-  //       data.game
-  //     )}/${encodeURIComponent(data.username)}/${encodeURIComponent(data.date)}`;
-  //     const response: GetGamePostIdListResData = await API.get(
-  //       this.apiName,
-  //       path,
-  //       {}
-  //     );
-  //     return response;
-  //   } catch (error) {
-  //     console.log(error);
-  //     return null;
-  //   }
-  // }
-
   public static async getPostsByUser(
     username: string
   ): Promise<GetPostsResData | null> {
@@ -266,25 +247,6 @@ export default class PostServices {
     }
   }
 
-  // public static async getNextUserPostIdList(
-  //   data: LastEvaluatedKeyForPost
-  // ): Promise<GetPostsResData | null> {
-  //   try {
-  //     const path = `${this.path}/user/${encodeURIComponent(
-  //       data.username
-  //     )}/${encodeURIComponent(data.date)}`;
-  //     const response: GetPostsResData = await API.get(
-  //       this.apiName,
-  //       path,
-  //       {}
-  //     );
-  //     return response;
-  //   } catch (error) {
-  //     console.log(error);
-  //     return null;
-  //   }
-  // }
-
   public static async getUserPostIdListByGame(
     username: string,
     game: string
@@ -301,7 +263,7 @@ export default class PostServices {
     }
   }
 
-  public static async getNextUserPostIdListByGame(
+  public static async getNextUserPostByGame(
     game: string,
     data: LastEvaluatedKeyForPost
   ): Promise<GetPostsResData | null> {

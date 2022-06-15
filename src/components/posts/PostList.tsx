@@ -100,11 +100,11 @@ export default function PostList({ category, searchParam }: Props) {
     <>
       <div className={styles.container}>
         <AddPostElement prevData={{ setPostData: setAddPostData }} />
-        {posts.map((postId, i) => {
+        {posts.map((post, i) => {
           return (
             <PostElement
-              key={`${postId.username}/${postId.date}`}
-              post={postId}
+              key={`${post.username}/${post.date}`}
+              post={post}
               removePost={removePost}
             />
           );

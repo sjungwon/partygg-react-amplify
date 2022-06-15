@@ -13,7 +13,7 @@ export interface Post extends PostStruct, UserResource {
   //partition key
   //username : string;
   //sort key
-  nickname: string;
+  profileId: string;
   date: string;
   images: ImageKeys[];
   likes: string[];
@@ -48,21 +48,17 @@ export interface GetGamePostsResData {
 }
 
 export interface AddPostReqData extends PostStruct {
+  profileId: string;
   images: ImageKeys[];
 }
 
-export interface AddPostReqBodyData extends AddPostReqData, UserResource {
-  nickname: string;
-}
+export interface AddPostReqBodyData extends AddPostReqData, UserResource {}
 
 export interface AddPostResData extends AddPostReqData, UserResource {
-  nickname: string;
   date: string;
 }
 
-export interface UpdatePostReqData extends AddPostReqData, UserResource {
-  nickname: string;
-}
+export interface UpdatePostReqData extends AddPostReqData, UserResource {}
 
 export interface UpdatePostResData extends AddPostResData {}
 
