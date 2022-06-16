@@ -14,6 +14,7 @@ interface UserDataContextType {
   filteredProfileArr: Profile[];
   setFilteredProfileHandler: (gameName: string) => void;
   addProfileHandler: (profile: Profile) => void;
+  removeProfileHandler: (profile: Profile) => void;
   checkLogin: () => void;
   logout: () => void;
 }
@@ -38,6 +39,7 @@ export const UserDataContext = createContext<UserDataContextType>({
   filteredProfileArr: [],
   setFilteredProfileHandler: (gameName: string) => {},
   addProfileHandler: (profile: Profile) => {},
+  removeProfileHandler: (profile: Profile) => {},
   checkLogin: () => {},
   logout: () => {},
 });
@@ -134,6 +136,27 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
     [filteredProfileArr]
   );
 
+  const removeProfileHandler = useCallback(
+    (profile: Profile) => {
+      setProfileArr((prev) =>
+        sortProfiles(
+          prev.filter((prevProfile) => prevProfile.id !== profile.id)
+        )
+      );
+      if (
+        filteredProfileArr.length &&
+        filteredProfileArr[0].game === profile.game
+      ) {
+        setFilteredProfileArr((prev) =>
+          sortProfiles(
+            prev.filter((prevProfile) => prevProfile.id !== profile.id)
+          )
+        );
+      }
+    },
+    [filteredProfileArr]
+  );
+
   const checkLogin = useCallback(async () => {
     try {
       const { username } = await UserServices.getUsernameWithRefresh();
@@ -190,6 +213,7 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
         filteredProfileArr,
         setFilteredProfileHandler,
         addProfileHandler,
+        removeProfileHandler,
         checkLogin,
         logout,
       }}

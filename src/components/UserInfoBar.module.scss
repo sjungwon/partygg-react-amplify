@@ -57,7 +57,13 @@
   display: flex;
   align-items: center;
   margin-left: .5rem;
+  padding-right: .25rem;
+  border-radius: .25rem;
   color: $font-color-gray;
+  &:hover{
+    color: $font-color-gray;
+    background-color: $primary-default-btn-background;
+  }
 }
 
 .profile_block{
@@ -65,6 +71,8 @@
   align-items: center;
   text-decoration: none;
   width: 100%;
+  
+  
 }
 .profile_btn{
   @include btn_gray;
@@ -72,5 +80,8 @@
   height: 1.5rem;
   padding: 0 4px;
   margin-left: .25rem;
+  svg{
+    pointer-events: none;
+  }
   // background-color: $primary-default;
 }

@@ -18,7 +18,7 @@ import { FaRegComment, FaComment } from "react-icons/fa";
 import ImageSlide from "../ImageSlide";
 import { Post } from "../../types/post.type";
 import { UserDataContext } from "../../context/UserDataContextProvider";
-import RemoveConfirmModal from "./RemoveConfirmModal";
+import RemoveConfirmModal from "../RemoveConfirmModal";
 import LikeServices from "../../services/LikeServices";
 import FileServices from "../../services/FileServices";
 import { ImageKeys } from "../../types/file.type";

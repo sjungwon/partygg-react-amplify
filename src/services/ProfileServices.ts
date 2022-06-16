@@ -79,18 +79,20 @@ export default class ProfileServices {
     }
   }
 
-  public static async deleteProfiles(date: string) {
+  public static async deleteProfiles(id: string): Promise<boolean> {
     const path = `/profiles/object`;
     try {
       const { username } = await UserServices.getUsernameWithRefresh();
       const response = await API.del(
         this.apiName,
-        `${path}/${encodeURIComponent(username)}/${encodeURIComponent(date)}`,
+        `${path}/${encodeURIComponent(username)}/${encodeURIComponent(id)}`,
         {}
       );
       console.log(response);
+      return true;
     } catch (error) {
       console.log(error);
+      return false;
     }
   }
 }
