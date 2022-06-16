@@ -1,22 +1,24 @@
-import { useCallback, useContext, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Button, Dropdown, DropdownButton, Modal } from "react-bootstrap";
 import { GameDataContext } from "../context/GameDataContextProvider";
 import { UserDataContext } from "../context/UserDataContextProvider";
 import FileServices from "../services/FileServices";
 import ProfileServices from "../services/ProfileServices";
 import TextValidServices from "../services/TextValidServices";
-import { AddProfileReqData } from "../types/profile.type";
+import { AddProfileReqData, Profile } from "../types/profile.type";
 import { MdOutlinePhotoSizeSelectActual } from "react-icons/md";
 import styles from "./AddProfileModal.module.scss";
+import { ImageKeys } from "../types/file.type";
 
 interface PropsType {
   show: boolean;
   close: () => void;
+  prevData?: Profile;
 }
 
-export default function AddProfileModal({ show, close }: PropsType) {
+export default function AddProfileModal({ show, close, prevData }: PropsType) {
   const { games } = useContext(GameDataContext);
-  const { profileArr, addProfileHandler } = useContext(UserDataContext);
+  const { profileArr, updateProfileHandler } = useContext(UserDataContext);
 
   const nicknameRef = useRef<HTMLInputElement>(null);
 
@@ -51,14 +53,32 @@ export default function AddProfileModal({ show, close }: PropsType) {
     }
   }, []);
 
-  const closeWithInit = useCallback(() => {
-    if (nicknameRef.current) {
-      nicknameRef.current.value = "";
+  const getPrevImage = useCallback(async (key: ImageKeys) => {
+    const image = await FileServices.getImage(key, "resized");
+    if (image) {
+      setImage(image);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!prevData) {
+      if (nicknameRef.current) {
+        nicknameRef.current.value = "";
+      }
       setSelectedGames("");
       setImage("");
+      return;
     }
-    close();
-  }, [close]);
+    if (nicknameRef.current) {
+      nicknameRef.current.value = prevData.nickname;
+    }
+    if (prevData.profileImage) {
+      getPrevImage(prevData.profileImage);
+    } else {
+      setImage("");
+    }
+    setSelectedGames(prevData.game);
+  }, [getPrevImage, prevData]);
 
   const submitProfile = useCallback(async () => {
     if (!selectedGames) {
@@ -76,14 +96,16 @@ export default function AddProfileModal({ show, close }: PropsType) {
       return;
     }
 
-    if (
-      profileArr.find(
-        (profile) =>
-          profile.game === selectedGames && profile.nickname === nickname
-      )
-    ) {
-      window.alert("이미 존재하는 프로필입니다.");
-      return;
+    if (!prevData) {
+      if (
+        profileArr.find(
+          (profile) =>
+            profile.game === selectedGames && profile.nickname === nickname
+        )
+      ) {
+        window.alert("이미 존재하는 프로필입니다.");
+        return;
+      }
     }
     let data: AddProfileReqData = {
       nickname,
@@ -91,10 +113,15 @@ export default function AddProfileModal({ show, close }: PropsType) {
       profileImage: undefined,
     };
     setLoading(true);
+
     if (file) {
       const profileImage = await FileServices.putProfileImage(file);
       if (!profileImage) {
-        window.alert("프로필 추가에 실패했습니다. 다시 시도해주세요.");
+        window.alert(
+          `프로필 ${
+            prevData ? "수정" : "추가"
+          }에 실패했습니다. 다시 시도해주세요.`
+        );
         setLoading(false);
         return;
       }
@@ -103,21 +130,41 @@ export default function AddProfileModal({ show, close }: PropsType) {
         profileImage,
       };
     }
-    const profile = await ProfileServices.addProfiles(data);
+    let profile: Profile | null = null;
+    if (prevData) {
+      const modifyData = {
+        ...prevData,
+        ...data,
+      };
+      profile = await ProfileServices.updateProfile(modifyData);
+    } else {
+      profile = await ProfileServices.addProfile(data);
+    }
     if (!profile) {
-      window.alert("프로필 추가에 실패했습니다. 다시 시도해주세요.");
+      window.alert(
+        `프로필 ${
+          prevData ? "수정" : "추가"
+        }에 실패했습니다. 다시 시도해주세요.`
+      );
       setLoading(false);
       return;
     }
-    addProfileHandler(profile);
+    if (prevData && prevData.profileImage) {
+      FileServices.removeImage(prevData.profileImage);
+    }
+    if (prevData) {
+      updateProfileHandler(profile, "modify");
+    } else {
+      updateProfileHandler(profile, "add");
+    }
     setLoading(false);
-    closeWithInit();
-  }, [addProfileHandler, closeWithInit, file, profileArr, selectedGames]);
+    close();
+  }, [close, file, prevData, profileArr, selectedGames, updateProfileHandler]);
 
   return (
     <Modal backdrop="static" show={show} size="sm" centered>
       <Modal.Header>
-        <Modal.Title>프로필 추가</Modal.Title>
+        <Modal.Title>프로필 {prevData ? "수정" : "추가"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <div className={styles.form_game_selector}>
@@ -187,9 +234,15 @@ export default function AddProfileModal({ show, close }: PropsType) {
           disabled={loading}
           className={styles.btn_submit}
         >
-          {loading ? "추가 중..." : "추가"}
+          {loading
+            ? prevData
+              ? "수정 중..."
+              : "추가 중..."
+            : prevData
+            ? "수정"
+            : "추가"}
         </Button>
-        <Button onClick={closeWithInit} size="sm">
+        <Button onClick={close} size="sm">
           취소
         </Button>
       </Modal.Footer>

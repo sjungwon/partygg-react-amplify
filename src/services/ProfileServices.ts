@@ -30,7 +30,7 @@ export default class ProfileServices {
     }
   }
 
-  public static async addProfiles(
+  public static async addProfile(
     data: AddProfileReqData
   ): Promise<Profile | null> {
     const path = "/profiles";
@@ -57,9 +57,9 @@ export default class ProfileServices {
     }
   }
 
-  public static async updateProfiles(
+  public static async updateProfile(
     data: UpdateProfileReqdata
-  ): Promise<void> {
+  ): Promise<Profile | null> {
     const { username } = await UserServices.getUsernameWithRefresh();
     const path = `/profiles/object/${encodeURIComponent(
       username
@@ -68,18 +68,20 @@ export default class ProfileServices {
       const myInit: { body: Profile } = {
         body: data,
       };
-      const profiles: GetProfilesResData = await API.post(
+      const profile: { data: Profile } = await API.post(
         this.apiName,
         path,
         myInit
       );
-      console.log(profiles);
+      console.log(profile);
+      return profile.data;
     } catch (error) {
       console.log(error);
+      return null;
     }
   }
 
-  public static async deleteProfiles(id: string): Promise<boolean> {
+  public static async deleteProfile(id: string): Promise<boolean> {
     const path = `/profiles/object`;
     try {
       const { username } = await UserServices.getUsernameWithRefresh();

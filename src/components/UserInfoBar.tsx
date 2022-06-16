@@ -10,27 +10,35 @@ import { Link } from "react-router-dom";
 import ProfileServices from "../services/ProfileServices";
 import FileServices from "../services/FileServices";
 import RemoveConfirmModal from "./RemoveConfirmModal";
+import { Profile } from "../types/profile.type";
 
 export default function UserInfoBar() {
-  const { username, profileArr, removeProfileHandler } =
+  const { username, profileArr, updateProfileHandler } =
     useContext(UserDataContext);
 
   const [showAdd, setShowAdd] = useState<boolean>(false);
-  const setShowAddHandler = useCallback(() => {
+  const [modifyData, setModifyData] = useState<Profile | undefined>();
+
+  const openShowAdd = useCallback(() => {
     if (!username) {
       window.alert("로그인이 필요합니다.");
       return;
     }
-    setShowAdd((prev) => !prev);
+    setShowAdd(true);
   }, [username]);
-  const close = useCallback(() => {
+  const closeShowAdd = useCallback(() => {
+    setModifyData(undefined);
     setShowAdd(false);
   }, []);
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [removeIndex, setRemoveIndex] = useState<number>(-1);
+  const [profileIndex, setProfileIndex] = useState<number>(-1);
+
   //remove modal
-  const [show, setShow] = useState<boolean>(false);
+  const [showRemoveMd, setShowRemoveMd] = useState<boolean>(false);
+  const removeMdClose = useCallback(() => {
+    setShowRemoveMd(false);
+  }, []);
 
   const setIndex: MouseEventHandler = useCallback(
     (event) => {
@@ -40,24 +48,32 @@ export default function UserInfoBar() {
       }
       const btnEl = event.target as HTMLButtonElement;
       const index = Number(btnEl.dataset.profileIndex);
+      const type = btnEl.dataset.profileType;
       if (isNaN(index)) {
-        window.alert("프로필 제거에 오류가 발생했습니다. 다시 시도해주세요.");
+        window.alert(
+          `프로필 ${
+            type === "remove" ? "제거" : "수정"
+          }에 오류가 발생했습니다. 다시 시도해주세요.`
+        );
         return;
       }
-      setRemoveIndex(index);
-      setShow(true);
+      setProfileIndex(index);
+      if (type === "remove") {
+        setShowRemoveMd(true);
+        return;
+      }
+      if (type === "modify") {
+        setModifyData(profileArr[index]);
+      }
+      openShowAdd();
     },
-    [username]
+    [openShowAdd, profileArr, username]
   );
-
-  const modalClose = useCallback(() => {
-    setShow(false);
-  }, []);
 
   const deleteProfile = useCallback(async () => {
     setLoading(true);
-    const removeProfile = profileArr[removeIndex];
-    const success = await ProfileServices.deleteProfiles(removeProfile.id);
+    const removeProfile = profileArr[profileIndex];
+    const success = await ProfileServices.deleteProfile(removeProfile.id);
     if (!success) {
       window.alert("프로필 제거에 오류가 발생했습니다. 다시 시도해주세요.");
       setLoading(false);
@@ -66,20 +82,24 @@ export default function UserInfoBar() {
     if (removeProfile.profileImage) {
       FileServices.removeImage(removeProfile.profileImage);
     }
-    removeProfileHandler(removeProfile);
+    updateProfileHandler(removeProfile, "remove");
     setLoading(false);
-    setShow(false);
-  }, [profileArr, removeIndex, removeProfileHandler]);
+    setShowRemoveMd(false);
+  }, [profileArr, profileIndex, updateProfileHandler]);
 
   return (
     <div className={styles.container}>
       <div className={styles.title_container}>
         <h3 className={styles.title}>{username} 님의 프로필</h3>
-        <button className={styles.title_btn_add} onClick={setShowAddHandler}>
+        <button className={styles.title_btn_add} onClick={openShowAdd}>
           {showAdd ? <AiOutlineClose /> : <BsPlusLg />}
         </button>
       </div>
-      <AddProfileModal show={showAdd} close={close} />
+      <AddProfileModal
+        show={showAdd}
+        close={closeShowAdd}
+        prevData={modifyData}
+      />
       <div>
         {profileArr.map((profile, i) => {
           if (i === 0 || profileArr[i].game !== profileArr[i - 1].game) {
@@ -101,12 +121,18 @@ export default function UserInfoBar() {
                   >
                     <ProfileBlock profile={profile} hideUsername />
                   </Link>
-                  <button className={styles.profile_btn}>
+                  <button
+                    className={styles.profile_btn}
+                    data-profile-index={i}
+                    data-profile-type={"modify"}
+                    onClick={setIndex}
+                  >
                     <BsPencilSquare />
                   </button>
                   <button
                     className={styles.profile_btn}
                     data-profile-index={i}
+                    data-profile-type={"remove"}
                     onClick={setIndex}
                   >
                     <BsTrash />
@@ -126,12 +152,18 @@ export default function UserInfoBar() {
               >
                 <ProfileBlock profile={profile} hideUsername />
               </Link>
-              <button className={styles.profile_btn}>
+              <button
+                className={styles.profile_btn}
+                data-profile-index={i}
+                data-profile-type={"modify"}
+                onClick={setIndex}
+              >
                 <BsPencilSquare />
               </button>
               <button
                 className={styles.profile_btn}
                 data-profile-index={i}
+                data-profile-type={"remove"}
                 onClick={setIndex}
               >
                 <BsTrash />
@@ -156,10 +188,10 @@ export default function UserInfoBar() {
         </a>
       </div>
       <RemoveConfirmModal
-        show={show}
+        show={showRemoveMd}
         loading={loading}
         remove={deleteProfile}
-        close={modalClose}
+        close={removeMdClose}
       />
     </div>
   );
