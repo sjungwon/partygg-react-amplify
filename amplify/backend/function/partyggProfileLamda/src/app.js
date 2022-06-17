@@ -1,4 +1,19 @@
-/*
+/* Amplify Params - DO NOT EDIT
+	ENV
+	REGION
+	STORAGE_PARTYGGCOMMENTTABLE_ARN
+	STORAGE_PARTYGGCOMMENTTABLE_NAME
+	STORAGE_PARTYGGCOMMENTTABLE_STREAMARN
+	STORAGE_PARTYGGPOSTTABLE_ARN
+	STORAGE_PARTYGGPOSTTABLE_NAME
+	STORAGE_PARTYGGPOSTTABLE_STREAMARN
+	STORAGE_PARTYGGPROFILETABLE_ARN
+	STORAGE_PARTYGGPROFILETABLE_NAME
+	STORAGE_PARTYGGPROFILETABLE_STREAMARN
+	STORAGE_PARTYGGSUBCOMMENTTABLE_ARN
+	STORAGE_PARTYGGSUBCOMMENTTABLE_NAME
+	STORAGE_PARTYGGSUBCOMMENTTABLE_STREAMARN
+Amplify Params - DO NOT EDIT */ /*
 Copyright 2017 - 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
     http://aws.amazon.com/apache2.0/
@@ -17,9 +32,17 @@ AWS.config.update({ region: process.env.TABLE_REGION });
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 let tableName = "partyggProfileTable";
+let postTableName = "partyggPostTable";
+let commentTableName = "partyggCommentTable";
+let subcommentTableName = "partyggSubcommentTable";
 if (process.env.ENV && process.env.ENV !== "NONE") {
   tableName = tableName + "-" + process.env.ENV;
+  postTableName = postTableName + "-" + process.env.ENV;
+  commentTableName = commentTableName + "-" + process.env.ENV;
+  subcommentTableName = subcommentTableName + "-" + process.env.ENV;
 }
+
+const profileIdIndexName = "profileId-date-index";
 
 const userIdPresent = false; // TODO: update in case is required to use that definition
 const partitionKeyName = "username";
@@ -245,12 +268,117 @@ app.post(
 
     try {
       await dynamodb.put(putItemParams).promise();
+      const updateFunc = async () => {
+        const param = {
+          IndexName: profileIdIndexName,
+          KeyConditionExpression: "profileId = :p",
+          ExpressionAttributeValues: {
+            ":p": req.params[sortKeyName],
+          },
+          ScanIndexForward: false,
+        };
+        const updateParam = {
+          ExpressionAttributeNames: {
+            "#P": "profile",
+          },
+          ExpressionAttributeValues: {
+            ":p": { ...req.body },
+          },
+          UpdateExpression: "SET #P = :p",
+        };
+        const postUpdate = new Promise(async (res) => {
+          const postQueryParam = {
+            TableName: postTableName,
+            ...param,
+          };
+          const posts = await dynamodb.query(postQueryParam).promise();
+          let result;
+          if (posts.Items) {
+            result = await Promise.all(
+              posts.Items.map(async (item) => {
+                const postUpdateParam = {
+                  TableName: postTableName,
+                  Key: {
+                    username: item.username,
+                    date: item.date,
+                  },
+                  ...updateParam,
+                };
+                const test = await dynamodb.update(postUpdateParam).promise();
+                return test;
+              })
+            );
+          }
+          res(result);
+        });
+        const commentUpdate = new Promise(async (res) => {
+          const commentQueryParam = {
+            TableName: commentTableName,
+            ...param,
+          };
+          const comments = await dynamodb.query(commentQueryParam).promise();
+          let result;
+          if (comments.Items) {
+            result = await Promise.all(
+              comments.Items.map(async (item) => {
+                const commentUpdateParam = {
+                  TableName: commentTableName,
+                  Key: {
+                    postId: item.postId,
+                    date: item.date,
+                  },
+                  ...updateParam,
+                };
+                const test = await dynamodb
+                  .update(commentUpdateParam)
+                  .promise();
+                return test;
+              })
+            );
+          }
+          res(result);
+        });
+        const subcommentUpdate = new Promise(async (res) => {
+          const subcommentQueryParam = {
+            TableName: subcommentTableName,
+            ...param,
+          };
+          const subcomments = await dynamodb
+            .query(subcommentQueryParam)
+            .promise();
+          let result;
+          if (subcomments.Items) {
+            result = await Promise.all(
+              subcomments.Items.map(async (item) => {
+                const subcommentUpdateParam = {
+                  TableName: subcommentTableName,
+                  Key: {
+                    commentId: item.commentId,
+                    date: item.date,
+                  },
+                  ...updateParam,
+                };
+                const test = await dynamodb
+                  .update(subcommentUpdateParam)
+                  .promise();
+                return test;
+              })
+            );
+          }
+          res(result);
+        });
+
+        await Promise.all([postUpdate, commentUpdate, subcommentUpdate]);
+      };
+      await updateFunc();
+
       res.json({
         success: "post call succeed!",
         url: req.url,
         data: putItemParams.Item,
       });
     } catch (err) {
+      console.log("Profile update error: " + err);
       res.statusCode = 500;
       res.json({ error: err, url: req.url, body: req.body });
     }

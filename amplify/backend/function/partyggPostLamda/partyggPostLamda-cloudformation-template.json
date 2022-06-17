@@ -87,6 +87,18 @@
     "storagepartyggSubcommentTableStreamArn": {
       "Type": "String",
       "Default": "storagepartyggSubcommentTableStreamArn"
+    },
+    "storagepartyggProfileTableName": {
+      "Type": "String",
+      "Default": "storagepartyggProfileTableName"
+    },
+    "storagepartyggProfileTableArn": {
+      "Type": "String",
+      "Default": "storagepartyggProfileTableArn"
+    },
+    "storagepartyggProfileTableStreamArn": {
+      "Type": "String",
+      "Default": "storagepartyggProfileTableStreamArn"
     }
   },
   "Conditions": {
@@ -195,6 +207,15 @@
             },
             "STORAGE_PARTYGGSUBCOMMENTTABLE_STREAMARN": {
               "Ref": "storagepartyggSubcommentTableStreamArn"
+            },
+            "STORAGE_PARTYGGPROFILETABLE_NAME": {
+              "Ref": "storagepartyggProfileTableName"
+            },
+            "STORAGE_PARTYGGPROFILETABLE_ARN": {
+              "Ref": "storagepartyggProfileTableArn"
+            },
+            "STORAGE_PARTYGGPROFILETABLE_STREAMARN": {
+              "Ref": "storagepartyggProfileTableStreamArn"
             }
           }
         },
@@ -499,6 +520,33 @@
                     [
                       {
                         "Ref": "storagepartyggSubcommentTableArn"
+                      },
+                      "index/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Get*",
+                "dynamodb:BatchGetItem",
+                "dynamodb:List*",
+                "dynamodb:Describe*",
+                "dynamodb:Scan",
+                "dynamodb:Query"
+              ],
+              "Resource": [
+                {
+                  "Ref": "storagepartyggProfileTableArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "storagepartyggProfileTableArn"
                       },
                       "index/*"
                     ]

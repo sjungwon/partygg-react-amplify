@@ -31,6 +31,17 @@
         "fieldName": "date",
         "fieldType": "string"
       }
+    },
+    {
+      "name": "profileId-date-index",
+      "partitionKey": {
+        "fieldName": "profileId",
+        "fieldType": "string"
+      },
+      "sortKey": {
+        "fieldName": "date",
+        "fieldType": "string"
+      }
     }
   ],
   "triggerFunctions": []
