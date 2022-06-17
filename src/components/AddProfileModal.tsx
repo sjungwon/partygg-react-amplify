@@ -9,6 +9,7 @@ import { AddProfileReqData, Profile } from "../types/profile.type";
 import { MdOutlinePhotoSizeSelectActual } from "react-icons/md";
 import styles from "./AddProfileModal.module.scss";
 import { ImageKeys } from "../types/file.type";
+import { useLocation } from "react-router-dom";
 
 interface PropsType {
   show: boolean;
@@ -159,6 +160,7 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
     }
     setLoading(false);
     close();
+    window.location.reload();
   }, [close, file, prevData, profileArr, selectedGames, updateProfileHandler]);
 
   return (
@@ -167,6 +169,11 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
         <Modal.Title>프로필 {prevData ? "수정" : "추가"}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        {prevData ? (
+          <p>
+            프로필 수정 시 다른 데이터에 반영을 위해 페이지가 새로고침됩니다.
+          </p>
+        ) : null}
         <div className={styles.form_game_selector}>
           <DropdownButton
             id="dropdown-gameList"

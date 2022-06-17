@@ -4,6 +4,7 @@ import { Profile } from "./profile.type";
 
 //기본 post 구조
 export interface PostStruct {
+  profileId: string;
   game: string;
   profile: Profile;
   text: string;
@@ -13,7 +14,6 @@ export interface Post extends PostStruct, UserResource {
   //partition key
   //username : string;
   //sort key
-  profileId: string;
   date: string;
   images: ImageKeys[];
   likes: string[];
