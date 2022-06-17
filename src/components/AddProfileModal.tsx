@@ -9,7 +9,6 @@ import { AddProfileReqData, Profile } from "../types/profile.type";
 import { MdOutlinePhotoSizeSelectActual } from "react-icons/md";
 import styles from "./AddProfileModal.module.scss";
 import { ImageKeys } from "../types/file.type";
-import { useLocation } from "react-router-dom";
 
 interface PropsType {
   show: boolean;
