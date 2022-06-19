@@ -65,30 +65,32 @@ export default function GameCategoryBar({ show }: PropsType) {
   return (
     <div className={`${styles.container} ${show ? "" : styles.container_hide}`}>
       <div className={styles.container_padding}>
-        <div className={styles.category_list_title}>
-          <AiOutlineUnorderedList />
-          <h3 className={styles.category_title}>게임 리스트</h3>
-          <button
-            className={styles.category_title_button}
-            onClick={setShowAddHandler}
-          >
-            {showAdd ? <AiOutlineClose /> : <BsPlusLg />}
-          </button>
-        </div>
-        <div className={showAdd ? styles.category_add : styles.hide}>
-          <input
-            type="text"
-            ref={gameInputRef}
-            placeholder="게임 이름"
-            className={styles.category_add_input}
-          />
-          <button
-            onClick={gameSubmit}
-            disabled={loading}
-            className={styles.category_add_button}
-          >
-            {<BsPlusLg />}
-          </button>
+        <div className={styles.category_list_title_container}>
+          <div className={styles.category_list_title}>
+            <AiOutlineUnorderedList />
+            <h3 className={styles.category_title}>게임 리스트</h3>
+            <button
+              className={styles.category_title_button}
+              onClick={setShowAddHandler}
+            >
+              {showAdd ? <AiOutlineClose /> : <BsPlusLg />}
+            </button>
+          </div>
+          <div className={showAdd ? styles.category_add : styles.hide}>
+            <input
+              type="text"
+              ref={gameInputRef}
+              placeholder="게임 이름"
+              className={styles.category_add_input}
+            />
+            <button
+              onClick={gameSubmit}
+              disabled={loading}
+              className={styles.category_add_button}
+            >
+              {<BsPlusLg />}
+            </button>
+          </div>
         </div>
         <nav className={styles.category_list}>
           <NavLink

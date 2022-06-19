@@ -169,7 +169,7 @@ export default function UserInfoBar() {
         close={closeShowAdd}
         prevData={modifyData}
       />
-      <div>
+      <div className={styles.profile_list_container}>
         {profileArr.map((profile, i) => {
           if (i === 0 || profileArr[i].game !== profileArr[i - 1].game) {
             return (
@@ -191,7 +191,6 @@ export default function UserInfoBar() {
           );
         })}
       </div>
-
       <RemoveConfirmModal
         show={showRemoveMd}
         loading={loading}

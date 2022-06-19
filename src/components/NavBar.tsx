@@ -1,4 +1,4 @@
-import { useCallback, useContext, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { UserDataContext } from "../context/UserDataContextProvider";
@@ -10,6 +10,7 @@ import {
   AiOutlineLogin,
   AiOutlineSearch,
 } from "react-icons/ai";
+import gsap from "gsap";
 
 interface PropsType {
   showCategoryHandler: () => void;
@@ -26,6 +27,23 @@ export default function NavBar({ showCategoryHandler }: PropsType) {
   const showSearchBarHandler = useCallback(() => {
     setShowSearchBar((prev) => !prev);
   }, []);
+
+  const searchBarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (searchBarRef.current && showSearchBar) {
+      gsap.to(searchBarRef.current, 0.2, {
+        display: "flex",
+        opacity: 1,
+      });
+    }
+    if (searchBarRef.current && !showSearchBar) {
+      gsap.to(searchBarRef.current, 0.2, {
+        display: "none",
+        opacity: 0,
+      });
+    }
+  }, [showSearchBar]);
 
   return (
     <div className={styles.navbar}>
@@ -44,11 +62,7 @@ export default function NavBar({ showCategoryHandler }: PropsType) {
             <img src="/logo192.png" alt="logo" className={styles.navbar_logo} />
             <h1>PartyGG</h1>
           </a>
-          <div
-            className={`${styles.navbar_search} ${
-              showSearchBar ? "" : styles.hide
-            }`}
-          >
+          <div className={`${styles.navbar_search}`} ref={searchBarRef}>
             <GameSearchRecommend />
           </div>
           <div className={styles.navbar_btns}>
