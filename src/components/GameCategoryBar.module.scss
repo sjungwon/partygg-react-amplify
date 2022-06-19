@@ -4,22 +4,25 @@
 .container{
   min-width: 12rem;
   max-width: 12rem;
-  max-height: 1000rem;
 }
 
 .container_padding{
   padding: .5rem 1rem;
 }
 
+.category_list{
+  max-height: 100vh;
+  overflow-y: scroll;
+}
 
 .category_list_title{
   position: relative;
   display: flex;
   align-items: center;
-  max-height: 1.5rem;
   width: 100%;
-  min-height: 3rem;
   min-width: 100%;
+  height: 3rem;
+  max-height: 3rem;
   padding-bottom: .5rem;
   font-size: 1.3rem;
 }
@@ -121,14 +124,12 @@
     overflow: hidden;
     border: 0;
   }
-  .container_padding{
-    padding: .5rem 1rem;
-  }
   .category_list_title{
     padding-bottom: 0;
     color: $primary-default-dark;
     font-size: 1.2rem;
     font-weight: 700;
+    border-bottom: 1px solid $primary-default;
   }
   .category_title{
     font-size: 1.15rem;
@@ -173,7 +174,7 @@
     }
   }
   .category_list{
-    max-height: 100vh;
+    min-height: calc(100vh - 7rem);
     overflow-y: scroll;
   }
   .category_item{

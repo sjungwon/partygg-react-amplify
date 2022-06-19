@@ -31,6 +31,9 @@
   .navbar_menu{
     display: none;
   }
+  .navbar_search_btn{
+    display: none;
+  }
   .navbar_title{
     display: flex;
     align-items: center;
@@ -146,7 +149,15 @@
       }
     }
     .navbar_search{
-      display: none;
+      position: absolute;
+      top: 3rem;
+      min-width: 100vw;
+      background-color: $primary-gray;
+      height: 2.5rem;
+      box-shadow: $card-box-shadow-bottom;
+      &.hide{
+        display: none;
+      }
     }
   }
   

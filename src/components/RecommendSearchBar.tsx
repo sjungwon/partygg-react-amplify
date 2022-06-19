@@ -51,7 +51,7 @@ export default function GameSearchRecommend() {
           return;
         }
         const category = selectedMenu === "게임" ? "games" : "usernames";
-        navigate(`/${category}/${searchParam}`);
+        navigate(`/posts/${category}/${searchParam}`);
         setFindedGames([]);
       };
     },
@@ -120,7 +120,7 @@ export default function GameSearchRecommend() {
         <Dropdown.Item eventKey="게임">게임</Dropdown.Item>
         <Dropdown.Item eventKey="이름">사용자 이름</Dropdown.Item>
       </DropdownButton>
-      <div className={styles.search_container}>
+      <div className={styles.input_container}>
         <input
           type="text"
           placeholder={selectedMenu}
@@ -158,6 +158,7 @@ export default function GameSearchRecommend() {
             : null}
         </div>
       </div>
+
       <Button
         size="sm"
         variant="secondary"

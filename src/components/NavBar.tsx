@@ -1,4 +1,4 @@
-import { useCallback, useContext } from "react";
+import { useCallback, useContext, useState } from "react";
 import { Button } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { UserDataContext } from "../context/UserDataContextProvider";
@@ -22,6 +22,11 @@ export default function NavBar({ showCategoryHandler }: PropsType) {
     navigate("/login");
   }, [navigate]);
 
+  const [showSearchBar, setShowSearchBar] = useState<boolean>(false);
+  const showSearchBarHandler = useCallback(() => {
+    setShowSearchBar((prev) => !prev);
+  }, []);
+
   return (
     <div className={styles.navbar}>
       <div className={styles.navbar_fixed}>
@@ -29,14 +34,21 @@ export default function NavBar({ showCategoryHandler }: PropsType) {
           <button className={styles.navbar_menu} onClick={showCategoryHandler}>
             <GiHamburgerMenu />
           </button>
-          <button className={styles.navbar_search_btn}>
+          <button
+            className={styles.navbar_search_btn}
+            onClick={showSearchBarHandler}
+          >
             <AiOutlineSearch />
           </button>
           <a href="/" className={styles.navbar_title}>
             <img src="/logo192.png" alt="logo" className={styles.navbar_logo} />
             <h1>PartyGG</h1>
           </a>
-          <div className={styles.navbar_search}>
+          <div
+            className={`${styles.navbar_search} ${
+              showSearchBar ? "" : styles.hide
+            }`}
+          >
             <GameSearchRecommend />
           </div>
           <div className={styles.navbar_btns}>
