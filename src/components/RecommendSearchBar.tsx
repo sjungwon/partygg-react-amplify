@@ -5,6 +5,7 @@ import styles from "./RecommendSearchBar.module.scss";
 import { useNavigate } from "react-router-dom";
 import { Button, Dropdown, DropdownButton } from "react-bootstrap";
 import { GameType } from "../types/game.type";
+import TextValidServices from "../services/TextValidServices";
 
 export default function GameSearchRecommend() {
   const { games } = useContext(GameDataContext);
@@ -48,6 +49,12 @@ export default function GameSearchRecommend() {
       return () => {
         const searchParam = optionalParam ? optionalParam : text;
         if (!searchParam) {
+          return;
+        }
+        if (TextValidServices.isIncludePathSpecial(searchParam)) {
+          window.alert(
+            `! * ${"`"} ' ; : @ & = + $ , / ? ${"\\"} # [ ] ( ) 는 포함할 수 없습니다.`
+          );
           return;
         }
         const category = selectedMenu === "게임" ? "games" : "usernames";

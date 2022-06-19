@@ -89,9 +89,9 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
       ? nicknameRef.current.value.trim()
       : "";
     if (!nickname) return;
-    if (TextValidServices.isIncludeSpecial(nickname)) {
+    if (TextValidServices.isIncludePathSpecial(nickname)) {
       window.alert(
-        "닉네임에 특수문자를 사용할 수 없습니다. 다시 시도해주세요."
+        `! * ${"`"} ' ; : @ & = + $ , / ? ${"\\"} # [ ] ( ) 는 포함할 수 없습니다.`
       );
       return;
     }

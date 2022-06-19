@@ -6,8 +6,8 @@
 }
 
 .container{
-  min-width: 12rem;
-  max-width: 12rem;
+  min-width: 13rem;
+  max-width: 13rem;
   padding: 1rem;
   padding-bottom: 0;
 }
@@ -68,7 +68,7 @@
 
 .profile_list_container{
   max-height: calc(100vh - 3.5rem);
-  overflow-y: scroll;
+  overflow-y: auto;
 }
 
 .profile_block{
@@ -76,8 +76,6 @@
   align-items: center;
   text-decoration: none;
   width: 100%;
-  
-  
 }
 .profile_btn{
   @include btn_gray;

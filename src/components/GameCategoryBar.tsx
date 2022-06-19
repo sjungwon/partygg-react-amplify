@@ -26,8 +26,10 @@ export default function GameCategoryBar({ show }: PropsType) {
       return;
     }
 
-    if (TextValidServices.isIncludeSpecial(gameText)) {
-      window.alert("특수문자를 포함할 수 없습니다. 제거하고 시도해주세요.");
+    if (TextValidServices.isIncludePathSpecial(gameText)) {
+      window.alert(
+        `! * ${"`"} ' ; : @ & = + $ , / ? ${"\\"} # [ ] ( ) 는 포함할 수 없습니다.`
+      );
       return;
     }
 

@@ -31,6 +31,10 @@ export default function NavBar({ showCategoryHandler }: PropsType) {
   const searchBarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (window.innerWidth > 829) {
+      console.log("desktop");
+      return;
+    }
     if (searchBarRef.current && showSearchBar) {
       gsap.to(searchBarRef.current, 0.2, {
         display: "flex",
@@ -62,7 +66,7 @@ export default function NavBar({ showCategoryHandler }: PropsType) {
             <img src="/logo192.png" alt="logo" className={styles.navbar_logo} />
             <h1>PartyGG</h1>
           </a>
-          <div className={`${styles.navbar_search}`} ref={searchBarRef}>
+          <div className={styles.navbar_search} ref={searchBarRef}>
             <GameSearchRecommend />
           </div>
           <div className={styles.navbar_btns}>
