@@ -1,18 +1,27 @@
 @import "../scss/variables";
+@import "../scss/mixin";
 
 .container{
   display: flex;
+  height: 2rem;
+  border: 1px solid $primary-gray;
+  border-radius: .25rem;
 }
 
-.search_container{
+.dropdown{
+  height: 100%;
 }
 
 .search_input{
+  display: block;
+  height: 100%;
+  border: 1px solid $primary-gray;
+  outline: none;
 }
 
 .search_recommand_container{
   background-color: white;
-  border: 1px solid $primary-blue;
+  border: 1px solid $primary-gray;
   border-top: none;
 }
 
@@ -23,4 +32,8 @@
 .navbar_btns{
   display: flex;
   right: 1rem;
+}
+
+.hide{
+  display: none;
 }

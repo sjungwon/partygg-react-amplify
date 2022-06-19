@@ -137,7 +137,7 @@ export default function RegisterModal({
       <Modal
         show={parentMdShow}
         onHide={parentMdClose}
-        centered
+        // centered
         backdrop={"static"}
       >
         <Modal.Header closeButton>

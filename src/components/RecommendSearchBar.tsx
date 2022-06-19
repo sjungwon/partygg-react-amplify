@@ -115,6 +115,7 @@ export default function GameSearchRecommend() {
         title={selectedMenu}
         size="sm"
         onSelect={menuSelect}
+        variant="secondary"
       >
         <Dropdown.Item eventKey="게임">게임</Dropdown.Item>
         <Dropdown.Item eventKey="이름">사용자 이름</Dropdown.Item>
@@ -130,7 +131,11 @@ export default function GameSearchRecommend() {
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}
         />
-        <div className={styles.search_recommand_container}>
+        <div
+          className={`${styles.search_recommand_container} ${
+            findedGames.length ? "" : styles.hide
+          }`}
+        >
           {selectedMenu === "게임"
             ? findedGames.map((game, i) => {
                 if (i === index) {
@@ -138,18 +143,24 @@ export default function GameSearchRecommend() {
                     <div
                       className={styles.finded_game_border}
                       onClick={click_Finded}
+                      key={game.name}
                     >
                       {game.name}
                     </div>
                   );
                 }
-                return <div onClick={click_Finded}>{game.name}</div>;
+                return (
+                  <div onClick={click_Finded} key={game.name}>
+                    {game.name}
+                  </div>
+                );
               })
             : null}
         </div>
       </div>
       <Button
         size="sm"
+        variant="secondary"
         className={styles.navbar_search_btn}
         onClick={searchSubmit()}
       >

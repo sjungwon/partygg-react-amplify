@@ -47,6 +47,7 @@ export default class PostServices {
     | LastEvaluatedKeyForProfile
     | undefined = undefined;
   private static getDone: boolean = false;
+  private static loading: boolean = false;
 
   public static init() {
     this.lastEvaluatedKeyForAll = undefined;
@@ -136,9 +137,13 @@ export default class PostServices {
     category: string,
     searchParam: string
   ): Promise<Post[] | null> {
-    if (this.getDone) {
+    if (this.getDone || this.loading) {
       return null;
     }
+    this.loading = true;
+
+    console.log(this.getDone, this.loading);
+
     if (category === "games" && searchParam) {
       const path = this.lastEvaluatedKeyForGame
         ? `${this.path}/game/${encodeURIComponent(
@@ -157,9 +162,11 @@ export default class PostServices {
           this.getDone = true;
         }
         this.lastEvaluatedKeyForGame = response.lastEvaluatedKey;
+        this.loading = false;
         return response.data;
       } catch (error) {
         console.log(error);
+        this.loading = false;
         return null;
       }
     }
@@ -180,9 +187,11 @@ export default class PostServices {
           this.getDone = true;
         }
         this.lastEvaluatedKeyForUser = response.lastEvaluatedKey;
+        this.loading = false;
         return response.data;
       } catch (error) {
         console.log(error);
+        this.loading = false;
         return null;
       }
     }
@@ -222,9 +231,11 @@ export default class PostServices {
         this.getDone = true;
       }
       this.lastEvaluatedKeyForAll = response.lastEvaluatedKey;
+      this.loading = false;
       return response.data;
     } catch (error) {
       console.log(error);
+      this.loading = false;
       return null;
     }
   }

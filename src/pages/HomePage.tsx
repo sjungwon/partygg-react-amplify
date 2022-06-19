@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GameCategoryBar from "../components/GameCategoryBar";
 import NavBar from "../components/NavBar";
@@ -15,6 +15,11 @@ export default function HomePage() {
 
   const { setFilteredProfileHandler } = useContext(UserDataContext);
 
+  const [showCategory, setShowCategory] = useState<boolean>(false);
+  const showCategoryHandler = useCallback(() => {
+    setShowCategory((prev) => !prev);
+  }, []);
+
   const navigate = useNavigate();
   useEffect(() => {
     if (category && !searchParam) {
@@ -22,16 +27,18 @@ export default function HomePage() {
       navigate(-1);
     } else if (category === "games" && searchParam) {
       setFilteredProfileHandler(decodeURI(searchParam));
+      setShowCategory(false);
     } else {
       setFilteredProfileHandler("");
+      setShowCategory(false);
     }
   }, [category, navigate, searchParam, setFilteredProfileHandler]);
 
   return (
-    <div>
-      <NavBar />
+    <div className={styles.container}>
+      <NavBar showCategoryHandler={showCategoryHandler} />
       <div className={styles.content_container}>
-        <GameCategoryBar />
+        <GameCategoryBar show={showCategory} />
         <PostList
           key={`${category}/${searchParam}`}
           category={category}

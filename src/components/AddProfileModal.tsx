@@ -159,7 +159,9 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
     }
     setLoading(false);
     close();
-    window.location.reload();
+    if (prevData) {
+      window.location.reload();
+    }
   }, [close, file, prevData, profileArr, selectedGames, updateProfileHandler]);
 
   return (

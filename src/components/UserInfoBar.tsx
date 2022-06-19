@@ -12,6 +12,75 @@ import FileServices from "../services/FileServices";
 import RemoveConfirmModal from "./RemoveConfirmModal";
 import { Profile } from "../types/profile.type";
 
+const ProfileWithMenu: React.FC<{
+  profile: Profile;
+  i: number;
+  setIndex: MouseEventHandler;
+}> = ({ profile, i, setIndex }) => {
+  return (
+    <>
+      <ul className={styles.profile_category}>{profile.game}</ul>
+      <li className={styles.profile_container}>
+        <Link
+          to={`/posts/profiles/${profile.id}`}
+          className={styles.profile_block}
+        >
+          <ProfileBlock profile={profile} hideUsername />
+        </Link>
+        <button
+          className={styles.profile_btn}
+          data-profile-index={i}
+          data-profile-type={"modify"}
+          onClick={setIndex}
+        >
+          <BsPencilSquare />
+        </button>
+        <button
+          className={styles.profile_btn}
+          data-profile-index={i}
+          data-profile-type={"remove"}
+          onClick={setIndex}
+        >
+          <BsTrash />
+        </button>
+      </li>
+    </>
+  );
+};
+
+const ProfileWithoutMenu: React.FC<{
+  profile: Profile;
+  i: number;
+  setIndex: MouseEventHandler;
+}> = ({ profile, i, setIndex }) => {
+  return (
+    <li className={styles.profile_container}>
+      <Link
+        to={`/posts/profiles/${profile.id}`}
+        className={styles.profile_block}
+      >
+        <ProfileBlock profile={profile} hideUsername />
+      </Link>
+      <button
+        className={styles.profile_btn}
+        data-profile-index={i}
+        data-profile-type={"modify"}
+        onClick={setIndex}
+      >
+        <BsPencilSquare />
+      </button>
+      <button
+        className={styles.profile_btn}
+        data-profile-index={i}
+        data-profile-type={"remove"}
+        onClick={setIndex}
+      >
+        <BsTrash />
+      </button>
+    </li>
+  );
+};
+
 export default function UserInfoBar() {
   const { username, profileArr, updateProfileHandler } =
     useContext(UserDataContext);
@@ -104,89 +173,25 @@ export default function UserInfoBar() {
         {profileArr.map((profile, i) => {
           if (i === 0 || profileArr[i].game !== profileArr[i - 1].game) {
             return (
-              <>
-                <ul
-                  key={`game-${profile.game}`}
-                  className={styles.profile_category}
-                >
-                  {profile.game}
-                </ul>
-                <li
-                  key={`${profile.game}-${profile.nickname}`}
-                  className={styles.profile_container}
-                >
-                  <Link
-                    to={`/posts/profiles/${profile.id}`}
-                    className={styles.profile_block}
-                  >
-                    <ProfileBlock profile={profile} hideUsername />
-                  </Link>
-                  <button
-                    className={styles.profile_btn}
-                    data-profile-index={i}
-                    data-profile-type={"modify"}
-                    onClick={setIndex}
-                  >
-                    <BsPencilSquare />
-                  </button>
-                  <button
-                    className={styles.profile_btn}
-                    data-profile-index={i}
-                    data-profile-type={"remove"}
-                    onClick={setIndex}
-                  >
-                    <BsTrash />
-                  </button>
-                </li>
-              </>
+              <ProfileWithMenu
+                profile={profile}
+                i={i}
+                setIndex={setIndex}
+                key={`${profile.game}-${profile.nickname}`}
+              />
             );
           }
           return (
-            <li
+            <ProfileWithoutMenu
+              profile={profile}
+              i={i}
+              setIndex={setIndex}
               key={`${profile.game}-${profile.nickname}`}
-              className={styles.profile_container}
-            >
-              <Link
-                to={`/posts/profiles/${profile.id}`}
-                className={styles.profile_block}
-              >
-                <ProfileBlock profile={profile} hideUsername />
-              </Link>
-              <button
-                className={styles.profile_btn}
-                data-profile-index={i}
-                data-profile-type={"modify"}
-                onClick={setIndex}
-              >
-                <BsPencilSquare />
-              </button>
-              <button
-                className={styles.profile_btn}
-                data-profile-index={i}
-                data-profile-type={"remove"}
-                onClick={setIndex}
-              >
-                <BsTrash />
-              </button>
-            </li>
+            />
           );
         })}
       </div>
-      <div>
-        <a
-          href="https://www.flaticon.com/kr/free-icons/"
-          title="사용자 아이콘"
-          className={styles.profile_img_credit}
-        >
-          사용자 아이콘 제작자: Ongicon - Flaticon
-        </a>
-        <a
-          href="https://www.flaticon.com/free-icons/warning"
-          title="warning icons"
-        >
-          Warning icons created by amonrat rungreangfangsai - Flaticon
-        </a>
-      </div>
+
       <RemoveConfirmModal
         show={showRemoveMd}
         loading={loading}

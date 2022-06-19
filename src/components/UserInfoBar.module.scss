@@ -85,3 +85,9 @@
   }
   // background-color: $primary-default;
 }
+
+@include mobile{
+  .container{
+    display: none;
+  }
+}

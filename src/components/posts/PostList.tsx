@@ -18,6 +18,7 @@ export default function PostList({ category, searchParam }: Props) {
 
   useEffect(() => {
     PostServices.init();
+    console.log("init");
   }, [navigate]);
 
   const removePost = useCallback((postId: string) => {
@@ -82,7 +83,7 @@ export default function PostList({ category, searchParam }: Props) {
     console.log("set handler");
     const option: IntersectionObserverInit = {
       root: null,
-      rootMargin: "300px",
+      rootMargin: "800px",
       threshold: 0,
     };
     const observer = new IntersectionObserver(handleObserver, option);

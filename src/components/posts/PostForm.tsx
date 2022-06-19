@@ -84,6 +84,13 @@ export default function PostForm({
     }
   }, []);
 
+  const textFocusControl = useCallback(
+    (e: any) =>
+      (e.currentTarget.selectionStart = e.currentTarget.selectionEnd =
+        prevData.postData ? prevData.postData.text.length : 0),
+    [prevData]
+  );
+
   const cancleModify = useCallback(() => {
     if (prevData.setMode) {
       prevData.setMode("");
@@ -233,6 +240,7 @@ export default function PostForm({
           className={styles.card_body_textarea}
           ref={textRef}
           autoFocus
+          onFocus={textFocusControl}
           onChange={calcCurrentByte}
           placeholder="500Byte 이하로 작성 가능합니다."
           defaultValue={prevData.postData ? prevData.postData.text : ""}

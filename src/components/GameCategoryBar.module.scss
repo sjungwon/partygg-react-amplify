@@ -4,9 +4,13 @@
 .container{
   min-width: 12rem;
   max-width: 12rem;
-  padding: 1rem;
-  padding-bottom: 0;
+  max-height: 1000rem;
 }
+
+.container_padding{
+  padding: .5rem 1rem;
+}
+
 
 .category_list_title{
   position: relative;
@@ -45,6 +49,7 @@
   display: none;
 }
 
+
 .category_add{
   display: flex;
   align-items: center;
@@ -76,7 +81,7 @@
   display: block;
   padding-left: .5rem;
   margin: .5rem 0;
-  border: 1px solid $primary-orange-border;
+  border: 1px solid $primary-default-border;
   border-radius: .25rem;
   text-decoration: none;
   font-size: .95rem;
@@ -89,11 +94,97 @@
   }
   &.active{
     margin-left: 1.25rem;
-    
+    background-color: $primary-default-btn-background;
   }
   .item_text{
     margin:0;
     text-indent: .5rem;
     // background-color: $primary-default-btn-background;
   }
+}
+
+@include mobile{
+  .container{
+    position: fixed;
+    top: 3rem;
+    z-index: 3;
+    min-width: 100vw;
+    max-width: 100vw;
+    max-height: 100vh;
+    border-bottom: $primary-default-border;
+    box-shadow: $card-box-shadow-bottom;
+    background-color: white;
+    transition: max-height .3s ease;
+  }
+  .container_hide{
+    max-height: 0;
+    overflow: hidden;
+    border: 0;
+  }
+  .container_padding{
+    padding: .5rem 1rem;
+  }
+  .category_list_title{
+    padding-bottom: 0;
+    color: $primary-default-dark;
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+  .category_title{
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+  .category_title_button{
+    position: absolute;
+    right: 0;
+    @include btn_gray;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin: 0;
+    background-color: $primary-blue;
+    color: white;
+    &:hover{
+      background-color: $primary-blue-hover;
+      color: white;
+    }
+  }
+  .category_add{
+    padding-bottom: .5rem;
+    font-size: .95rem;
+    &_input{
+      height: 1.75rem;
+      width: 100%;
+      border: 1px solid $primary-default-border;
+      border-radius: .25rem;
+      text-indent: .25rem;
+      outline: none;
+      &:focus{
+        border: 2px solid $primary-default-dark;
+        border-radius: .25rem;
+      }
+    }
+    &_button{
+      @include btn_gray;
+      color: white;
+      background-color: $primary-default;
+      width: 1.75rem;
+      height: 1.75rem;
+      margin-left: .25rem;
+    }
+  }
+  .category_list{
+    max-height: 100vh;
+    overflow-y: scroll;
+  }
+  .category_item{
+    display: flex;
+    align-items: center;
+    font-size: .95rem;
+    height: 1.75rem;
+    color: $font-color-gray;
+    &.active{
+      margin-left: 2rem;
+    }
+  }
+  
 }

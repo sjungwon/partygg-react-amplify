@@ -1,6 +1,6 @@
 import { Comment, CommentsLastEvaluatedKey } from "../../types/post.type";
 import styles from "./CommentList.module.scss";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { GoTriangleUp, GoTriangleDown } from "react-icons/go";
 import { AiOutlineDownCircle, AiOutlineUpCircle } from "react-icons/ai";
 import CommentElement from "./CommentElement";
@@ -32,16 +32,14 @@ export default function CommentList({
   >(commentsData.lastEvaluatedKey);
 
   const [renderLength, setRenderLength] = useState<number>(
-    commentsData.data.length > 2 ? 3 : commentsData.data.length
+    comments.length > 2 ? 3 : comments.length
   );
 
   useEffect(() => {
     if (!showComment) {
-      setRenderLength(
-        commentsData.data.length > 2 ? 3 : commentsData.data.length
-      );
+      setRenderLength(comments.length > 2 ? 3 : comments.length);
     }
-  }, [commentsData.data.length, showComment]);
+  }, [comments.length, commentsData.data.length, showComment]);
 
   const [commentLoading, setCommentLoading] = useState<boolean>(false);
   const renderLengthHandler = useCallback(
@@ -157,7 +155,8 @@ export default function CommentList({
             borderBottom={false}
             parentShowComment={showComment}
           />
-          {comments.length > 1 ? (
+          {comments.length > 1 ||
+          (comments.length && comments[0].subcomments.length) ? (
             <div className={styles.direct} onClick={openComments}>
               <div className={styles.direct_icon}>
                 <GoTriangleDown />

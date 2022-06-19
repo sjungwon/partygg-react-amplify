@@ -8,7 +8,11 @@ import { GameDataContext } from "../context/GameDataContextProvider";
 import TextValidServices from "../services/TextValidServices";
 import { UserDataContext } from "../context/UserDataContextProvider";
 
-export default function GameCategoryBar() {
+interface PropsType {
+  show: boolean;
+}
+
+export default function GameCategoryBar({ show }: PropsType) {
   const { games, setGamesHandler } = useContext(GameDataContext);
 
   const gameInputRef = useRef<HTMLInputElement>(null);
@@ -59,53 +63,56 @@ export default function GameCategoryBar() {
   }, [username]);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.category_list_title}>
-        <AiOutlineUnorderedList />
-        <h3 className={styles.category_title}>게임 리스트</h3>
-        <button
-          className={styles.category_title_button}
-          onClick={setShowAddHandler}
-        >
-          {showAdd ? <AiOutlineClose /> : <BsPlusLg />}
-        </button>
-      </div>
-      <div className={showAdd ? styles.category_add : styles.hide}>
-        <input
-          type="text"
-          ref={gameInputRef}
-          placeholder="게임 이름"
-          className={styles.category_add_input}
-        />
-        <button
-          onClick={gameSubmit}
-          disabled={loading}
-          className={styles.category_add_button}
-        >
-          {<BsPlusLg />}
-        </button>
-      </div>
-      <nav className={styles.category_list}>
-        <NavLink
-          to={"/"}
-          className={({ isActive }) =>
-            `${styles.category_item} ${isActive ? styles.active : ""}`
-          }
-        >
-          전체 보기
-        </NavLink>
-
-        {games.map((game) => (
+    <div className={`${styles.container} ${show ? "" : styles.container_hide}`}>
+      <div className={styles.container_padding}>
+        <div className={styles.category_list_title}>
+          <AiOutlineUnorderedList />
+          <h3 className={styles.category_title}>게임 리스트</h3>
+          <button
+            className={styles.category_title_button}
+            onClick={setShowAddHandler}
+          >
+            {showAdd ? <AiOutlineClose /> : <BsPlusLg />}
+          </button>
+        </div>
+        <div className={showAdd ? styles.category_add : styles.hide}>
+          <input
+            type="text"
+            ref={gameInputRef}
+            placeholder="게임 이름"
+            className={styles.category_add_input}
+          />
+          <button
+            onClick={gameSubmit}
+            disabled={loading}
+            className={styles.category_add_button}
+          >
+            {<BsPlusLg />}
+          </button>
+        </div>
+        <nav className={styles.category_list}>
           <NavLink
-            to={`/posts/games/${encodeURI(game.name)}`}
+            to={"/"}
             className={({ isActive }) =>
               `${styles.category_item} ${isActive ? styles.active : ""}`
             }
           >
-            {game.name}
+            전체 보기
           </NavLink>
-        ))}
-      </nav>
+
+          {games.map((game) => (
+            <NavLink
+              to={`/posts/games/${encodeURI(game.name)}`}
+              key={game.name}
+              className={({ isActive }) =>
+                `${styles.category_item} ${isActive ? styles.active : ""}`
+              }
+            >
+              {game.name}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
     </div>
   );
 }
