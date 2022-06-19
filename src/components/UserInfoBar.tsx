@@ -6,7 +6,7 @@ import { BsPlusLg } from "react-icons/bs";
 import styles from "./UserInfoBar.module.scss";
 import AddProfileModal from "./AddProfileModal";
 import { BsPencilSquare, BsTrash } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import ProfileServices from "../services/ProfileServices";
 import FileServices from "../services/FileServices";
 import RemoveConfirmModal from "./RemoveConfirmModal";
@@ -21,12 +21,12 @@ const ProfileWithMenu: React.FC<{
     <>
       <ul className={styles.profile_category}>{profile.game}</ul>
       <li className={styles.profile_container}>
-        <Link
+        <NavLink
           to={`/posts/profiles/${profile.id}`}
           className={styles.profile_block}
         >
           <ProfileBlock profile={profile} hideUsername />
-        </Link>
+        </NavLink>
         <button
           className={styles.profile_btn}
           data-profile-index={i}
@@ -55,12 +55,12 @@ const ProfileWithoutMenu: React.FC<{
 }> = ({ profile, i, setIndex }) => {
   return (
     <li className={styles.profile_container}>
-      <Link
+      <NavLink
         to={`/posts/profiles/${profile.id}`}
         className={styles.profile_block}
       >
         <ProfileBlock profile={profile} hideUsername />
-      </Link>
+      </NavLink>
       <button
         className={styles.profile_btn}
         data-profile-index={i}

@@ -13,7 +13,8 @@ export default function HomePage() {
     useCategory();
   console.log("home", category, searchParam);
 
-  const { setFilteredProfileHandler } = useContext(UserDataContext);
+  const { setFilteredProfileHandler, setFilteredProfileHandlerByProfile } =
+    useContext(UserDataContext);
 
   const [showCategory, setShowCategory] = useState<boolean>(false);
   const showCategoryHandler = useCallback(() => {
@@ -28,11 +29,19 @@ export default function HomePage() {
     } else if (category === "games" && searchParam) {
       setFilteredProfileHandler(decodeURI(searchParam));
       setShowCategory(false);
+    } else if (category === "profiles" && searchParam) {
+      setFilteredProfileHandlerByProfile(searchParam);
     } else {
       setFilteredProfileHandler("");
       setShowCategory(false);
     }
-  }, [category, navigate, searchParam, setFilteredProfileHandler]);
+  }, [
+    category,
+    navigate,
+    searchParam,
+    setFilteredProfileHandler,
+    setFilteredProfileHandlerByProfile,
+  ]);
 
   return (
     <div className={styles.container}>

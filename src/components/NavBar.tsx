@@ -67,7 +67,9 @@ export default function NavBar({ showCategoryHandler }: PropsType) {
             <h1>PartyGG</h1>
           </a>
           <div className={styles.navbar_search} ref={searchBarRef}>
-            <GameSearchRecommend />
+            <GameSearchRecommend
+              showInputHandlerForMobile={showSearchBarHandler}
+            />
           </div>
           <div className={styles.navbar_btns}>
             {username ? <div>{username}</div> : null}

@@ -137,8 +137,9 @@ export default class PostServices {
     category: string,
     searchParam: string
   ): Promise<Post[] | null> {
+    console.log("services", this.getDone, this.loading);
     if (this.getDone || this.loading) {
-      return null;
+      return [];
     }
     this.loading = true;
 
@@ -214,9 +215,11 @@ export default class PostServices {
           this.getDone = true;
         }
         this.lastEvaluatedKeyForProfile = response.lastEvaluatedKey;
+        this.loading = false;
         return response.data;
       } catch (error) {
         console.log(error);
+        this.loading = false;
         return null;
       }
     }

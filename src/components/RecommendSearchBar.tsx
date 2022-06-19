@@ -7,7 +7,13 @@ import { Button, Dropdown, DropdownButton } from "react-bootstrap";
 import { GameType } from "../types/game.type";
 import TextValidServices from "../services/TextValidServices";
 
-export default function GameSearchRecommend() {
+interface PropsType {
+  showInputHandlerForMobile: () => void;
+}
+
+export default function GameSearchRecommend({
+  showInputHandlerForMobile,
+}: PropsType) {
   const { games } = useContext(GameDataContext);
 
   const [text, setText] = useState<string>("");
@@ -58,11 +64,12 @@ export default function GameSearchRecommend() {
           return;
         }
         const category = selectedMenu === "게임" ? "games" : "usernames";
+        showInputHandlerForMobile();
         navigate(`/posts/${category}/${searchParam}`);
         setFindedGames([]);
       };
     },
-    [navigate, selectedMenu, text]
+    [navigate, selectedMenu, showInputHandlerForMobile, text]
   );
 
   const [findedGames, setFindedGames] = useState<GameType[]>([]);

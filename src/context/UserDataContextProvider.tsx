@@ -13,6 +13,7 @@ interface UserDataContextType {
   setCurrentProfileHandler: (profile: Profile) => void;
   filteredProfileArr: Profile[];
   setFilteredProfileHandler: (gameName: string) => void;
+  setFilteredProfileHandlerByProfile: (profileId: string) => void;
   updateProfileHandler: (
     profile: Profile,
     type: "add" | "modify" | "remove"
@@ -40,6 +41,7 @@ export const UserDataContext = createContext<UserDataContextType>({
   setCurrentProfileHandler: (profile: Profile) => {},
   filteredProfileArr: [],
   setFilteredProfileHandler: (gameName: string) => {},
+  setFilteredProfileHandlerByProfile: (profileId: string) => {},
   updateProfileHandler: (
     profile: Profile,
     type: "add" | "modify" | "remove"
@@ -125,6 +127,17 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
       );
     },
     [profileArr, username]
+  );
+
+  const setFilteredProfileHandlerByProfile = useCallback(
+    (profileId: string) => {
+      const profile = profileArr.find((profile) => profile.id === profileId);
+      if (profile) {
+        setFilteredProfileArr([{ ...profile }]);
+        setCurrentProfile({ ...profile });
+      }
+    },
+    [profileArr]
   );
 
   const updateProfileHandler = useCallback(
@@ -242,6 +255,7 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
         setCurrentProfileHandler,
         filteredProfileArr,
         setFilteredProfileHandler,
+        setFilteredProfileHandlerByProfile,
         updateProfileHandler,
         checkLogin,
         logout,
