@@ -1,0 +1,26 @@
+{
+  "resourceName": "partyggSubcommentTable",
+  "tableName": "partyggSubcommentTable",
+  "partitionKey": {
+    "fieldName": "commentId",
+    "fieldType": "string"
+  },
+  "sortKey": {
+    "fieldName": "date",
+    "fieldType": "string"
+  },
+  "gsi": [
+    {
+      "name": "profileId-date-index",
+      "partitionKey": {
+        "fieldName": "profileId",
+        "fieldType": "string"
+      },
+      "sortKey": {
+        "fieldName": "date",
+        "fieldType": "string"
+      }
+    }
+  ],
+  "triggerFunctions": []
+}

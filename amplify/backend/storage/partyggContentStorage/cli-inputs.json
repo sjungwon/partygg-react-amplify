@@ -1,0 +1,16 @@
+{
+  "resourceName": "partyggContentStorage",
+  "policyUUID": "458cb43f",
+  "bucketName": "partyggcontentstorage",
+  "storageAccess": "authAndGuest",
+  "guestAccess": [
+    "READ"
+  ],
+  "authAccess": [
+    "CREATE_AND_UPDATE",
+    "READ",
+    "DELETE"
+  ],
+  "triggerFunction": "S3Trigger8322dec8",
+  "groupAccess": {}
+}

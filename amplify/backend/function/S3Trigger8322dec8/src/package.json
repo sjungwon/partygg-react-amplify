@@ -1,0 +1,18 @@
+{
+  "name": "S3Trigger8322dec8",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "sharp": "^0.30.6"
+  },
+  "devDependencies": {
+    "aws-sdk": "^2.1113.0"
+  }
+}

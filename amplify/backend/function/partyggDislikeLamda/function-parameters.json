@@ -1,0 +1,17 @@
+{
+  "lambdaLayers": [],
+  "permissions": {
+    "storage": {
+      "partyggLikeTable": [
+        "read",
+        "delete"
+      ],
+      "partyggDislikeTable": [
+        "create",
+        "read",
+        "update",
+        "delete"
+      ]
+    }
+  }
+}

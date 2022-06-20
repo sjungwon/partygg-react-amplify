@@ -1,0 +1,117 @@
+{
+  "version": 1,
+  "paths": {
+    "/games": {
+      "name": "/games",
+      "lambdaFunction": "partyggGameLamda",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
+    },
+    "/likes": {
+      "name": "/likes",
+      "lambdaFunction": "partyggLikeLamda",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
+    },
+    "/dislikes": {
+      "name": "/dislikes",
+      "lambdaFunction": "partyggDislikeLamda",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
+    },
+    "/posts": {
+      "name": "/posts",
+      "lambdaFunction": "partyggPostLamda",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
+    },
+    "/comments": {
+      "name": "/comments",
+      "lambdaFunction": "partyggCommentLamda",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
+    },
+    "/subcomments": {
+      "name": "/subcomments",
+      "lambdaFunction": "partyggSubcommentLamda",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
+    },
+    "/profiles": {
+      "name": "/profiles",
+      "lambdaFunction": "partyggProfileLamda",
+      "permissions": {
+        "setting": "protected",
+        "auth": [
+          "create",
+          "read",
+          "update",
+          "delete"
+        ],
+        "guest": [
+          "read"
+        ]
+      }
+    }
+  }
+}
