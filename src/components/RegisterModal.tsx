@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { ChangeEventHandler, useCallback, useEffect, useState } from "react";
 import { Button, Form, Modal } from "react-bootstrap";
 import AuthServices from "../services/AuthServices";
 import TextValidServices from "../services/TextValidServices";
@@ -35,10 +35,19 @@ export default function RegisterModal({
   const [usernameVerify, setUsernameVerify] = useState<boolean>(false);
   const [usernameVerifyMessage, setUsernameVerifyMessage] =
     useState<string>("");
-  const verifyUsername = useCallback(
-    (event: any) => {
-      const usernameText = (event.target as HTMLInputElement).value;
+  const verifyUsername: ChangeEventHandler<HTMLInputElement> = useCallback(
+    (event) => {
+      const usernameText = event.target.value;
       setUsername(usernameText);
+      const usernameIncludeSpecial =
+        TextValidServices.isIncludePathSpecial(usernameText);
+      if (usernameIncludeSpecial) {
+        setUsernameVerifyMessage(
+          `! * ${"`"} ' ; : @ & = + $ , / ? ${"\\"} # [ ] ( ) 는 포함할 수 없습니다.`
+        );
+        setUsernameVerify(false);
+        return;
+      }
       const usernameLengthVerify = TextValidServices.isShorterThanNumber(
         usernameText,
         8
@@ -57,9 +66,9 @@ export default function RegisterModal({
   //이메일 입력 검증
   const [emailVerify, setEmailVerify] = useState<boolean>(false);
   const [emailVerifyMessage, setEmailVerifyMessage] = useState<string>("");
-  const verifyEmail = useCallback(
-    (event: any) => {
-      const emailText = (event.target as HTMLInputElement).value;
+  const verifyEmail: ChangeEventHandler<HTMLInputElement> = useCallback(
+    (event) => {
+      const emailText = event.target.value;
       setEmail(emailText);
       const emailTypeVerify = TextValidServices.isEmailType(emailText);
       if (!emailTypeVerify) {
@@ -77,9 +86,9 @@ export default function RegisterModal({
   const [passwordVerify, setPasswordVerify] = useState<boolean>(false);
   const [passwordVerifyMessage, setPasswordVerifyMessage] =
     useState<string>("");
-  const verifyPassword = useCallback(
-    (event: any) => {
-      const passwordText = (event.target as HTMLInputElement).value;
+  const verifyPassword: ChangeEventHandler<HTMLInputElement> = useCallback(
+    (event) => {
+      const passwordText = event.target.value;
       setPassword(passwordText);
       const textVerify = TextValidServices.isIncludeAlphabet(passwordText);
       if (!textVerify) {
@@ -107,6 +116,18 @@ export default function RegisterModal({
     },
     [setPassword]
   );
+
+  useEffect(() => {
+    setUsername("");
+    setUsernameVerify(false);
+    setUsernameVerifyMessage("");
+    setEmail("");
+    setEmailVerify(false);
+    setEmailVerifyMessage("");
+    setPassword("");
+    setPasswordVerify(false);
+    setPasswordVerifyMessage("");
+  }, [parentMdShow]);
 
   //가입 확인 모달 데이터
   const [registerUsername, setRegisterUsername] = useState<string>("");

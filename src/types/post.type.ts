@@ -4,6 +4,7 @@ import { Profile } from "./profile.type";
 
 //기본 post 구조
 export interface PostStruct {
+  profileId: string;
   game: string;
   profile: Profile;
   text: string;
@@ -13,7 +14,6 @@ export interface Post extends PostStruct, UserResource {
   //partition key
   //username : string;
   //sort key
-  nickname: string;
   date: string;
   images: ImageKeys[];
   likes: string[];
@@ -37,6 +37,10 @@ export interface LastEvaluatedKeyForGamePost extends LastEvaluatedKeyForPost {
   game: string;
 }
 
+export interface LastEvaluatedKeyForProfile extends LastEvaluatedKeyForPost {
+  profileId: string;
+}
+
 export interface GetPostsResData {
   data: Post[];
   lastEvaluatedKey?: LastEvaluatedKeyForAllPost;
@@ -47,22 +51,28 @@ export interface GetGamePostsResData {
   lastEvaluatedKey?: LastEvaluatedKeyForGamePost;
 }
 
+export interface GetUserPostsResData {
+  data: Post[];
+  lastEvaluatedKey?: LastEvaluatedKeyForPost;
+}
+
+export interface GetProfilePostsResData {
+  data: Post[];
+  lastEvaluatedKey?: LastEvaluatedKeyForProfile;
+}
+
 export interface AddPostReqData extends PostStruct {
+  profileId: string;
   images: ImageKeys[];
 }
 
-export interface AddPostReqBodyData extends AddPostReqData, UserResource {
-  nickname: string;
-}
+export interface AddPostReqBodyData extends AddPostReqData, UserResource {}
 
 export interface AddPostResData extends AddPostReqData, UserResource {
-  nickname: string;
   date: string;
 }
 
-export interface UpdatePostReqData extends AddPostReqData, UserResource {
-  nickname: string;
-}
+export interface UpdatePostReqData extends AddPostReqData, UserResource {}
 
 export interface UpdatePostResData extends AddPostResData {}
 

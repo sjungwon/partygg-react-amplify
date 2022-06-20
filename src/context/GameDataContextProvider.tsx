@@ -20,26 +20,29 @@ const initialGameDataContext: GameDataContextType = {
 
 export const GameDataContext = createContext(initialGameDataContext);
 
+const sortGames = (games: GameType[]): GameType[] => {
+  return [...games].sort((gameA, gameB) => {
+    if (gameA.name < gameB.name) {
+      return -1;
+    } else if (gameA.name > gameB.name) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+};
+
 const GameDataContextProvider: React.FC<propsType> = ({ children }) => {
   const [games, setGames] = useState<GameType[]>([]);
 
   const setGamesHandler = useCallback((games: GameType[]) => {
-    setGames(games);
+    setGames(sortGames(games));
   }, []);
 
   const getGames = useCallback(async () => {
     const gameData = await GameServices.getGames();
     if (gameData) {
-      const sortedGameData = [...gameData].sort((gameA, gameB) => {
-        if (gameA.name < gameB.name) {
-          return -1;
-        } else if (gameA.name > gameB.name) {
-          return 1;
-        } else {
-          return 0;
-        }
-      });
-      setGames(sortedGameData);
+      setGames(sortGames(gameData));
     }
   }, []);
 

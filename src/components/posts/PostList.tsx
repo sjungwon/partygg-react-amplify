@@ -2,9 +2,11 @@ import styles from "./PostList.module.scss";
 import AddPostElement from "./AddPostElement";
 import PostElement from "./PostElement";
 import PostServices from "../../services/PostServices";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Post } from "../../types/post.type";
 import { useNavigate } from "react-router-dom";
+import { UserDataContext } from "../../context/UserDataContextProvider";
+import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
 
 interface Props {
   category: string;
@@ -37,16 +39,24 @@ export default function PostList({ category, searchParam }: Props) {
     }
   }, [addPostData]);
 
+  const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const sendQuery = useCallback(async () => {
     console.log("query");
+    setQueryLoading(true);
     const postIdList = await PostServices.getPosts(
       category,
       searchParam ? searchParam : ""
     );
-    if (postIdList) {
+    if (!postIdList) {
+      window.alert(
+        "포스트를 가져오는데 오류가 발생했습니다. 다시 시도해주세요."
+      );
+      return;
+    }
+    if (postIdList.length) {
       setPosts((prev: Post[]) => [...prev, ...postIdList]);
     }
-    return;
+    setQueryLoading(false);
   }, [category, searchParam]);
 
   const loader = useRef<HTMLDivElement>(null);
@@ -82,7 +92,7 @@ export default function PostList({ category, searchParam }: Props) {
     console.log("set handler");
     const option: IntersectionObserverInit = {
       root: null,
-      rootMargin: "300px",
+      rootMargin: "600px",
       threshold: 0,
     };
     const observer = new IntersectionObserver(handleObserver, option);
@@ -94,21 +104,65 @@ export default function PostList({ category, searchParam }: Props) {
     };
   }, [handleObserver]);
 
+  const { profileArr } = useContext(UserDataContext);
+  const getTitle = (): string => {
+    if (category) {
+      if (category === "profiles") {
+        const profile = profileArr.find(
+          (profile) => profile.id === searchParam
+        );
+        if (profile) {
+          return `프로필/${profile.nickname}`;
+        } else {
+          return "프로필";
+        }
+      } else if (category === "games") {
+        if (searchParam) {
+          return `게임/${decodeURI(searchParam)}`;
+        }
+        return "게임";
+      } else if (category === "users") {
+        if (searchParam) {
+          return `유저/${decodeURI(searchParam)}`;
+        }
+        return "유저";
+      } else {
+        return "카테고리";
+      }
+    }
+    return "전체";
+  };
+
   //렌더
   //post가 있는 경우
   return (
     <>
       <div className={styles.container}>
+        <h3 className={styles.category}>{getTitle()}</h3>
         <AddPostElement prevData={{ setPostData: setAddPostData }} />
-        {posts.map((postId, i) => {
+        {posts.map((post, i) => {
           return (
             <PostElement
-              key={`${postId.username}/${postId.date}`}
-              post={postId}
+              key={`${post.username}/${post.date}`}
+              post={post}
               removePost={removePost}
             />
           );
         })}
+        <div className={styles.final_container}>
+          <h3 className={styles.final}>
+            {queryLoading ? (
+              <div className={styles.loading}>
+                <AiOutlineLoading3Quarters />
+              </div>
+            ) : (
+              <div className={styles.loading_done}>
+                <AiOutlineCheck />
+              </div>
+            )}
+          </h3>
+        </div>
+
         <div ref={loader} className={styles.loader}></div>
       </div>
     </>

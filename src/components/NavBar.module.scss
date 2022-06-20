@@ -1,4 +1,5 @@
 @import "../scss/variables";
+@import "../scss/mixin";
 
 .navbar{
   position:relative;
@@ -22,10 +23,17 @@
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  max-width: 58rem;
+  min-width: 44rem;
+  max-width: 56rem;
   height: 3rem;
   margin: 0 auto;
   padding: 1rem;
+  .navbar_menu{
+    display: none;
+  }
+  .navbar_search_btn{
+    display: none;
+  }
   .navbar_title{
     display: flex;
     align-items: center;
@@ -52,4 +60,105 @@
     max-width: 20rem;
     margin: 0 auto;
   }
+  .navbar_btns{
+    display: flex;
+  }
+}
+.navbar_btn_login{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  font-size: 1.5rem;
+  background-color: white;
+  border: 1px solid transparent;
+  border-radius: 50%;
+  color: $primary-default-dark;
+}
+
+@include mobile{
+  .navbar{
+    max-width: 100vw;
+  }
+  .navbar_fixed{
+    max-width: 100vw;
+  }
+  .navbar_container{
+    max-width: 100vw;
+    min-width: 100vw;
+    padding: 0 1rem;
+    justify-content: flex-end;
+    .navbar_menu{
+      position: absolute;
+      top: .5rem;
+      left: .5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid transparent;
+      background-color: transparent;
+      padding: 0;
+      width: 2rem;
+      height: 2rem;
+      font-size: 1.5rem;
+      color: $primary-default-background;
+      svg{
+        pointer-events: none;
+      }
+    }
+    .navbar_search_btn{
+      position: absolute;
+      top: .5rem;
+      left: 2.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid transparent;
+      background-color: transparent;
+      padding: 0;
+      width: 2rem;
+      height: 2rem;
+      font-size: 1.5rem;
+      color: $primary-default-background;
+      svg{
+        pointer-events: none;
+      }
+    }
+    .navbar_title{
+      position: absolute;
+      left: 0;
+      right: 0;
+      margin: 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 6rem;
+      border: 1px solid $primary-orange-border;
+      border-radius: .25rem;
+      background-color: white;
+      .navbar_logo{
+        display: none;
+      }
+      h1{
+        font-size: 1.5rem;
+        color: $primary-orange;
+        margin: 0;
+        margin-bottom: .1rem;
+      }
+    }
+    .navbar_search{
+      position: absolute;
+      top: 3rem;
+      min-width: 100vw;
+      background-color: $primary-gray;
+      height: 2.5rem;
+      box-shadow: $card-box-shadow-bottom;
+    }
+    .navbar_search_mobile{
+      display: none;
+    }
+  }
+  
 }

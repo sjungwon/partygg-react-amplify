@@ -3,7 +3,7 @@ import { useCallback, useContext, useState } from "react";
 import { BsTrash, BsPencilSquare } from "react-icons/bs";
 import { Subcomment } from "../../types/post.type";
 import { UserDataContext } from "../../context/UserDataContextProvider";
-import RemoveConfirmModal from "./RemoveConfirmModal";
+import RemoveConfirmModal from "../RemoveConfirmModal";
 import PostServices from "../../services/PostServices";
 import AddSubcomment from "./AddSubcomment";
 import ProfileBlock from "../ProfileBlock";

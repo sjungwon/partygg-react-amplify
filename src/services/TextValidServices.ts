@@ -30,11 +30,15 @@ export default class TextValidServices {
   }
 
   public static isIncludeSpecial(text: string): boolean {
-    return new RegExp(/[{}[\]/?.,;:|)*~`!^\-_+<>@#₩$%&\\=('"]/gi).test(text);
+    return new RegExp(/[{}[\]/?.,;:|)*~`!^\-_+<>@#₩$%&\\=('"]/g).test(text);
+  }
+
+  public static isIncludePathSpecial(text: string): boolean {
+    return new RegExp(/[!*`';:@&=+$,/?\\#[\]()]/g).test(text);
   }
 
   public static removeSpecial(text: string): string {
-    const reg = /[{}[\]/?.,;:|)*~`!^\-_+<>@#₩$%&\\=('"]/gi;
+    const reg = /[{}[\]/?.,;:|)*~`!^\-_+<>@#₩$%&\\=('"]/g;
     return text.replace(reg, "");
   }
 }

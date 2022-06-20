@@ -57,6 +57,7 @@ export default function AddComment({
     setLoading(true);
 
     const submitData: AddCommentReqData = {
+      profileId: currentProfile.id,
       profile: currentProfile,
       game: currentProfile.game,
       postId,

@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import GameCategoryBar from "../components/GameCategoryBar";
 import NavBar from "../components/NavBar";
@@ -11,26 +11,43 @@ import styles from "./HomePage.module.scss";
 export default function HomePage() {
   const { category, searchParam }: { category: string; searchParam: string } =
     useCategory();
+  console.log("home", category, searchParam);
 
-  const { setFilteredProfileHandler } = useContext(UserDataContext);
+  const { setFilteredProfileHandler, setFilteredProfileHandlerByProfile } =
+    useContext(UserDataContext);
+
+  const [showCategory, setShowCategory] = useState<boolean>(false);
+  const showCategoryHandler = useCallback(() => {
+    setShowCategory((prev) => !prev);
+  }, []);
 
   const navigate = useNavigate();
   useEffect(() => {
     if (category && !searchParam) {
       window.alert("잘못된 링크로 접속하셨습니다.");
       navigate(-1);
-    } else if (category && searchParam) {
+    } else if (category === "games" && searchParam) {
       setFilteredProfileHandler(decodeURI(searchParam));
+      setShowCategory(false);
+    } else if (category === "profiles" && searchParam) {
+      setFilteredProfileHandlerByProfile(searchParam);
     } else {
       setFilteredProfileHandler("");
+      setShowCategory(false);
     }
-  }, [category, navigate, searchParam, setFilteredProfileHandler]);
+  }, [
+    category,
+    navigate,
+    searchParam,
+    setFilteredProfileHandler,
+    setFilteredProfileHandlerByProfile,
+  ]);
 
   return (
-    <div>
-      <NavBar />
+    <div className={styles.container}>
+      <NavBar showCategoryHandler={showCategoryHandler} />
       <div className={styles.content_container}>
-        <GameCategoryBar />
+        <GameCategoryBar show={showCategory} />
         <PostList
           key={`${category}/${searchParam}`}
           category={category}
