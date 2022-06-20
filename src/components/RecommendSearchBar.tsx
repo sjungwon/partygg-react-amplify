@@ -65,7 +65,7 @@ export default function GameSearchRecommend({
         }
         const category = selectedMenu === "게임" ? "games" : "usernames";
         showInputHandlerForMobile();
-        navigate(`/posts/${category}/${searchParam}`);
+        navigate(`/${category}/${searchParam}`);
         setFindedGames([]);
       };
     },

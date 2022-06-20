@@ -4,9 +4,12 @@ import PostElement from "./PostElement";
 import PostServices from "../../services/PostServices";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Post } from "../../types/post.type";
-import { useNavigate } from "react-router-dom";
 import { UserDataContext } from "../../context/UserDataContextProvider";
 import { AiOutlineCheck, AiOutlineLoading3Quarters } from "react-icons/ai";
+import UserHomeCard from "../UserHomeCard";
+import ProfileCard from "../ProfileCard";
+import { Profile } from "../../types/profile.type";
+import ProfileServices from "../../services/ProfileServices";
 
 interface Props {
   category: string;
@@ -14,13 +17,12 @@ interface Props {
 }
 
 export default function PostList({ category, searchParam }: Props) {
-  const navigate = useNavigate();
-
   const [posts, setPosts] = useState<Post[]>([]);
 
   useEffect(() => {
     PostServices.init();
-  }, [navigate]);
+    setPosts([]);
+  }, [category, searchParam]);
 
   const removePost = useCallback((postId: string) => {
     setPosts((prev: Post[]) =>
@@ -104,42 +106,82 @@ export default function PostList({ category, searchParam }: Props) {
     };
   }, [handleObserver]);
 
-  const { profileArr } = useContext(UserDataContext);
-  const getTitle = (): string => {
+  const [title, setTitle] = useState<string>("");
+  const { username, profileArr } = useContext(UserDataContext);
+  const [searchProfile, setSearchProfile] = useState<Profile>();
+  const getProfile = useCallback(async (profileId: string) => {
+    const profile = await ProfileServices.getProfileById(profileId);
+    if (!profile) {
+      window.alert(
+        "프로필 정보를 가져오는데 오류가 발생했습니다. 다시 시도해주세요."
+      );
+      return;
+    }
+    setSearchProfile(profile);
+    setTitle(`프로필/${profile.nickname}(${profile.username})`);
+  }, []);
+
+  const getTitle = useCallback((): void => {
     if (category) {
       if (category === "profiles") {
         const profile = profileArr.find(
           (profile) => profile.id === searchParam
         );
         if (profile) {
-          return `프로필/${profile.nickname}`;
+          setTitle(`프로필/${profile.nickname}`);
+          return;
         } else {
-          return "프로필";
+          if (searchParam) {
+            getProfile(searchParam);
+            return;
+          }
+          setTitle("프로필");
+          return;
         }
       } else if (category === "games") {
         if (searchParam) {
-          return `게임/${decodeURI(searchParam)}`;
+          setTitle(`게임/${decodeURI(searchParam)}`);
+          return;
         }
-        return "게임";
-      } else if (category === "users") {
+        setTitle("게임");
+        return;
+      } else if (category === "usernames") {
         if (searchParam) {
-          return `유저/${decodeURI(searchParam)}`;
+          setTitle(`유저/${decodeURI(searchParam)}`);
+          return;
         }
-        return "유저";
+        setTitle("유저");
+        return;
       } else {
-        return "카테고리";
+        setTitle("카테고리");
+        return;
       }
     }
-    return "전체";
-  };
+    setTitle("전체");
+    return;
+  }, [category, getProfile, profileArr, searchParam]);
+
+  useEffect(() => {
+    getTitle();
+  }, [getTitle]);
 
   //렌더
   //post가 있는 경우
   return (
     <>
       <div className={styles.container}>
-        <h3 className={styles.category}>{getTitle()}</h3>
-        <AddPostElement prevData={{ setPostData: setAddPostData }} />
+        <h3 className={styles.category}>{title}</h3>
+        {category === "usernames" ? (
+          <UserHomeCard username={decodeURI(searchParam)} />
+        ) : null}
+        {category === "profiles" ? (
+          <ProfileCard searchProfile={searchProfile} />
+        ) : null}
+        {!category ||
+        category === "games" ||
+        (category === "usernames" && username === decodeURI(searchParam)) ? (
+          <AddPostElement prevData={{ setPostData: setAddPostData }} />
+        ) : null}
         {posts.map((post, i) => {
           return (
             <PostElement

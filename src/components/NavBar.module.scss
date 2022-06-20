@@ -24,7 +24,7 @@
   align-items: center;
   width: 100%;
   min-width: 44rem;
-  max-width: 56rem;
+  max-width: 58rem;
   height: 3rem;
   margin: 0 auto;
   padding: 1rem;
@@ -103,7 +103,7 @@
       width: 2rem;
       height: 2rem;
       font-size: 1.5rem;
-      color: $primary-default-background;
+      color: $mobile-btn-gray;
       svg{
         pointer-events: none;
       }
@@ -121,7 +121,7 @@
       width: 2rem;
       height: 2rem;
       font-size: 1.5rem;
-      color: $primary-default-background;
+      color: $mobile-btn-gray;
       svg{
         pointer-events: none;
       }
@@ -135,7 +135,6 @@
       justify-content: center;
       align-items: center;
       width: 6rem;
-      border: 1px solid $primary-orange-border;
       border-radius: .25rem;
       background-color: white;
       .navbar_logo{

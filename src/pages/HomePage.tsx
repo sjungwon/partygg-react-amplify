@@ -48,11 +48,7 @@ export default function HomePage() {
       <NavBar showCategoryHandler={showCategoryHandler} />
       <div className={styles.content_container}>
         <GameCategoryBar show={showCategory} />
-        <PostList
-          key={`${category}/${searchParam}`}
-          category={category}
-          searchParam={searchParam}
-        />
+        <PostList category={category} searchParam={searchParam} />
         <UserInfoBar />
       </div>
     </div>

@@ -8,6 +8,7 @@ div.card{
   box-shadow: $card-box-shadow-bottom;
   border-radius: .5rem;
   border: 1px solid $primary-default-border;
+  overflow: hidden;
 }
 
 div.card_header{
@@ -15,6 +16,7 @@ div.card_header{
   align-items: center;
   justify-content: space-between;
   border-bottom: none;
+  background-color: white;
   .card_header_img{
     height: 2.2rem;
     width: 2.2rem;

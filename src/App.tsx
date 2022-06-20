@@ -26,9 +26,9 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/posts/games/*" element={<HomePage />} />
-            <Route path="/posts/usernames/*" element={<HomePage />} />
-            <Route path="/posts/profiles/*" element={<HomePage />} />
+            <Route path="/games/*" element={<HomePage />} />
+            <Route path="/usernames/*" element={<HomePage />} />
+            <Route path="/profiles/*" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
