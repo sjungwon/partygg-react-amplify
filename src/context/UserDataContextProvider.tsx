@@ -13,7 +13,11 @@ interface UserDataContextType {
   setCurrentProfileHandler: (profile: Profile) => void;
   filteredProfileArr: Profile[];
   setFilteredProfileHandler: (gameName: string) => void;
-  addProfileHandler: (profile: Profile) => void;
+  setFilteredProfileHandlerByProfile: (profileId: string) => void;
+  updateProfileHandler: (
+    profile: Profile,
+    type: "add" | "modify" | "remove"
+  ) => void;
   checkLogin: () => void;
   logout: () => void;
 }
@@ -29,7 +33,7 @@ export const UserDataContext = createContext<UserDataContextType>({
   setProfileArrHandler: (profiles: Profile[]) => {},
   currentProfile: {
     username: "",
-    date: "",
+    id: "",
     nickname: "",
     game: "",
     profileImage: undefined,
@@ -37,14 +41,18 @@ export const UserDataContext = createContext<UserDataContextType>({
   setCurrentProfileHandler: (profile: Profile) => {},
   filteredProfileArr: [],
   setFilteredProfileHandler: (gameName: string) => {},
-  addProfileHandler: (profile: Profile) => {},
+  setFilteredProfileHandlerByProfile: (profileId: string) => {},
+  updateProfileHandler: (
+    profile: Profile,
+    type: "add" | "modify" | "remove"
+  ) => {},
   checkLogin: () => {},
   logout: () => {},
 });
 
-const initialProfile = {
+const initialProfile: Profile = {
   username: "",
-  date: "",
+  id: "",
   nickname: "",
   game: "",
   profileImage: undefined,
@@ -121,14 +129,72 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
     [profileArr, username]
   );
 
-  const addProfileHandler = useCallback(
-    (profile: Profile) => {
-      setProfileArr((prev) => sortProfiles([profile, ...prev]));
-      if (
-        filteredProfileArr.length &&
-        filteredProfileArr[0].game === profile.game
-      ) {
-        setFilteredProfileArr((prev) => sortProfiles([profile, ...prev]));
+  const setFilteredProfileHandlerByProfile = useCallback(
+    (profileId: string) => {
+      const profile = profileArr.find((profile) => profile.id === profileId);
+      if (profile) {
+        setFilteredProfileArr([{ ...profile }]);
+        setCurrentProfile({ ...profile });
+      }
+    },
+    [profileArr]
+  );
+
+  const updateProfileHandler = useCallback(
+    (profile: Profile, type: "add" | "modify" | "remove") => {
+      if (type === "add") {
+        setProfileArr((prev) => sortProfiles([profile, ...prev]));
+        if (
+          filteredProfileArr.length &&
+          filteredProfileArr[0].game === profile.game
+        ) {
+          setFilteredProfileArr((prev) => sortProfiles([profile, ...prev]));
+        }
+        return;
+      } else if (type === "modify") {
+        setProfileArr((prev) =>
+          sortProfiles(
+            prev.map((prevProfile) => {
+              if (prevProfile.id === profile.id) {
+                return profile;
+              }
+
+              return prevProfile;
+            })
+          )
+        );
+        if (
+          filteredProfileArr.length &&
+          filteredProfileArr[0].game === profile.game
+        ) {
+          setFilteredProfileArr((prev) =>
+            sortProfiles(
+              prev.map((prevProfile) => {
+                if (prevProfile.id === profile.id) {
+                  return profile;
+                }
+
+                return prevProfile;
+              })
+            )
+          );
+        }
+      } else {
+        setProfileArr((prev) =>
+          sortProfiles(
+            prev.filter((prevProfile) => prevProfile.id !== profile.id)
+          )
+        );
+        if (
+          filteredProfileArr.length &&
+          filteredProfileArr[0].game === profile.game
+        ) {
+          setFilteredProfileArr((prev) =>
+            sortProfiles(
+              prev.filter((prevProfile) => prevProfile.id !== profile.id)
+            )
+          );
+        }
       }
     },
     [filteredProfileArr]
@@ -189,7 +255,8 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
         setCurrentProfileHandler,
         filteredProfileArr,
         setFilteredProfileHandler,
-        addProfileHandler,
+        setFilteredProfileHandlerByProfile,
+        updateProfileHandler,
         checkLogin,
         logout,
       }}

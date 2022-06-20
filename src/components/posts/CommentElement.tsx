@@ -4,7 +4,7 @@ import { FaRegComment, FaComment } from "react-icons/fa";
 import { BsTrash, BsPencilSquare } from "react-icons/bs";
 import { Comment } from "../../types/post.type";
 import { UserDataContext } from "../../context/UserDataContextProvider";
-import RemoveConfirmModal from "./RemoveConfirmModal";
+import RemoveConfirmModal from "../RemoveConfirmModal";
 import PostServices from "../../services/PostServices";
 import AddComment from "./AddComment";
 import SubcommentList from "./SubcommentList";

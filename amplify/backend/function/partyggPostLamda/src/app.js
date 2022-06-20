@@ -16,6 +16,9 @@
 	STORAGE_PARTYGGPOSTTABLE_ARN
 	STORAGE_PARTYGGPOSTTABLE_NAME
 	STORAGE_PARTYGGPOSTTABLE_STREAMARN
+	STORAGE_PARTYGGPROFILETABLE_ARN
+	STORAGE_PARTYGGPROFILETABLE_NAME
+	STORAGE_PARTYGGPROFILETABLE_STREAMARN
 	STORAGE_PARTYGGSUBCOMMENTTABLE_ARN
 	STORAGE_PARTYGGSUBCOMMENTTABLE_NAME
 	STORAGE_PARTYGGSUBCOMMENTTABLE_STREAMARN
@@ -44,16 +47,19 @@ let likeTableName = "partyggLikeTable";
 let dislikeTableName = "partyggDislikeTable";
 let commentTableName = "partyggCommentTable";
 let subcommentTableName = "partyggSubcommentTable";
+// let profileTableName = "partyggProfileTable";
 if (process.env.ENV && process.env.ENV !== "NONE") {
   tableName = tableName + "-" + process.env.ENV;
   likeTableName = likeTableName + "-" + process.env.ENV;
   dislikeTableName = dislikeTableName + "-" + process.env.ENV;
   commentTableName = commentTableName + "-" + process.env.ENV;
   subcommentTableName = subcommentTableName + "-" + process.env.ENV;
+  // profileTableName = profileTableName + "-" + process.env.ENV;
 }
 
 const gameIndexName = "game-date-index";
 const allIndexName = "forall-date-index";
+const profileIdIndexName = "profileId-date-index";
 
 const userIdPresent = false; // TODO: update in case is required to use that definition
 const partitionKeyName = "username";
@@ -68,6 +74,8 @@ const sortKeyPath = hasSortKey ? "/:" + sortKeyName : "";
 const gameKeyName = "game";
 const gameKeyType = "S";
 const gameKeyPath = "/:" + gameKeyName;
+const profileIdKeyName = "profileId";
+const profileIdPath = "/:" + profileIdKeyName;
 
 // declare a new express app
 const app = express();
@@ -125,6 +133,24 @@ const addAdditionalData = async (post) => {
     dislikes = dislikeDb;
   }
 
+  // const profileParam = {
+  //   TableName: profileTableName,
+  //   Key: {
+  //     username: post.username,
+  //     id: post.profileId,
+  //   },
+  // };
+  // let profile = {
+  //   username: post.username,
+  //   id: "",
+  //   nickname: "제거된 프로필",
+  //   game: post.game,
+  // };
+  // const profileDb = await dynamodb.get(profileParam).promise();
+  // if (profileDb.Item) {
+  //   profile = profileDb.Item;
+  // }
+
   //comment & subcomment 6개씩만 추가
   const commentParam = {
     TableName: commentTableName,
@@ -166,6 +192,7 @@ const addAdditionalData = async (post) => {
     ...post,
     likes,
     dislikes,
+    // profile,
     comments,
     commentsLastEvaluatedKey: commentDb.LastEvaluatedKey,
   };
@@ -333,16 +360,6 @@ app.get(
             data: newItem,
             lastEvaluatedKey: data.LastEvaluatedKey,
           });
-          // try {
-          //   const newItem = await addAdditionalData(data.Items);
-          //   res.json({
-          //     data: newItem,
-          //     lastEvaluatedKey: data.LastEvaluatedKey,
-          //   });
-          // } catch (error) {
-          //   res.statusCode = 500;
-          //   res.json({ error: "Could not load Items: " + err });
-          // }
         } else {
           res.json({ data: data, lastEvaluatedKey: data.LastEvaluatedKey });
         }
@@ -391,16 +408,6 @@ app.get(
             data: newItem,
             lastEvaluatedKey: data.LastEvaluatedKey,
           });
-          // try {
-          //   const newItem = await addAdditionalData(data.Items);
-          //   res.json({
-          //     data: newItem,
-          //     lastEvaluatedKey: data.LastEvaluatedKey,
-          //   });
-          // } catch (error) {
-          //   res.statusCode = 500;
-          //   res.json({ error: "Could not load Items: " + err });
-          // }
         } else {
           res.json({ data: data, lastEvaluatedKey: data.LastEvaluatedKey });
         }
@@ -516,16 +523,6 @@ app.get(path + "/user" + hashKeyPath, function (req, res) {
           data: newItem,
           lastEvaluatedKey: data.LastEvaluatedKey,
         });
-        // try {
-        //   const newItem = await addAdditionalData(data.Items);
-        //   res.json({
-        //     data: newItem,
-        //     lastEvaluatedKey: data.LastEvaluatedKey,
-        //   });
-        // } catch (error) {
-        //   res.statusCode = 500;
-        //   res.json({ error: "Could not load Items: " + err });
-        // }
       } else {
         res.json({ data: data, lastEvaluatedKey: data.LastEvaluatedKey });
       }
@@ -578,22 +575,108 @@ app.get(path + "/user" + hashKeyPath + sortKeyPath, function (req, res) {
           data: newItem,
           lastEvaluatedKey: data.LastEvaluatedKey,
         });
-        // try {
-        //   const newItem = await addAdditionalData(data.Items);
-        //   res.json({
-        //     data: newItem,
-        //     lastEvaluatedKey: data.LastEvaluatedKey,
-        //   });
-        // } catch (error) {
-        //   res.statusCode = 500;
-        //   res.json({ error: "Could not load Items: " + err });
-        // }
       } else {
         res.json({ data: data, lastEvaluatedKey: data.LastEvaluatedKey });
       }
     }
   });
 });
+
+/********************************
+ * HTTP Get method for first page of match profileId object
+ ********************************/
+app.get(path + "/profile" + profileIdPath, async function (req, res) {
+  if (!req.params[profileIdKeyName]) {
+    res.statusCode = 500;
+    res.json({ error: "params missing", url: req.url });
+    return;
+  }
+
+  const params = {
+    TableName: tableName,
+    IndexName: profileIdIndexName,
+    KeyConditionExpression: "profileId = :p",
+    ExpressionAttributeValues: {
+      ":p": req.params[profileIdKeyName],
+    },
+    ScanIndexForward: false,
+    Limit: 6,
+  };
+
+  try {
+    const data = await dynamodb.query(params).promise();
+    if (data.Items) {
+      const newItem = await Promise.all(
+        data.Items.map(async (item) => {
+          return await addAdditionalData(item);
+        })
+      );
+      res.json({
+        data: newItem,
+        lastEvaluatedKey: data.LastEvaluatedKey,
+      });
+    } else {
+      res.json({ data: data, lastEvaluatedKey: data.LastEvaluatedKey });
+    }
+  } catch (err) {
+    res.statusCode = 500;
+    res.json({ error: err, url: req.url });
+  }
+});
+
+/********************************
+ * HTTP Get method for next page of match profileId object
+ ********************************/
+app.get(
+  path + "/profile" + profileIdPath + hashKeyPath + sortKeyPath,
+  async function (req, res) {
+    if (!req.params[profileIdKeyName]) {
+      res.statusCode = 500;
+      res.json({ error: "params missing", url: req.url });
+      return;
+    }
+
+    const lastEvaluatedKey = {
+      date: req.params[sortKeyName],
+      profileId: req.params[profileIdKeyName],
+      username: req.params[partitionKeyName],
+    };
+
+    const params = {
+      TableName: tableName,
+      IndexName: profileIdIndexName,
+      KeyConditionExpression: "profileId = :p",
+      ExpressionAttributeValues: {
+        ":p": req.params[profileIdKeyName],
+      },
+      ScanIndexForward: false,
+      ExclusiveStartKey: {
+        ...lastEvaluatedKey,
+      },
+      Limit: 6,
+    };
+
+    try {
+      const data = await dynamodb.query(params).promise();
+      if (data.Items) {
+        const newItem = await Promise.all(
+          data.Items.map(async (item) => {
+            return await addAdditionalData(item);
+          })
+        );
+        res.json({
+          data: newItem,
+          lastEvaluatedKey: data.LastEvaluatedKey,
+        });
+      } else {
+        res.json({ data: data, lastEvaluatedKey: data.LastEvaluatedKey });
+      }
+    } catch (err) {
+      res.statusCode = 500;
+      res.json({ error: err, url: req.url });
+    }
+  }
+);
 
 /*****************************************
  * HTTP Get method for get single object *

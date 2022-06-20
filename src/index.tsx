@@ -6,6 +6,7 @@ import reportWebVitals from "./reportWebVitals";
 import { Amplify } from "aws-amplify";
 import awsExports from "./aws-exports";
 import UserDataContextProvider from "./context/UserDataContextProvider";
+import GameDataContextProvider from "./context/GameDataContextProvider";
 
 //Amplify 리소스 사용
 Amplify.configure(awsExports);
@@ -16,7 +17,9 @@ const root = ReactDOM.createRoot(
 root.render(
   // <React.StrictMode>
   <UserDataContextProvider>
-    <App />
+    <GameDataContextProvider>
+      <App />
+    </GameDataContextProvider>
   </UserDataContextProvider>
   // </React.StrictMode>
 );

@@ -20,35 +20,35 @@
       "function": {
         "partyggProfileLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggProfileLamda-357867346a6d47366658-build.zip"
+          "s3Key": "amplify-builds/partyggProfileLamda-4a2b6f4f4a3773583977-build.zip"
         },
         "partyggLikeLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggLikeLamda-64687343387643665647-build.zip"
+          "s3Key": "amplify-builds/partyggLikeLamda-57744648684b544c786f-build.zip"
         },
         "partyggGameLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggGameLamda-515534756177586c5849-build.zip"
+          "s3Key": "amplify-builds/partyggGameLamda-354d4859412b46646f49-build.zip"
         },
         "partyggPostLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggPostLamda-54317665556d3970492b-build.zip"
+          "s3Key": "amplify-builds/partyggPostLamda-7959756b787379332f6b-build.zip"
         },
         "partyggDislikeLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggDislikeLamda-466c434472614f685571-build.zip"
+          "s3Key": "amplify-builds/partyggDislikeLamda-654c2b6c4f6238795451-build.zip"
         },
         "S3Trigger8322dec8": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/S3Trigger8322dec8-36494a38387a53414b35-build.zip"
+          "s3Key": "amplify-builds/S3Trigger8322dec8-6d684556307a5642656d-build.zip"
         },
         "partyggSubcommentLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggSubcommentLamda-35445670694a426f3947-build.zip"
+          "s3Key": "amplify-builds/partyggSubcommentLamda-6343692b6f6973745550-build.zip"
         },
         "partyggCommentLamda": {
           "deploymentBucketName": "amplify-partyggreactamplify-dev-30140-deployment",
-          "s3Key": "amplify-builds/partyggCommentLamda-3679306e4350306d5144-build.zip"
+          "s3Key": "amplify-builds/partyggCommentLamda-7033436153704b706c4b-build.zip"
         }
       }
     }

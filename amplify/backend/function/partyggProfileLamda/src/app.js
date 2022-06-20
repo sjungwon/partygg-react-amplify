@@ -1,4 +1,19 @@
-/*
+/* Amplify Params - DO NOT EDIT
+	ENV
+	REGION
+	STORAGE_PARTYGGCOMMENTTABLE_ARN
+	STORAGE_PARTYGGCOMMENTTABLE_NAME
+	STORAGE_PARTYGGCOMMENTTABLE_STREAMARN
+	STORAGE_PARTYGGPOSTTABLE_ARN
+	STORAGE_PARTYGGPOSTTABLE_NAME
+	STORAGE_PARTYGGPOSTTABLE_STREAMARN
+	STORAGE_PARTYGGPROFILETABLE_ARN
+	STORAGE_PARTYGGPROFILETABLE_NAME
+	STORAGE_PARTYGGPROFILETABLE_STREAMARN
+	STORAGE_PARTYGGSUBCOMMENTTABLE_ARN
+	STORAGE_PARTYGGSUBCOMMENTTABLE_NAME
+	STORAGE_PARTYGGSUBCOMMENTTABLE_STREAMARN
+Amplify Params - DO NOT EDIT */ /*
 Copyright 2017 - 2017 Amazon.com, Inc. or its affiliates. All Rights Reserved.
 Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file except in compliance with the License. A copy of the License is located at
     http://aws.amazon.com/apache2.0/
@@ -10,23 +25,29 @@ const AWS = require("aws-sdk");
 const awsServerlessExpressMiddleware = require("aws-serverless-express/middleware");
 const bodyParser = require("body-parser");
 const express = require("express");
-const moment = require("moment");
-require("moment-timezone");
-moment.tz.setDefault("Asia/Seoul");
+const { v4: uuidv4 } = require("uuid");
 
 AWS.config.update({ region: process.env.TABLE_REGION });
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
 let tableName = "partyggProfileTable";
+let postTableName = "partyggPostTable";
+let commentTableName = "partyggCommentTable";
+let subcommentTableName = "partyggSubcommentTable";
 if (process.env.ENV && process.env.ENV !== "NONE") {
   tableName = tableName + "-" + process.env.ENV;
+  postTableName = postTableName + "-" + process.env.ENV;
+  commentTableName = commentTableName + "-" + process.env.ENV;
+  subcommentTableName = subcommentTableName + "-" + process.env.ENV;
 }
+
+const profileIdIndexName = "profileId-date-index";
 
 const userIdPresent = false; // TODO: update in case is required to use that definition
 const partitionKeyName = "username";
 const partitionKeyType = "S";
-const sortKeyName = "date";
+const sortKeyName = "id";
 const sortKeyType = "S";
 const hasSortKey = sortKeyName !== "";
 const path = "/profiles";
@@ -85,8 +106,6 @@ app.get(path + hashKeyPath, function (req, res) {
     TableName: tableName,
     KeyConditions: condition,
   };
-
-  console.log(req.apiGateway.event.identity);
 
   dynamodb.query(queryParams, (err, data) => {
     if (err) {
@@ -178,104 +197,193 @@ app.put(path, function (req, res) {
  * HTTP post method for insert object *
  *************************************/
 
-app.post(path, function (req, res) {
-  const params = {};
+app.post(path, async function (req, res) {
   if (userIdPresent) {
     req.body["userId"] =
       req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-  } else {
-    params[partitionKeyName] = req.body[partitionKeyName];
-    try {
-      params[partitionKeyName] = convertUrlType(
-        req.body[partitionKeyName],
-        partitionKeyType
-      );
-    } catch (err) {
-      res.statusCode = 500;
-      res.json({ error: "Wrong column type " + err });
-    }
-  }
-
-  let getItemParams = {
-    TableName: tableName,
-    KeyConditionExpression: "#user = :u",
-    FilterExpression: "game = :g AND nickname = :n",
-    ExpressionAttributeNames: {
-      "#user": "username",
-    },
-    ExpressionAttributeValues: {
-      ":u": req.body["username"],
-      ":g": req.body["game"],
-      ":n": req.body["nickname"],
-    },
-  };
-
-  dynamodb.query(getItemParams, (err, data) => {
-    if (err) {
-      res.statusCode = 500;
-      res.json({ error: "Could not load items: " + err.message });
-    } else {
-      console.log(data);
-      if (data.Count) {
-        res.statusCode = 409;
-        res.json({ error: "Data already exists profile" });
-      } else {
-        const date = moment().format("YYYY-MM-DD HH:mm:ss SSS");
-        let putItemParams = {
-          TableName: tableName,
-          Item: {
-            ...req.body,
-            date,
-          },
-        };
-        dynamodb.put(putItemParams, (err, data) => {
-          if (err) {
-            res.statusCode = 500;
-            res.json({ error: err, url: req.url, body: req.body });
-          } else {
-            res.json({
-              success: "post update succeed!",
-              url: req.url,
-              data: putItemParams.Item,
-            });
-          }
-        });
-      }
-    }
-  });
-});
-
-/************************************
- * HTTP post method for update object *
- *************************************/
-app.post(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
-  const username = req.params[partitionKeyName];
-  if (username !== req.body[partitionKeyName]) {
-    res.statusCode = 403;
-    res.json({ error: "Unauthorized update profiles" });
-    return;
   }
 
   let putItemParams = {
     TableName: tableName,
     Item: {
       ...req.body,
+      id: uuidv4(),
     },
   };
 
-  dynamodb.put(putItemParams, (err, data) => {
-    if (err) {
+  console.log(putItemParams);
+
+  const findParam = {
+    TableName: tableName,
+    Key: {
+      username: putItemParams.Item.username,
+      id: putItemParams.Item.id,
+    },
+  };
+  //중복 방지
+  let i = 0;
+  while (i < 3) {
+    try {
+      const findIdRedundancy = await dynamodb.get(findParam).promise();
+      if (findIdRedundancy.Item?.id) {
+        findParam.Key.id = putItemParams.Item.id = uuidv4();
+        i++;
+        continue;
+      } else {
+        await dynamodb.put(putItemParams).promise();
+        res.json({
+          success: "post call succeed!",
+          url: req.url,
+          data: putItemParams.Item,
+        });
+        return;
+      }
+    } catch (err) {
       res.statusCode = 500;
       res.json({ error: err, url: req.url, body: req.body });
-    } else {
+      return;
+    }
+  }
+});
+
+/************************************
+ * HTTP post method for update object *
+ *************************************/
+
+app.post(
+  path + "/object" + hashKeyPath + sortKeyPath,
+  async function (req, res) {
+    if (userIdPresent) {
+      req.body["userId"] =
+        req.apiGateway.event.requestContext.identity.cognitoIdentityId ||
+        UNAUTH;
+    }
+
+    let putItemParams = {
+      TableName: tableName,
+      Item: {
+        ...req.body,
+      },
+    };
+
+    try {
+      await dynamodb.put(putItemParams).promise();
+      const updateFunc = async () => {
+        const param = {
+          IndexName: profileIdIndexName,
+          KeyConditionExpression: "profileId = :p",
+          ExpressionAttributeValues: {
+            ":p": req.params[sortKeyName],
+          },
+          ScanIndexForward: false,
+        };
+        const updateParam = {
+          ExpressionAttributeNames: {
+            "#P": "profile",
+          },
+          ExpressionAttributeValues: {
+            ":p": { ...req.body },
+          },
+          UpdateExpression: "SET #P = :p",
+        };
+        const postUpdate = new Promise(async (res) => {
+          const postQueryParam = {
+            TableName: postTableName,
+            ...param,
+          };
+          const posts = await dynamodb.query(postQueryParam).promise();
+          let result;
+          if (posts.Items) {
+            result = await Promise.all(
+              posts.Items.map(async (item) => {
+                const postUpdateParam = {
+                  TableName: postTableName,
+                  Key: {
+                    username: item.username,
+                    date: item.date,
+                  },
+                  ...updateParam,
+                };
+                const test = await dynamodb.update(postUpdateParam).promise();
+                return test;
+              })
+            );
+          }
+          res(result);
+        });
+        const commentUpdate = new Promise(async (res) => {
+          const commentQueryParam = {
+            TableName: commentTableName,
+            ...param,
+          };
+          const comments = await dynamodb.query(commentQueryParam).promise();
+          let result;
+          if (comments.Items) {
+            result = await Promise.all(
+              comments.Items.map(async (item) => {
+                const commentUpdateParam = {
+                  TableName: commentTableName,
+                  Key: {
+                    postId: item.postId,
+                    date: item.date,
+                  },
+                  ...updateParam,
+                };
+                const test = await dynamodb
+                  .update(commentUpdateParam)
+                  .promise();
+                return test;
+              })
+            );
+          }
+          res(result);
+        });
+        const subcommentUpdate = new Promise(async (res) => {
+          const subcommentQueryParam = {
+            TableName: subcommentTableName,
+            ...param,
+          };
+          const subcomments = await dynamodb
+            .query(subcommentQueryParam)
+            .promise();
+          let result;
+          if (subcomments.Items) {
+            result = await Promise.all(
+              subcomments.Items.map(async (item) => {
+                const subcommentUpdateParam = {
+                  TableName: subcommentTableName,
+                  Key: {
+                    commentId: item.commentId,
+                    date: item.date,
+                  },
+                  ...updateParam,
+                };
+                const test = await dynamodb
+                  .update(subcommentUpdateParam)
+                  .promise();
+                return test;
+              })
+            );
+          }
+          res(result);
+        });
+
+        await Promise.all([postUpdate, commentUpdate, subcommentUpdate]);
+      };
+      await updateFunc();
+
       res.json({
-        success: "post update succeed!",
+        success: "post call succeed!",
         url: req.url,
         data: putItemParams.Item,
       });
+    } catch (err) {
+      console.log("Profile update error: " + err);
+      res.statusCode = 500;
+      res.json({ error: err, url: req.url, body: req.body });
     }
-  });
-});
+  }
+);
 
 /**************************************
  * HTTP remove method to delete object *
@@ -314,37 +422,12 @@ app.delete(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
     TableName: tableName,
     Key: params,
   };
-
-  const username = req.params[partitionKeyName];
-
-  dynamodb.get(removeItemParams, (err, data) => {
+  dynamodb.delete(removeItemParams, (err, data) => {
     if (err) {
       res.statusCode = 500;
       res.json({ error: err, url: req.url });
     } else {
-      if (data.Item) {
-        console.log(data.Item.username);
-        if (data.Item.username !== username) {
-          res.statusCode = 403;
-          res.json({ error: "Unauthorized Delete" });
-        } else {
-          dynamodb.delete(removeItemParams, (err, data) => {
-            if (err) {
-              res.statusCode = 500;
-              res.json({ error: err, url: req.url });
-            } else {
-              res.json({
-                success: "delete call succeed!",
-                url: req.url,
-                data: data,
-              });
-            }
-          });
-        }
-      } else {
-        res.statusCode = 500;
-        res.json({ error: "Could not load items: " + err.message });
-      }
+      res.json({ url: req.url, data: data });
     }
   });
 });

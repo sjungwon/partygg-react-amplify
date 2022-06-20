@@ -24,6 +24,9 @@ import {
   SubcommentsLastEvaluatedKey,
   UpdatePostReqData,
   UpdatePostResData,
+  LastEvaluatedKeyForProfile,
+  GetProfilePostsResData,
+  GetUserPostsResData,
 } from "../types/post.type";
 import UserServices from "./UserServices";
 
@@ -40,12 +43,17 @@ export default class PostServices {
     | undefined = undefined;
   private static lastEvaluatedKeyForUser: LastEvaluatedKeyForPost | undefined =
     undefined;
+  private static lastEvaluatedKeyForProfile:
+    | LastEvaluatedKeyForProfile
+    | undefined = undefined;
   private static getDone: boolean = false;
+  private static loading: boolean = false;
 
   public static init() {
     this.lastEvaluatedKeyForAll = undefined;
     this.lastEvaluatedKeyForGame = undefined;
     this.lastEvaluatedKeyForUser = undefined;
+    this.lastEvaluatedKeyForProfile = undefined;
     this.getDone = false;
   }
 
@@ -58,7 +66,7 @@ export default class PostServices {
       const myInit: { body: AddPostReqBodyData } = {
         body: {
           ...newPost,
-          nickname: newPost.profile.nickname,
+          profileId: newPost.profile.id,
           username,
         },
       };
@@ -79,7 +87,7 @@ export default class PostServices {
   public static async updatePost(postData: Post): Promise<Post | null> {
     try {
       const { username } = await UserServices.getUsernameWithRefresh();
-      const { game, profile, text, images, nickname } = postData;
+      const { game, profile, text, images } = postData;
       if (!username) {
         return null;
       }
@@ -93,7 +101,7 @@ export default class PostServices {
           text,
           images,
           username,
-          nickname,
+          profileId: profile.id,
         },
       };
       const response = await API.post(this.apiName, updatePath, myInit);
@@ -129,9 +137,14 @@ export default class PostServices {
     category: string,
     searchParam: string
   ): Promise<Post[] | null> {
-    if (this.getDone) {
-      return null;
+    console.log("services", this.getDone, this.loading);
+    if (this.getDone || this.loading) {
+      return [];
     }
+    this.loading = true;
+
+    console.log(this.getDone, this.loading);
+
     if (category === "games" && searchParam) {
       const path = this.lastEvaluatedKeyForGame
         ? `${this.path}/game/${encodeURIComponent(
@@ -150,9 +163,11 @@ export default class PostServices {
           this.getDone = true;
         }
         this.lastEvaluatedKeyForGame = response.lastEvaluatedKey;
+        this.loading = false;
         return response.data;
       } catch (error) {
         console.log(error);
+        this.loading = false;
         return null;
       }
     }
@@ -164,14 +179,47 @@ export default class PostServices {
           )}/${encodeURIComponent(this.lastEvaluatedKeyForUser.date)}`
         : `${this.path}/user/${searchParam}`;
       try {
-        const response: GetPostsResData = await API.get(this.apiName, path, {});
+        const response: GetUserPostsResData = await API.get(
+          this.apiName,
+          path,
+          {}
+        );
         if (!response.lastEvaluatedKey) {
           this.getDone = true;
         }
         this.lastEvaluatedKeyForUser = response.lastEvaluatedKey;
+        this.loading = false;
         return response.data;
       } catch (error) {
         console.log(error);
+        this.loading = false;
+        return null;
+      }
+    }
+
+    if (category === "profiles" && searchParam) {
+      const path = this.lastEvaluatedKeyForProfile
+        ? `${this.path}/profile/${encodeURIComponent(
+            this.lastEvaluatedKeyForProfile.profileId
+          )}/${encodeURIComponent(
+            this.lastEvaluatedKeyForProfile?.username
+          )}/${encodeURIComponent(this.lastEvaluatedKeyForProfile.date)}}`
+        : `${this.path}/profile/${searchParam}`;
+      try {
+        const response: GetProfilePostsResData = await API.get(
+          this.apiName,
+          path,
+          {}
+        );
+        if (!response.lastEvaluatedKey) {
+          this.getDone = true;
+        }
+        this.lastEvaluatedKeyForProfile = response.lastEvaluatedKey;
+        this.loading = false;
+        return response.data;
+      } catch (error) {
+        console.log(error);
+        this.loading = false;
         return null;
       }
     }
@@ -186,55 +234,38 @@ export default class PostServices {
         this.getDone = true;
       }
       this.lastEvaluatedKeyForAll = response.lastEvaluatedKey;
+      this.loading = false;
       return response.data;
     } catch (error) {
       console.log(error);
+      this.loading = false;
       return null;
     }
   }
 
-  public static async getPostsByGame(
-    game: string
-  ): Promise<GetGamePostsResData | null> {
-    if (this.getDone) {
-      return null;
-    }
-    const path = this.lastEvaluatedKeyForGame
-      ? `${this.path}/game/${encodeURIComponent(
-          this.lastEvaluatedKeyForGame.game
-        )}/${encodeURIComponent(
-          this.lastEvaluatedKeyForGame.username
-        )}/${encodeURIComponent(this.lastEvaluatedKeyForGame.date)}`
-      : `${this.path}/game/${game}`;
-    try {
-      const response: GetGamePostsResData = await API.get(
-        this.apiName,
-        path,
-        {}
-      );
-      if (!response.lastEvaluatedKey) {
-        this.getDone = true;
-      }
-      this.lastEvaluatedKeyForGame = response.lastEvaluatedKey;
-      return response;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  }
-
-  // public static async getNextPostIdListByGame(
-  //   data: LastEvaluatedKeyForGame
-  // ): Promise<GetGamePostIdListResData | null> {
+  // public static async getPostsByGame(
+  //   game: string
+  // ): Promise<GetGamePostsResData | null> {
+  //   if (this.getDone) {
+  //     return null;
+  //   }
+  //   const path = this.lastEvaluatedKeyForGame
+  //     ? `${this.path}/game/${encodeURIComponent(
+  //         this.lastEvaluatedKeyForGame.game
+  //       )}/${encodeURIComponent(
+  //         this.lastEvaluatedKeyForGame.username
+  //       )}/${encodeURIComponent(this.lastEvaluatedKeyForGame.date)}`
+  //     : `${this.path}/game/${game}`;
   //   try {
-  //     const path = `${this.path}/game/${encodeURIComponent(
-  //       data.game
-  //     )}/${encodeURIComponent(data.username)}/${encodeURIComponent(data.date)}`;
-  //     const response: GetGamePostIdListResData = await API.get(
+  //     const response: GetGamePostsResData = await API.get(
   //       this.apiName,
   //       path,
   //       {}
   //     );
+  //     if (!response.lastEvaluatedKey) {
+  //       this.getDone = true;
+  //     }
+  //     this.lastEvaluatedKeyForGame = response.lastEvaluatedKey;
   //     return response;
   //   } catch (error) {
   //     console.log(error);
@@ -242,44 +273,51 @@ export default class PostServices {
   //   }
   // }
 
-  public static async getPostsByUser(
-    username: string
-  ): Promise<GetPostsResData | null> {
-    if (this.getDone) {
-      return null;
-    }
-    const path = this.lastEvaluatedKeyForUser
-      ? `${this.path}/user/${encodeURIComponent(
-          this.lastEvaluatedKeyForUser.username
-        )}/${encodeURIComponent(this.lastEvaluatedKeyForUser.date)}`
-      : `${this.path}/user/${username}`;
-    try {
-      const response: GetPostsResData = await API.get(this.apiName, path, {});
-      if (!response.lastEvaluatedKey) {
-        this.getDone = true;
-      }
-      this.lastEvaluatedKeyForUser = response.lastEvaluatedKey;
-      return response;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  }
-
-  // public static async getNextUserPostIdList(
-  //   data: LastEvaluatedKeyForPost
-  // ): Promise<GetPostsResData | null> {
+  // public static async getPostsByUser(
+  //   username: string
+  // ): Promise<Post[] | null> {
+  //   if (this.getDone) {
+  //     return null;
+  //   }
+  //   const path = this.lastEvaluatedKeyForUser
+  //     ? `${this.path}/user/${encodeURIComponent(
+  //         this.lastEvaluatedKeyForUser.username
+  //       )}/${encodeURIComponent(this.lastEvaluatedKeyForUser.date)}`
+  //     : `${this.path}/user/${username}`;
   //   try {
-  //     const path = `${this.path}/user/${encodeURIComponent(
-  //       data.username
-  //     )}/${encodeURIComponent(data.date)}`;
-  //     const response: GetPostsResData = await API.get(
-  //       this.apiName,
-  //       path,
-  //       {}
-  //     );
-  //     return response;
+  //     const response: GetUserPostsResData = await API.get(this.apiName, path, {});
+  //     if (!response.lastEvaluatedKey) {
+  //       this.getDone = true;
+  //     }
+  //     this.lastEvaluatedKeyForUser = response.lastEvaluatedKey;
+  //     return response.data;
   //   } catch (error) {
+  //     console.log(error);
+  //     return null;
+  //   }
+  // }
+
+  // public static async getPostByProfile(
+  //   profileId: string
+  // ): Promise<GetProfilePostsResData | null> {
+  //   if (this.getDone) {
+  //     return null;
+  //   }
+  //   const path = this.lastEvaluatedKeyForProfile
+  //     ? `${this.path}/profile/${encodeURIComponent(
+  //         this.lastEvaluatedKeyForProfile.profileId
+  //       )}/${encodeURIComponent(
+  //         this.lastEvaluatedKeyForProfile?.username
+  //       )}/${encodeURIComponent(this.lastEvaluatedKeyForProfile.date)}}`
+  //     : `${this.path}/profile/${profileId}`;
+  //   try{
+  //     const response: GetProfilePostsResData = await API.get(this.apiName,path,{});
+  //     if(!response.lastEvaluatedKey){
+  //       this.getDone = true;
+  //     }
+  //     this.lastEvaluatedKeyForProfile = response.lastEvaluatedKey;
+  //     return response;
+  //   }catch(error){
   //     console.log(error);
   //     return null;
   //   }
@@ -301,7 +339,7 @@ export default class PostServices {
     }
   }
 
-  public static async getNextUserPostIdListByGame(
+  public static async getNextUserPostByGame(
     game: string,
     data: LastEvaluatedKeyForPost
   ): Promise<GetPostsResData | null> {

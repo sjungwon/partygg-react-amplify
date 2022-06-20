@@ -1,5 +1,5 @@
-import { useCallback, useContext, useMemo, useRef, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useCallback, useContext, useRef, useState } from "react";
+import { NavLink } from "react-router-dom";
 import GameServices from "../services/GameServices";
 import { AiOutlineUnorderedList, AiOutlineClose } from "react-icons/ai";
 import { BsPlusLg } from "react-icons/bs";
@@ -8,7 +8,11 @@ import { GameDataContext } from "../context/GameDataContextProvider";
 import TextValidServices from "../services/TextValidServices";
 import { UserDataContext } from "../context/UserDataContextProvider";
 
-export default function GameCategoryBar() {
+interface PropsType {
+  show: boolean;
+}
+
+export default function GameCategoryBar({ show }: PropsType) {
   const { games, setGamesHandler } = useContext(GameDataContext);
 
   const gameInputRef = useRef<HTMLInputElement>(null);
@@ -22,8 +26,10 @@ export default function GameCategoryBar() {
       return;
     }
 
-    if (TextValidServices.isIncludeSpecial(gameText)) {
-      window.alert("특수문자를 포함할 수 없습니다. 제거하고 시도해주세요.");
+    if (TextValidServices.isIncludePathSpecial(gameText)) {
+      window.alert(
+        `! * ${"`"} ' ; : @ & = + $ , / ? ${"\\"} # [ ] ( ) 는 포함할 수 없습니다.`
+      );
       return;
     }
 
@@ -44,43 +50,6 @@ export default function GameCategoryBar() {
     }
   }, [games, setGamesHandler]);
 
-  const navigate = useNavigate();
-  const location = useLocation();
-  const {
-    path,
-    category,
-    searchParam,
-  }: { path: string; category: string; searchParam: string } = useMemo(() => {
-    const path = location.pathname;
-    const splitPath = path.split("/");
-    const category = splitPath[1];
-    const searchParam = splitPath.length > 2 ? splitPath[2] : "";
-    return {
-      path,
-      category,
-      searchParam,
-    };
-  }, [location]);
-
-  const categoryChange = useCallback(
-    (event: any) => {
-      const El = event.target as HTMLDivElement;
-      const queryParam = El.textContent;
-      console.log(queryParam);
-      const newPath = `/games/${queryParam}`;
-      const encodeNewPath = encodeURI(newPath);
-      console.log(path, newPath, encodeNewPath);
-      if (path !== encodeNewPath) {
-        navigate(`/games/${queryParam}`);
-      }
-    },
-    [navigate, path]
-  );
-
-  const categoryAll = useCallback(() => {
-    navigate("/");
-  }, [navigate]);
-
   const [showAdd, setShowAdd] = useState<boolean>(false);
   const { username } = useContext(UserDataContext);
   const setShowAddHandler = useCallback(() => {
@@ -96,51 +65,58 @@ export default function GameCategoryBar() {
   }, [username]);
 
   return (
-    <div className={styles.container}>
-      <div className={styles.category_list_title}>
-        <AiOutlineUnorderedList />
-        <h3 className={styles.category_title}>게임 리스트</h3>
-        <button
-          className={styles.category_title_button}
-          onClick={setShowAddHandler}
-        >
-          {showAdd ? <AiOutlineClose /> : <BsPlusLg />}
-        </button>
-      </div>
-      <div className={showAdd ? styles.category_add : styles.hide}>
-        <input
-          type="text"
-          ref={gameInputRef}
-          placeholder="게임 이름"
-          className={styles.category_add_input}
-        />
-        <button
-          onClick={gameSubmit}
-          disabled={loading}
-          className={styles.category_add_button}
-        >
-          {<BsPlusLg />}
-        </button>
-      </div>
-      <ul className={styles.category_list}>
-        <li
-          onClick={categoryAll}
-          className={`${styles.category_item} ${category ? "" : styles.active}`}
-        >
-          <p className={styles.item_text}>전체 보기</p>
-        </li>
-        {games.map((game) => (
-          <li
-            key={game.name}
-            onClick={categoryChange}
-            className={`${styles.category_item} ${
-              searchParam === encodeURI(game.name) ? styles.active : ""
-            }`}
+    <div className={`${styles.container} ${show ? "" : styles.container_hide}`}>
+      <div className={styles.container_padding}>
+        <div className={styles.category_list_title_container}>
+          <div className={styles.category_list_title}>
+            <AiOutlineUnorderedList />
+            <h3 className={styles.category_title}>게임 리스트</h3>
+            <button
+              className={styles.category_title_button}
+              onClick={setShowAddHandler}
+            >
+              {showAdd ? <AiOutlineClose /> : <BsPlusLg />}
+            </button>
+          </div>
+          <div className={showAdd ? styles.category_add : styles.hide}>
+            <input
+              type="text"
+              ref={gameInputRef}
+              placeholder="게임 이름"
+              className={styles.category_add_input}
+            />
+            <button
+              onClick={gameSubmit}
+              disabled={loading}
+              className={styles.category_add_button}
+            >
+              {<BsPlusLg />}
+            </button>
+          </div>
+        </div>
+        <nav className={styles.category_list}>
+          <NavLink
+            to={"/"}
+            className={({ isActive }) =>
+              `${styles.category_item} ${isActive ? styles.active : ""}`
+            }
           >
-            <p className={styles.item_text}>{game.name}</p>
-          </li>
-        ))}
-      </ul>
+            전체 보기
+          </NavLink>
+
+          {games.map((game) => (
+            <NavLink
+              to={`/posts/games/${encodeURI(game.name)}`}
+              key={game.name}
+              className={({ isActive }) =>
+                `${styles.category_item} ${isActive ? styles.active : ""}`
+              }
+            >
+              {game.name}
+            </NavLink>
+          ))}
+        </nav>
+      </div>
     </div>
   );
 }

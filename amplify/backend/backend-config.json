@@ -1,9 +1,5 @@
 {
   "storage": {
-    "partyggProfileTable": {
-      "service": "DynamoDB",
-      "providerPlugin": "awscloudformation"
-    },
     "partyggGameTable": {
       "service": "DynamoDB",
       "providerPlugin": "awscloudformation"
@@ -42,28 +38,13 @@
     "partyggSubcommentTable": {
       "service": "DynamoDB",
       "providerPlugin": "awscloudformation"
+    },
+    "partyggProfileTable": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
     }
   },
   "function": {
-    "partyggProfileLamda": {
-      "build": true,
-      "providerPlugin": "awscloudformation",
-      "service": "Lambda",
-      "dependsOn": [
-        {
-          "category": "storage",
-          "resourceName": "partyggProfileTable",
-          "attributes": [
-            "Name",
-            "Arn"
-          ],
-          "attributeEnvMap": {
-            "Name": "TABLE_NAME",
-            "Arn": "TABLE_ARN"
-          }
-        }
-      ]
-    },
     "partyggGameLamda": {
       "build": true,
       "providerPlugin": "awscloudformation",
@@ -191,6 +172,15 @@
             "Arn",
             "StreamArn"
           ]
+        },
+        {
+          "category": "storage",
+          "resourceName": "partyggProfileTable",
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ]
         }
       ]
     },
@@ -242,6 +232,49 @@
           }
         }
       ]
+    },
+    "partyggProfileLamda": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "partyggPostTable",
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ]
+        },
+        {
+          "category": "storage",
+          "resourceName": "partyggCommentTable",
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ]
+        },
+        {
+          "category": "storage",
+          "resourceName": "partyggSubcommentTable",
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ]
+        },
+        {
+          "category": "storage",
+          "resourceName": "partyggProfileTable",
+          "attributes": [
+            "Name",
+            "Arn",
+            "StreamArn"
+          ]
+        }
+      ]
     }
   },
   "auth": {
@@ -278,14 +311,6 @@
       "service": "API Gateway",
       "providerPlugin": "awscloudformation",
       "dependsOn": [
-        {
-          "category": "function",
-          "resourceName": "partyggProfileLamda",
-          "attributes": [
-            "Name",
-            "Arn"
-          ]
-        },
         {
           "category": "function",
           "resourceName": "partyggGameLamda",
@@ -329,6 +354,14 @@
         {
           "category": "function",
           "resourceName": "partyggSubcommentLamda",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "partyggProfileLamda",
           "attributes": [
             "Name",
             "Arn"

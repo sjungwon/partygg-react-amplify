@@ -8,14 +8,17 @@ import NotFoundPage from "./pages/NotFoundPage";
 import ErrorPage from "./pages/ErrorPage";
 import { useContext, useEffect } from "react";
 import { UserDataContext } from "./context/UserDataContextProvider";
+import { GameDataContext } from "./context/GameDataContextProvider";
 
 function App() {
   const { checkLogin } = useContext(UserDataContext);
+  const { getGames } = useContext(GameDataContext);
 
   useEffect(() => {
     console.log("login check");
     checkLogin();
-  }, [checkLogin]);
+    getGames();
+  }, [checkLogin, getGames]);
 
   return (
     <div className="App">
@@ -23,8 +26,9 @@ function App() {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route path="/games/*" element={<HomePage />} />
-            <Route path="/usernames/*" element={<HomePage />} />
+            <Route path="/posts/games/*" element={<HomePage />} />
+            <Route path="/posts/usernames/*" element={<HomePage />} />
+            <Route path="/posts/profiles/*" element={<HomePage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="*" element={<NotFoundPage />} />
           </Routes>
