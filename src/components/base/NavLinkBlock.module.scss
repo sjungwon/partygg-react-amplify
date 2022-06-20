@@ -5,8 +5,5 @@ a.nav_link{
   color: $font-color-gray;
   &:hover{
     color: $font-color-light-gray;
-    .nav_link_child{
-      color: $font-color-light-gray;
-    }
   }
 }

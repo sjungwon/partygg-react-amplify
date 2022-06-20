@@ -194,7 +194,7 @@ export default function PostList({ category, searchParam }: Props) {
             />
           );
         })}
-        <div className={styles.final_container}>
+        <div className={styles.final_container} ref={loader}>
           <h3 className={styles.final}>
             {queryLoading ? (
               <div className={styles.loading}>
@@ -207,8 +207,6 @@ export default function PostList({ category, searchParam }: Props) {
             )}
           </h3>
         </div>
-
-        <div ref={loader} className={styles.loader}></div>
       </div>
     </>
   );

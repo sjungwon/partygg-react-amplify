@@ -19,14 +19,6 @@
   align-items: center;
 }
 
-.nav_link{
-  text-decoration: none;
-  color: $font-color-gray;
-  &:hover{
-    color: $font-color-light-gray;
-  }
-}
-
 .comment_text{
   font-size: .85rem;
   font-weight: 400;
@@ -57,17 +49,6 @@
   width: 10rem;
   margin: 0 auto;
 }
-
-// .more{
-//   margin: .5rem;
-//   font-size: .9rem;
-//   color: $primary-blue;
-//   width: 5rem;
-//   cursor: pointer;
-//   &:hover{
-//     color: $primary-blue-hover;
-//   }
-// }
 
 .comment_btns{
   display: flex;

@@ -43,6 +43,11 @@ export default function HomePage() {
     setFilteredProfileHandlerByProfile,
   ]);
 
+  useEffect(() => {
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    });
+  }, [category, searchParam]);
   return (
     <div className={styles.container}>
       <NavBar showCategoryHandler={showCategoryHandler} />
