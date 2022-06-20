@@ -40,7 +40,7 @@ export default function UserHomeCard({ username }: PropsType) {
 
   return (
     <Card className={styles.container}>
-      <Card.Header className={styles.title_container}>
+      <Card.Header>
         <Card.Title className={styles.title}>{username}</Card.Title>
       </Card.Header>
       <Card.Body className={styles.body_container}>

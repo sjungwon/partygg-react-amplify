@@ -1,14 +1,13 @@
 @import "../../scss/variables";
 
+
 div.card{
   max-width: 28rem;
-  max-height: 80rem;
   margin: 2.5rem auto;
   margin-top: 0;
   box-shadow: $card-box-shadow-bottom;
   border-radius: .5rem;
   border: 1px solid $primary-default-border;
-  overflow: hidden;
 }
 
 div.card_header{
@@ -16,7 +15,7 @@ div.card_header{
   align-items: center;
   justify-content: space-between;
   border-bottom: none;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0);
   .card_header_img{
     height: 2.2rem;
     width: 2.2rem;

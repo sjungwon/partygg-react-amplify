@@ -107,7 +107,7 @@ export default function PostList({ category, searchParam }: Props) {
   }, [handleObserver]);
 
   const [title, setTitle] = useState<string>("");
-  const { username, profileArr } = useContext(UserDataContext);
+  const { username, currentProfile } = useContext(UserDataContext);
   const [searchProfile, setSearchProfile] = useState<Profile>();
   const getProfile = useCallback(async (profileId: string) => {
     const profile = await ProfileServices.getProfileById(profileId);
@@ -124,13 +124,9 @@ export default function PostList({ category, searchParam }: Props) {
   const getTitle = useCallback((): void => {
     if (category) {
       if (category === "profiles") {
-        setSearchProfile(undefined);
-        const profile = profileArr.find(
-          (profile) => profile.id === searchParam
-        );
-        if (profile) {
-          setSearchProfile(profile);
-          setTitle(`프로필/${profile.nickname}`);
+        if (currentProfile.id === searchParam) {
+          setSearchProfile({ ...currentProfile });
+          setTitle(`프로필/${currentProfile.nickname}`);
           return;
         } else {
           if (searchParam) {
@@ -141,6 +137,7 @@ export default function PostList({ category, searchParam }: Props) {
           return;
         }
       } else if (category === "games") {
+        setSearchProfile((prev) => (prev ? undefined : prev));
         if (searchParam) {
           setTitle(`게임/${decodeURI(searchParam)}`);
           return;
@@ -148,6 +145,7 @@ export default function PostList({ category, searchParam }: Props) {
         setTitle("게임");
         return;
       } else if (category === "usernames") {
+        setSearchProfile((prev) => (prev ? undefined : prev));
         if (searchParam) {
           setTitle(`유저/${decodeURI(searchParam)}`);
           return;
@@ -155,13 +153,15 @@ export default function PostList({ category, searchParam }: Props) {
         setTitle("유저");
         return;
       } else {
+        setSearchProfile((prev) => (prev ? undefined : prev));
         setTitle("카테고리");
         return;
       }
     }
+    setSearchProfile((prev) => (prev ? undefined : prev));
     setTitle("전체");
     return;
-  }, [category, getProfile, profileArr, searchParam]);
+  }, [category, currentProfile, getProfile, searchParam]);
 
   useEffect(() => {
     getTitle();
@@ -181,7 +181,8 @@ export default function PostList({ category, searchParam }: Props) {
         ) : null}
         {!category ||
         category === "games" ||
-        (category === "usernames" && username === decodeURI(searchParam)) ? (
+        (category === "usernames" && username === decodeURI(searchParam)) ||
+        (category === "profiles" && currentProfile.id === searchParam) ? (
           <AddPostElement prevData={{ setPostData: setAddPostData }} />
         ) : null}
         {posts.map((post, i) => {

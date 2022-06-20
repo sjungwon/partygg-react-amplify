@@ -9,13 +9,12 @@ div.card{
   box-shadow: $card-box-shadow-bottom;
   border-radius: .5rem;
   border: 1px solid $primary-default-border;
-  overflow: hidden;
 }
 
 div.card_header{
   border-bottom: none;
   position: relative;
-  background-color: white;
+  background-color: rgba(255, 255, 255, 0);
   .nav_link{
     text-decoration: none;
     color: $font-color-gray;
