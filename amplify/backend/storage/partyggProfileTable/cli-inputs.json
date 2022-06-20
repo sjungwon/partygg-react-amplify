@@ -6,7 +6,7 @@
     "fieldType": "string"
   },
   "sortKey": {
-    "fieldName": "nickname",
+    "fieldName": "id",
     "fieldType": "string"
   },
   "gsi": [],

@@ -1,15 +1,5 @@
 export type AmplifyDependentResourcesAttributes = {
     "storage": {
-        "partyggProfileTable": {
-            "Name": "string",
-            "Arn": "string",
-            "StreamArn": "string",
-            "PartitionKeyName": "string",
-            "PartitionKeyType": "string",
-            "SortKeyName": "string",
-            "SortKeyType": "string",
-            "Region": "string"
-        },
         "partyggGameTable": {
             "Name": "string",
             "Arn": "string",
@@ -71,15 +61,19 @@ export type AmplifyDependentResourcesAttributes = {
             "SortKeyName": "string",
             "SortKeyType": "string",
             "Region": "string"
+        },
+        "partyggProfileTable": {
+            "Name": "string",
+            "Arn": "string",
+            "StreamArn": "string",
+            "PartitionKeyName": "string",
+            "PartitionKeyType": "string",
+            "SortKeyName": "string",
+            "SortKeyType": "string",
+            "Region": "string"
         }
     },
     "function": {
-        "partyggProfileLamda": {
-            "Name": "string",
-            "Arn": "string",
-            "Region": "string",
-            "LambdaExecutionRole": "string"
-        },
         "partyggGameLamda": {
             "Name": "string",
             "Arn": "string",
@@ -117,6 +111,12 @@ export type AmplifyDependentResourcesAttributes = {
             "LambdaExecutionRole": "string"
         },
         "partyggSubcommentLamda": {
+            "Name": "string",
+            "Arn": "string",
+            "Region": "string",
+            "LambdaExecutionRole": "string"
+        },
+        "partyggProfileLamda": {
             "Name": "string",
             "Arn": "string",
             "Region": "string",

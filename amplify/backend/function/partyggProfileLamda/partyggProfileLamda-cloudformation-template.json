@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"8.2.0\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"8.5.0\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
@@ -23,6 +23,46 @@
     "storagepartyggProfileTableArn": {
       "Type": "String",
       "Default": "storagepartyggProfileTableArn"
+    },
+    "storagepartyggPostTableName": {
+      "Type": "String",
+      "Default": "storagepartyggPostTableName"
+    },
+    "storagepartyggPostTableArn": {
+      "Type": "String",
+      "Default": "storagepartyggPostTableArn"
+    },
+    "storagepartyggPostTableStreamArn": {
+      "Type": "String",
+      "Default": "storagepartyggPostTableStreamArn"
+    },
+    "storagepartyggCommentTableName": {
+      "Type": "String",
+      "Default": "storagepartyggCommentTableName"
+    },
+    "storagepartyggCommentTableArn": {
+      "Type": "String",
+      "Default": "storagepartyggCommentTableArn"
+    },
+    "storagepartyggCommentTableStreamArn": {
+      "Type": "String",
+      "Default": "storagepartyggCommentTableStreamArn"
+    },
+    "storagepartyggSubcommentTableName": {
+      "Type": "String",
+      "Default": "storagepartyggSubcommentTableName"
+    },
+    "storagepartyggSubcommentTableArn": {
+      "Type": "String",
+      "Default": "storagepartyggSubcommentTableArn"
+    },
+    "storagepartyggSubcommentTableStreamArn": {
+      "Type": "String",
+      "Default": "storagepartyggSubcommentTableStreamArn"
+    },
+    "storagepartyggProfileTableStreamArn": {
+      "Type": "String",
+      "Default": "storagepartyggProfileTableStreamArn"
     }
   },
   "Conditions": {
@@ -77,6 +117,42 @@
             },
             "REGION": {
               "Ref": "AWS::Region"
+            },
+            "STORAGE_PARTYGGPOSTTABLE_NAME": {
+              "Ref": "storagepartyggPostTableName"
+            },
+            "STORAGE_PARTYGGPOSTTABLE_ARN": {
+              "Ref": "storagepartyggPostTableArn"
+            },
+            "STORAGE_PARTYGGPOSTTABLE_STREAMARN": {
+              "Ref": "storagepartyggPostTableStreamArn"
+            },
+            "STORAGE_PARTYGGCOMMENTTABLE_NAME": {
+              "Ref": "storagepartyggCommentTableName"
+            },
+            "STORAGE_PARTYGGCOMMENTTABLE_ARN": {
+              "Ref": "storagepartyggCommentTableArn"
+            },
+            "STORAGE_PARTYGGCOMMENTTABLE_STREAMARN": {
+              "Ref": "storagepartyggCommentTableStreamArn"
+            },
+            "STORAGE_PARTYGGSUBCOMMENTTABLE_NAME": {
+              "Ref": "storagepartyggSubcommentTableName"
+            },
+            "STORAGE_PARTYGGSUBCOMMENTTABLE_ARN": {
+              "Ref": "storagepartyggSubcommentTableArn"
+            },
+            "STORAGE_PARTYGGSUBCOMMENTTABLE_STREAMARN": {
+              "Ref": "storagepartyggSubcommentTableStreamArn"
+            },
+            "STORAGE_PARTYGGPROFILETABLE_NAME": {
+              "Ref": "storagepartyggProfileTableName"
+            },
+            "STORAGE_PARTYGGPROFILETABLE_ARN": {
+              "Ref": "storagepartyggProfileTableArn"
+            },
+            "STORAGE_PARTYGGPROFILETABLE_STREAMARN": {
+              "Ref": "storagepartyggProfileTableStreamArn"
             }
           }
         },
@@ -97,12 +173,12 @@
         "RoleName": {
           "Fn::If": [
             "ShouldNotCreateEnvResources",
-            "partyggreactamplifyLambdaRole4220c608",
+            "partyggreactamplifyLambdaRole47f806c2",
             {
               "Fn::Join": [
                 "",
                 [
-                  "partyggreactamplifyLambdaRole4220c608",
+                  "partyggreactamplifyLambdaRole47f806c2",
                   "-",
                   {
                     "Ref": "env"
@@ -179,6 +255,145 @@
                 "dynamodb:PutItem",
                 "dynamodb:UpdateItem",
                 "dynamodb:DeleteItem"
+              ],
+              "Resource": [
+                {
+                  "Ref": "storagepartyggProfileTableArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "storagepartyggProfileTableArn"
+                      },
+                      "index/*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "AmplifyResourcesPolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "amplify-lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Get*",
+                "dynamodb:BatchGetItem",
+                "dynamodb:List*",
+                "dynamodb:Describe*",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:Update*",
+                "dynamodb:RestoreTable*"
+              ],
+              "Resource": [
+                {
+                  "Ref": "storagepartyggPostTableArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "storagepartyggPostTableArn"
+                      },
+                      "index/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Get*",
+                "dynamodb:BatchGetItem",
+                "dynamodb:List*",
+                "dynamodb:Describe*",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:Update*",
+                "dynamodb:RestoreTable*"
+              ],
+              "Resource": [
+                {
+                  "Ref": "storagepartyggCommentTableArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "storagepartyggCommentTableArn"
+                      },
+                      "index/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Get*",
+                "dynamodb:BatchGetItem",
+                "dynamodb:List*",
+                "dynamodb:Describe*",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:Update*",
+                "dynamodb:RestoreTable*"
+              ],
+              "Resource": [
+                {
+                  "Ref": "storagepartyggSubcommentTableArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "storagepartyggSubcommentTableArn"
+                      },
+                      "index/*"
+                    ]
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Put*",
+                "dynamodb:Create*",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:Get*",
+                "dynamodb:BatchGetItem",
+                "dynamodb:List*",
+                "dynamodb:Describe*",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:Update*",
+                "dynamodb:RestoreTable*",
+                "dynamodb:Delete*"
               ],
               "Resource": [
                 {
