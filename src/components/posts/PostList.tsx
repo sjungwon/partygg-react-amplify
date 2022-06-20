@@ -124,10 +124,12 @@ export default function PostList({ category, searchParam }: Props) {
   const getTitle = useCallback((): void => {
     if (category) {
       if (category === "profiles") {
+        setSearchProfile(undefined);
         const profile = profileArr.find(
           (profile) => profile.id === searchParam
         );
         if (profile) {
+          setSearchProfile(profile);
           setTitle(`프로필/${profile.nickname}`);
           return;
         } else {

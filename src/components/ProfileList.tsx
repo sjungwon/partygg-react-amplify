@@ -36,7 +36,7 @@ const ProfileLiEl: FC<{
         to={`/profiles/${profile.id}`}
         className={my ? styles.profile : styles.profile_other}
       >
-        <ProfileBlock profile={profile} hideUsername />
+        <ProfileBlock profile={profile} hideUsername disableNavigate />
       </NavLink>
       {my ? (
         <>

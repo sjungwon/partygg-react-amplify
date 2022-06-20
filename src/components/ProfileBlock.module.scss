@@ -14,11 +14,10 @@
 .profile_nickname{
   font-size: 0.85rem;
   font-weight: 500;
-  color: $font-color-gray;
+  word-break: break-all;
 }
 
 .profile_username{
   padding-right: .5rem;
   font-size: .8rem;
-  color: $font-color-gray;
 }

@@ -132,7 +132,7 @@ export default function AddSubcomment({
   return (
     <div className={prevData ? styles.add_comment : styles.add_comment_border}>
       <div className={styles.add_comment_header}>
-        <ProfileBlock profile={currentProfile} />
+        <ProfileBlock profile={currentProfile} disableNavigate />
         <ProfileSelector size={"sm"} setCurrentProfile={setCurrentProfile} />
       </div>
       <textarea

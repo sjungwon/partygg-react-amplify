@@ -26,6 +26,7 @@ import PostServices from "../../services/PostServices";
 import AddPostElement from "./AddPostElement";
 import CommentList, { CommentsData } from "./CommentList";
 import useImgLoadError from "../../hooks/useImgLoadError";
+import { NavLink } from "react-router-dom";
 
 interface PropsType {
   post: Post;
@@ -311,30 +312,33 @@ export default function PostElement({ post, removePost }: PropsType) {
     <Card className={styles.card}>
       <Card.Header className={styles.card_header} ref={headerRef}>
         <Card.Title className={styles.card_header_game}>
-          {postData.game}
+          <NavLink to={`/games/${postData.game}`} className={styles.nav_link}>
+            {postData.game}
+          </NavLink>
         </Card.Title>
         <div className={styles.card_header_profile}>
-          <img
-            src={profileImage ? profileImage : "/default_profile.png"}
-            className={styles.card_header_img}
-            alt="profile"
-            onError={loadError}
-          />
-          {postData.profile.profileImage ? null : (
-            <a
-              href="https://www.flaticon.com/kr/free-icons/"
-              title="사용자 아이콘"
-              className={styles.card_header_img_credit}
-            >
-              사용자 아이콘 제작자: Ongicon - Flaticon
-            </a>
-          )}
+          <NavLink
+            to={`/profiles/${postData.profileId}`}
+            className={styles.nav_link}
+          >
+            <img
+              src={profileImage ? profileImage : "/default_profile.png"}
+              className={styles.card_header_img}
+              alt="profile"
+              onError={loadError}
+            />
+          </NavLink>
           <div>
             <Card.Title className={styles.card_header_title}>
-              {postData.profile.nickname}
-              <span className={styles.card_header_username}>
-                {postData.username ? ` (${postData.username})` : ""}
-              </span>
+              <NavLink
+                to={`/profiles/${postData.profileId}`}
+                className={styles.nav_link}
+              >
+                {postData.profile.nickname}
+                <span className={styles.card_header_username}>
+                  {postData.username ? ` (${postData.username})` : ""}
+                </span>
+              </NavLink>
             </Card.Title>
             <Card.Subtitle className={styles.card_header_subtitle}>
               {postData.date.substring(0, postData.date.length - 4)}

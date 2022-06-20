@@ -19,6 +19,14 @@
   align-items: center;
 }
 
+.nav_link{
+  text-decoration: none;
+  color: $font-color-gray;
+  &:hover{
+    color: $font-color-light-gray;
+  }
+}
+
 .comment_text{
   font-size: .85rem;
   font-weight: 400;
