@@ -34,6 +34,16 @@ export default class ProfileServices {
     }
   }
 
+  private static removedProfileGen = (profileId: string): Profile => {
+    return {
+      id: profileId,
+      username: "",
+      nickname: "삭제된 프로필",
+      game: "",
+      profileImage: undefined,
+    };
+  };
+
   public static async getProfileById(
     profileId: string
   ): Promise<Profile | null> {
@@ -42,7 +52,7 @@ export default class ProfileServices {
       const profile: Profile[] = await API.get(this.apiName, path, {});
       console.log(profile);
       if (!profile.length) {
-        return null;
+        return this.removedProfileGen(profileId);
       }
       return profile[0];
     } catch (error) {

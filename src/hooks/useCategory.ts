@@ -17,5 +17,5 @@ export default function useCategory() {
     setSearchParam("");
   }, [location]);
 
-  return { category, searchParam };
+  return { category, searchParam, setCategory, setSearchParam };
 }

@@ -112,13 +112,15 @@ export default function PostList({ category, searchParam }: Props) {
   const getProfile = useCallback(async (profileId: string) => {
     const profile = await ProfileServices.getProfileById(profileId);
     if (!profile) {
-      window.alert(
-        "프로필 정보를 가져오는데 오류가 발생했습니다. 다시 시도해주세요."
-      );
+      window.alert("프로필 정보를 가져오는데 오류가 발생했습니다.");
       return;
     }
     setSearchProfile(profile);
-    setTitle(`프로필/${profile.nickname}(${profile.username})`);
+    if (profile.nickname !== "삭제된 프로필") {
+      setTitle(`프로필/${profile.nickname}(${profile.username})`);
+    } else {
+      setTitle(`프로필/삭제된 프로필`);
+    }
   }, []);
 
   const getTitle = useCallback((): void => {

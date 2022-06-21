@@ -59,26 +59,6 @@ const initialProfile: Profile = {
   profileImage: undefined,
 };
 
-// const sortProfiles = (profileArr: Profile[]) => {
-//   const sortedProfile = [...profileArr].sort((a, b) => {
-//     if (a.game > b.game) {
-//       return 1;
-//     } else if (a.game < b.game) {
-//       return -1;
-//     } else {
-//       console.log(a, b);
-//       if (a.nickname < b.nickname) {
-//         return -1;
-//       } else if (a.nickname > b.nickname) {
-//         return 1;
-//       } else {
-//         return 0;
-//       }
-//     }
-//   });
-//   return [...sortedProfile];
-// };
-
 const UserDataContextProvider: React.FC<Props> = ({ children }) => {
   const [username, setUsername] = useState("");
 
@@ -242,8 +222,6 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
       window.alert("로그아웃에 실패했습니다. 다시 시도해주세요.");
     }
   }, []);
-
-  console.log("context render");
 
   return (
     <UserDataContext.Provider

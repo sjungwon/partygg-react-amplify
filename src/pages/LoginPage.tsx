@@ -121,8 +121,15 @@ export default function LoginPage() {
     [submitRef]
   );
 
+  const goBack = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
   return (
     <div className={styles.login}>
+      <div>
+        <button onClick={goBack}>back</button>
+      </div>
       <div className={styles.login_card}>
         <div className={styles.login_card__wrapper}>
           <h1 className={styles.login_title}>PartyGG</h1>

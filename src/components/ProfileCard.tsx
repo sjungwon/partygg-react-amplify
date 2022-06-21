@@ -52,25 +52,30 @@ export default function ProfileCard({ searchProfile }: PropsType) {
           />
         </div>
         <Card.Title className={styles.title}>
-          닉네임: {profile.nickname}
+          {profile.nickname !== "삭제된 프로필" ? "닉네임:" : ""}{" "}
+          {profile.nickname}
         </Card.Title>
         <Card.Subtitle className={styles.subtitle}>
           사용자 이름:{" "}
-          <NavLink
-            to={`/usernames/${profile.username}`}
-            className={styles.subtitle_link}
-          >
-            {profile.username}
-          </NavLink>
+          {profile.username ? (
+            <NavLink
+              to={`/usernames/${profile.username}`}
+              className={styles.subtitle_link}
+            >
+              {profile.username}
+            </NavLink>
+          ) : null}
         </Card.Subtitle>
         <Card.Subtitle className={styles.subtitle}>
           게임 :{" "}
-          <NavLink
-            to={`/games/${profile.game}`}
-            className={styles.subtitle_link}
-          >
-            {profile.game}
-          </NavLink>
+          {profile.game ? (
+            <NavLink
+              to={`/games/${profile.game}`}
+              className={styles.subtitle_link}
+            >
+              {profile.game}
+            </NavLink>
+          ) : null}
         </Card.Subtitle>
       </Card.Body>
     </Card>
