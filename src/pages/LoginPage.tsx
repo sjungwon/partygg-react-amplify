@@ -6,6 +6,7 @@ import AuthServices from "../services/AuthServices";
 import styles from "./LoginPage.module.scss";
 import RegisterModal from "../components/RegisterModal";
 import { UserDataContext } from "../context/UserDataContextProvider";
+import { AiOutlineArrowLeft } from "react-icons/ai";
 
 export default function LoginPage() {
   const [username, setUsername] = useState<string>("");
@@ -29,12 +30,12 @@ export default function LoginPage() {
   const usernameChange = useCallback(
     (event: any) => {
       const usernameText = (event.target as HTMLInputElement).value;
+      setUsername(usernameText);
       if (usernameText && password) {
         setbtnDisabled(false);
       } else {
         setbtnDisabled(true);
       }
-      setUsername(usernameText);
     },
     [password]
   );
@@ -43,12 +44,12 @@ export default function LoginPage() {
   const passwordChange = useCallback(
     (event: any) => {
       const passwordText = (event.target as HTMLInputElement).value;
+      setPassword(passwordText);
       if (username && passwordText) {
         setbtnDisabled(false);
       } else {
         setbtnDisabled(true);
       }
-      setPassword(passwordText);
     },
     [username]
   );
@@ -121,8 +122,15 @@ export default function LoginPage() {
     [submitRef]
   );
 
+  const goBack = useCallback(() => {
+    navigate(-1);
+  }, [navigate]);
+
   return (
     <div className={styles.login}>
+      <button onClick={goBack} className={styles.btn_back}>
+        <AiOutlineArrowLeft />
+      </button>
       <div className={styles.login_card}>
         <div className={styles.login_card__wrapper}>
           <h1 className={styles.login_title}>PartyGG</h1>

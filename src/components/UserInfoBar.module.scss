@@ -1,92 +1,11 @@
 @import "../scss/variables";
 @import "../scss/mixin";
 
-.hide{
-  display: none;
-}
-
 .container{
   min-width: 13rem;
   max-width: 13rem;
   padding: 1rem;
   padding-bottom: 0;
-}
-
-.title_container{
-  position: relative;
-  display: flex;
-  align-items: center;
-  min-width: 100%;
-  width: 100%;
-  max-height: 3rem;
-  min-height: 3rem;
-  font-size: 1.3rem;
-}
-
-.title{
-  font-size: 1.1rem;
-  font-weight: 400;
-  margin: 0;
-}
-
-.title_btn_add{
-  position: absolute;
-  right: 0;
-  @include btn_gray;
-  width: 1.5rem;
-  height: 1.5rem;
-  margin: 0;
-  background-color: $primary-blue;
-  color: white;
-  &:hover{
-    background-color: $primary-blue-hover;
-    color: white;
-  }
-}
-
-.profile_category{
-  list-style: none;
-  font-size: .95rem;
-  font-weight: 400;
-  padding: 0;
-  margin: 0;
-  margin-top: .5rem;
-}
-
-.profile_container{
-  display: flex;
-  align-items: center;
-  margin-left: .5rem;
-  padding-right: .25rem;
-  border-radius: .25rem;
-  color: $font-color-gray;
-  &:hover{
-    color: $font-color-gray;
-    background-color: $primary-default-btn-background;
-  }
-}
-
-.profile_list_container{
-  max-height: calc(100vh - 3.5rem);
-  overflow-y: auto;
-}
-
-.profile_block{
-  display: flex;
-  align-items: center;
-  text-decoration: none;
-  width: 100%;
-}
-.profile_btn{
-  @include btn_gray;
-  width: 1.5rem;
-  height: 1.5rem;
-  padding: 0 4px;
-  margin-left: .25rem;
-  svg{
-    pointer-events: none;
-  }
-  // background-color: $primary-default;
 }
 
 @include mobile{

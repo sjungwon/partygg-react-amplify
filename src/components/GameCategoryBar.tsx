@@ -65,7 +65,7 @@ export default function GameCategoryBar({ show }: PropsType) {
   }, [username]);
 
   return (
-    <div className={`${styles.container} ${show ? "" : styles.container_hide}`}>
+    <div className={`${styles.container} ${show ? styles.container_show : ""}`}>
       <div className={styles.container_padding}>
         <div className={styles.category_list_title_container}>
           <div className={styles.category_list_title}>
@@ -106,7 +106,7 @@ export default function GameCategoryBar({ show }: PropsType) {
 
           {games.map((game) => (
             <NavLink
-              to={`/posts/games/${encodeURI(game.name)}`}
+              to={`/games/${encodeURI(game.name)}`}
               key={game.name}
               className={({ isActive }) =>
                 `${styles.category_item} ${isActive ? styles.active : ""}`

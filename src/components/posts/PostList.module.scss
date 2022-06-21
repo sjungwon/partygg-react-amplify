@@ -5,17 +5,13 @@
   position: relative;
   width: 100%;
   min-width: 20rem;
-  max-width: 30rem;
+  max-width: 32rem;
+  min-height: calc(100vh - 3rem);
   margin: 0;
   padding: 0;
   background-color: $primary-default-background;
   border-left: 1px solid $primary-default-border;
   border-right: 1px solid $primary-default-border;
-}
-
-.loader{
-  width: 100%;
-  background-color: red;
 }
 
 .category{
@@ -89,7 +85,6 @@
   .container{
     min-width: 100vw;
     max-width: 100vw;
-    min-height: calc(100vh - 3rem);
   }
   .final{
     max-width: 28rem;

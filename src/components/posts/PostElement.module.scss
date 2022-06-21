@@ -14,6 +14,14 @@ div.card{
 div.card_header{
   border-bottom: none;
   position: relative;
+  background-color: rgba(255, 255, 255, 0);
+  .nav_link{
+    text-decoration: none;
+    color: $font-color-gray;
+    &:hover{
+      color: $font-color-light-gray;
+    }
+  }
   .card_header_game{
     height: 1.5rem;
     margin: 0 auto;
@@ -33,9 +41,6 @@ div.card_header{
       border-radius: 50%;
       margin-right: .5rem;
       object-fit: cover;
-    }
-    .card_header_img_credit{
-      display: none;
     }
     .card_header_title{
       margin-bottom: .3rem;
@@ -81,7 +86,6 @@ div.card_body{
   padding: .5rem 1.3rem;
   font-size: .95rem;
   font-weight: 400;
-  background-color: rgba(0,0,0,.03);
   .card_body_slide{
     display: block;
     width: 100%;

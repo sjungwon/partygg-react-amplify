@@ -1,5 +1,4 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import GameCategoryBar from "../components/GameCategoryBar";
 import NavBar from "../components/NavBar";
 import PostList from "../components/posts/PostList";
@@ -9,9 +8,7 @@ import useCategory from "../hooks/useCategory";
 import styles from "./HomePage.module.scss";
 
 export default function HomePage() {
-  const { category, searchParam }: { category: string; searchParam: string } =
-    useCategory();
-  console.log("home", category, searchParam);
+  const { category, searchParam } = useCategory();
 
   const { setFilteredProfileHandler, setFilteredProfileHandlerByProfile } =
     useContext(UserDataContext);
@@ -21,38 +18,36 @@ export default function HomePage() {
     setShowCategory((prev) => !prev);
   }, []);
 
-  const navigate = useNavigate();
   useEffect(() => {
-    if (category && !searchParam) {
-      window.alert("잘못된 링크로 접속하셨습니다.");
-      navigate(-1);
-    } else if (category === "games" && searchParam) {
+    if (category === "games" && searchParam) {
       setFilteredProfileHandler(decodeURI(searchParam));
       setShowCategory(false);
+      return;
     } else if (category === "profiles" && searchParam) {
       setFilteredProfileHandlerByProfile(searchParam);
-    } else {
-      setFilteredProfileHandler("");
-      setShowCategory(false);
+      return;
     }
+    setFilteredProfileHandler("");
+    setShowCategory(false);
   }, [
     category,
-    navigate,
     searchParam,
     setFilteredProfileHandler,
     setFilteredProfileHandlerByProfile,
   ]);
+
+  useEffect(() => {
+    setTimeout(() => {
+      window.scrollTo(0, 0);
+    });
+  }, [category, searchParam]);
 
   return (
     <div className={styles.container}>
       <NavBar showCategoryHandler={showCategoryHandler} />
       <div className={styles.content_container}>
         <GameCategoryBar show={showCategory} />
-        <PostList
-          key={`${category}/${searchParam}`}
-          category={category}
-          searchParam={searchParam}
-        />
+        <PostList category={category} searchParam={searchParam} />
         <UserInfoBar />
       </div>
     </div>

@@ -10,20 +10,51 @@ import UserServices from "./UserServices";
 
 export default class ProfileServices {
   private static apiName: string = "partyggApi";
+  private static path: string = "/profiles";
 
-  public static async getProfiles(): Promise<GetProfilesResData | null> {
-    const path = "/profiles";
-
+  public static async getProfiles(
+    otherUsername?: string
+  ): Promise<GetProfilesResData | null> {
     try {
       const { username } = await UserServices.getUsernameWithRefresh();
 
+      const path = otherUsername
+        ? `${this.path}/${encodeURIComponent(otherUsername)}`
+        : `${this.path}/${encodeURIComponent(username)}`;
       const profiles: GetProfilesResData = await API.get(
         this.apiName,
-        `${path}/${encodeURIComponent(username)}`,
+        path,
         {}
       );
       console.log(profiles);
       return profiles;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
+
+  private static removedProfileGen = (profileId: string): Profile => {
+    return {
+      id: profileId,
+      username: "",
+      nickname: "삭제된 프로필",
+      game: "",
+      profileImage: undefined,
+    };
+  };
+
+  public static async getProfileById(
+    profileId: string
+  ): Promise<Profile | null> {
+    try {
+      const path = `${this.path}/object/${profileId}`;
+      const profile: Profile[] = await API.get(this.apiName, path, {});
+      console.log(profile);
+      if (!profile.length) {
+        return this.removedProfileGen(profileId);
+      }
+      return profile[0];
     } catch (error) {
       console.log(error);
       return null;

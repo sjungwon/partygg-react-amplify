@@ -99,7 +99,6 @@ export default function SubcommentElement({
         show={showRemoveModal}
         loading={loading}
         remove={removeSubcomment}
-        className={styles.subComment_remove_modal}
       />
     </div>
   );
