@@ -79,21 +79,14 @@ export default function CommentList({
     [comments.length, lastEvaluatedKey, renderLength]
   );
 
-  const [scrollHeight, setScrollHeight] = useState<number>(0);
-
   const openComments = useCallback(() => {
     setShowComment(true);
-    console.log(window.scrollY);
-    setScrollHeight(window.scrollY);
   }, [setShowComment]);
 
   const closeComments = useCallback(() => {
     renderLengthHandler("close")();
     setShowComment(false);
-    setTimeout(() => {
-      window.scrollTo({ top: scrollHeight, behavior: "auto" });
-    });
-  }, [renderLengthHandler, scrollHeight, setShowComment]);
+  }, [renderLengthHandler, setShowComment]);
 
   //더보기 누르면 comment를 더 가져오도록 설정
   //닫기를 누르면 다시 처음으로 돌아가는걸 원함

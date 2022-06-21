@@ -34,7 +34,7 @@ interface PropsType {
 }
 
 export default function PostElement({ post, removePost }: PropsType) {
-  const { username, profileArr } = useContext(UserDataContext);
+  const { username, filteredProfileArr } = useContext(UserDataContext);
   const [images, setImages] = useState<string[]>([]);
   const [postData, setPostData] = useState<Post>(post);
   const postId = useMemo<string>(() => `${post.username}/${post.date}`, [post]);
@@ -89,9 +89,34 @@ export default function PostElement({ post, removePost }: PropsType) {
 
   //댓글 보기 관련 함수
   const [showComment, setShowComment] = useState<boolean>(false);
+  const [scrollHeight, setScrollHeight] = useState<number>(0);
+
   const commentHandler = useCallback(() => {
-    setShowComment((prev) => !prev);
-  }, []);
+    setShowComment((prev) => {
+      if (!prev) {
+        setScrollHeight(window.scrollY);
+      } else {
+        setTimeout(() => {
+          window.scrollTo({ top: scrollHeight, behavior: "auto" });
+        });
+      }
+      return !prev;
+    });
+  }, [scrollHeight]);
+
+  const childShowCommentHandler = useCallback(
+    (show: boolean) => {
+      if (show) {
+        setScrollHeight(window.scrollY);
+      } else {
+        setTimeout(() => {
+          window.scrollTo({ top: scrollHeight, behavior: "auto" });
+        });
+      }
+      setShowComment(show);
+    },
+    [scrollHeight]
+  );
 
   //댓글 쪽에서 열고 닫을 때 스크롤 조절하기 위해
   //하위 컴포넌트인 댓글 컴포넌트로 전달할 Ref 생성
@@ -251,22 +276,19 @@ export default function PostElement({ post, removePost }: PropsType) {
   const select = useCallback(
     (eventKey: any) => {
       if (eventKey === "1") {
-        const profile = profileArr.find(
+        const profile = filteredProfileArr.find(
           (profile) => profile.nickname === postData.profile.nickname
         );
         if (profile) {
           setMode("modify");
           return;
         } else {
-          const findReplaceableProfile = profileArr.find(
-            (profile) => profile.game === postData.game
-          );
-          if (findReplaceableProfile) {
+          if (filteredProfileArr.length) {
             setMode("modify");
             return;
           }
           window.alert(
-            "해당 게임에 포함되는 프로필이 존재하지 않아 수정할 수 없습니다."
+            "현재 카테고리에 포함되는 프로필이 없어 수정할 수 없습니다."
           );
           return;
         }
@@ -276,12 +298,7 @@ export default function PostElement({ post, removePost }: PropsType) {
         return;
       }
     },
-    [
-      handleRemoveModalOpen,
-      postData.game,
-      postData.profile.nickname,
-      profileArr,
-    ]
+    [filteredProfileArr, handleRemoveModalOpen, postData.profile.nickname]
   );
 
   //텍스트 제한 관련 데이터
@@ -425,7 +442,7 @@ export default function PostElement({ post, removePost }: PropsType) {
         postId={`${post.username}/${post.date}`}
         commentsData={commentsData}
         showComment={showComment}
-        setShowComment={setShowComment}
+        setShowComment={childShowCommentHandler}
       />
       <RemoveConfirmModal
         close={handleRemoveModalClose}

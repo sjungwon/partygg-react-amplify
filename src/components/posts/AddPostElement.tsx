@@ -29,13 +29,10 @@ export default function AddPostElement({ prevData }: Props) {
   //prevData가 있으면 해당 데이터의 프로필로 현재 프로필 변경, 없으면 첫번째 프로필로 설정
   useEffect(() => {
     if (prevData.postData) {
-      const post = prevData.postData;
-      const index = filteredProfileArr.findIndex(
-        (profile) => profile.nickname === post.profile.nickname
+      const profile = filteredProfileArr.find(
+        (profile) => profile.nickname === prevData.postData?.profile.nickname
       );
-      setCurrentProfile(
-        index > -1 ? filteredProfileArr[index] : filteredProfileArr[0]
-      );
+      setCurrentProfile(profile ? profile : filteredProfileArr[0]);
       return;
     }
     setCurrentProfile(defaultProfile);

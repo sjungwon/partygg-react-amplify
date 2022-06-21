@@ -22,8 +22,10 @@ export default function HomePage() {
     if (category === "games" && searchParam) {
       setFilteredProfileHandler(decodeURI(searchParam));
       setShowCategory(false);
+      return;
     } else if (category === "profiles" && searchParam) {
       setFilteredProfileHandlerByProfile(searchParam);
+      return;
     }
     setFilteredProfileHandler("");
     setShowCategory(false);
