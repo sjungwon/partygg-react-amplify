@@ -121,6 +121,32 @@ app.get(path + hashKeyPath, function (req, res) {
  * HTTP Get method for get single object *
  *****************************************/
 
+app.get(path + "/object" + sortKeyPath, function (req, res) {
+  let scanParams = {
+    TableName: tableName,
+    FilterExpression: "id = :i",
+    ExpressionAttributeValues: {
+      ":i": req.params[sortKeyName],
+    },
+  };
+
+  dynamodb.scan(scanParams, (err, data) => {
+    if (err) {
+      res.statusCode = 500;
+      res.json({ error: "Could not load items: " + err.message });
+    } else {
+      if (data.Items && data.Items.length) {
+        res.json(data.Items);
+      } else {
+        res.json([]);
+      }
+    }
+  });
+});
+
+/*****************************************
+ * HTTP Get method for get single object With id *
+ *****************************************/
 app.get(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
   const params = {};
   if (userIdPresent && req.apiGateway) {
