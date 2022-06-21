@@ -1,4 +1,4 @@
-import styles from "./AddComment.module.scss";
+import styles from "./AddSubcomment.module.scss";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import ProfileSelector from "../ProfileSelector";
 import { AddSubcommentReqData, Subcomment } from "../../types/post.type";

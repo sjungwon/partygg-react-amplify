@@ -251,23 +251,37 @@ export default function PostElement({ post, removePost }: PropsType) {
   const select = useCallback(
     (eventKey: any) => {
       if (eventKey === "1") {
-        if (
-          profileArr.find(
-            (profile) => profile.nickname === postData.profile.nickname
-          )
-        ) {
+        const profile = profileArr.find(
+          (profile) => profile.nickname === postData.profile.nickname
+        );
+        if (profile) {
           setMode("modify");
+          return;
         } else {
-          window.alert(
-            "해당 포스트의 프로필이 현재 존재하지 않아 수정할 수 없습니다."
+          const findReplaceableProfile = profileArr.find(
+            (profile) => profile.game === postData.game
           );
+          if (findReplaceableProfile) {
+            setMode("modify");
+            return;
+          }
+          window.alert(
+            "해당 게임에 포함되는 프로필이 존재하지 않아 수정할 수 없습니다."
+          );
+          return;
         }
       }
       if (eventKey === "2") {
         handleRemoveModalOpen();
+        return;
       }
     },
-    [handleRemoveModalOpen, postData.profile.nickname, profileArr]
+    [
+      handleRemoveModalOpen,
+      postData.game,
+      postData.profile.nickname,
+      profileArr,
+    ]
   );
 
   //텍스트 제한 관련 데이터
@@ -418,7 +432,6 @@ export default function PostElement({ post, removePost }: PropsType) {
         show={showRemoveModal}
         loading={removeLoading}
         remove={sendRemovePost}
-        className={styles.card_remove_modal}
       />
     </Card>
   );

@@ -29,12 +29,12 @@ export default function LoginPage() {
   const usernameChange = useCallback(
     (event: any) => {
       const usernameText = (event.target as HTMLInputElement).value;
+      setUsername(usernameText);
       if (usernameText && password) {
         setbtnDisabled(false);
       } else {
         setbtnDisabled(true);
       }
-      setUsername(usernameText);
     },
     [password]
   );
@@ -43,12 +43,12 @@ export default function LoginPage() {
   const passwordChange = useCallback(
     (event: any) => {
       const passwordText = (event.target as HTMLInputElement).value;
+      setPassword(passwordText);
       if (username && passwordText) {
         setbtnDisabled(false);
       } else {
         setbtnDisabled(true);
       }
-      setPassword(passwordText);
     },
     [username]
   );

@@ -1,5 +1,4 @@
 import { Button, Modal } from "react-bootstrap";
-import styles from "./RemoveConfirmModal.module.scss";
 
 //모달 show state
 //모달 닫는 close 함수 -> show를 false로 변경하는 함수
@@ -10,7 +9,6 @@ interface PropsType {
   close: () => void;
   loading: boolean;
   remove: () => void;
-  className?: string;
 }
 
 export default function RemoveConfirmModal({
@@ -18,16 +16,9 @@ export default function RemoveConfirmModal({
   close,
   loading,
   remove,
-  className,
 }: PropsType) {
   return (
-    <Modal
-      show={show}
-      onHide={close}
-      size="sm"
-      centered
-      dialogClassName={`${className} ${styles.modal_container}`}
-    >
+    <Modal show={show} onHide={close} size="sm" centered>
       <Modal.Header closeButton>
         <Modal.Title>삭제</Modal.Title>
       </Modal.Header>
