@@ -6,6 +6,7 @@ import AuthServices from "../services/AuthServices";
 import styles from "./LoginPage.module.scss";
 import RegisterModal from "../components/RegisterModal";
 import { UserDataContext } from "../context/UserDataContextProvider";
+import { AiOutlineArrowLeft } from "react-icons/ai";
 
 export default function LoginPage() {
   const [username, setUsername] = useState<string>("");
@@ -127,9 +128,9 @@ export default function LoginPage() {
 
   return (
     <div className={styles.login}>
-      <div>
-        <button onClick={goBack}>back</button>
-      </div>
+      <button onClick={goBack} className={styles.btn_back}>
+        <AiOutlineArrowLeft />
+      </button>
       <div className={styles.login_card}>
         <div className={styles.login_card__wrapper}>
           <h1 className={styles.login_title}>PartyGG</h1>
