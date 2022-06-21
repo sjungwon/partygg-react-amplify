@@ -26,6 +26,7 @@ import PostServices from "../../services/PostServices";
 import AddPostElement from "./AddPostElement";
 import CommentList, { CommentsData } from "./CommentList";
 import useImgLoadError from "../../hooks/useImgLoadError";
+import { NavLink } from "react-router-dom";
 
 interface PropsType {
   post: Post;
@@ -33,7 +34,7 @@ interface PropsType {
 }
 
 export default function PostElement({ post, removePost }: PropsType) {
-  const { username, profileArr } = useContext(UserDataContext);
+  const { username, filteredProfileArr } = useContext(UserDataContext);
   const [images, setImages] = useState<string[]>([]);
   const [postData, setPostData] = useState<Post>(post);
   const postId = useMemo<string>(() => `${post.username}/${post.date}`, [post]);
@@ -88,9 +89,34 @@ export default function PostElement({ post, removePost }: PropsType) {
 
   //댓글 보기 관련 함수
   const [showComment, setShowComment] = useState<boolean>(false);
+  const [scrollHeight, setScrollHeight] = useState<number>(0);
+
   const commentHandler = useCallback(() => {
-    setShowComment((prev) => !prev);
-  }, []);
+    setShowComment((prev) => {
+      if (!prev) {
+        setScrollHeight(window.scrollY);
+      } else {
+        setTimeout(() => {
+          window.scrollTo({ top: scrollHeight, behavior: "auto" });
+        });
+      }
+      return !prev;
+    });
+  }, [scrollHeight]);
+
+  const childShowCommentHandler = useCallback(
+    (show: boolean) => {
+      if (show) {
+        setScrollHeight(window.scrollY);
+      } else {
+        setTimeout(() => {
+          window.scrollTo({ top: scrollHeight, behavior: "auto" });
+        });
+      }
+      setShowComment(show);
+    },
+    [scrollHeight]
+  );
 
   //댓글 쪽에서 열고 닫을 때 스크롤 조절하기 위해
   //하위 컴포넌트인 댓글 컴포넌트로 전달할 Ref 생성
@@ -250,23 +276,29 @@ export default function PostElement({ post, removePost }: PropsType) {
   const select = useCallback(
     (eventKey: any) => {
       if (eventKey === "1") {
-        if (
-          profileArr.find(
-            (profile) => profile.nickname === postData.profile.nickname
-          )
-        ) {
+        const profile = filteredProfileArr.find(
+          (profile) => profile.nickname === postData.profile.nickname
+        );
+        if (profile) {
           setMode("modify");
+          return;
         } else {
+          if (filteredProfileArr.length) {
+            setMode("modify");
+            return;
+          }
           window.alert(
-            "해당 포스트의 프로필이 현재 존재하지 않아 수정할 수 없습니다."
+            "현재 카테고리에 포함되는 프로필이 없어 수정할 수 없습니다."
           );
+          return;
         }
       }
       if (eventKey === "2") {
         handleRemoveModalOpen();
+        return;
       }
     },
-    [handleRemoveModalOpen, postData.profile.nickname, profileArr]
+    [filteredProfileArr, handleRemoveModalOpen, postData.profile.nickname]
   );
 
   //텍스트 제한 관련 데이터
@@ -311,30 +343,33 @@ export default function PostElement({ post, removePost }: PropsType) {
     <Card className={styles.card}>
       <Card.Header className={styles.card_header} ref={headerRef}>
         <Card.Title className={styles.card_header_game}>
-          {postData.game}
+          <NavLink to={`/games/${postData.game}`} className={styles.nav_link}>
+            {postData.game}
+          </NavLink>
         </Card.Title>
         <div className={styles.card_header_profile}>
-          <img
-            src={profileImage ? profileImage : "/default_profile.png"}
-            className={styles.card_header_img}
-            alt="profile"
-            onError={loadError}
-          />
-          {postData.profile.profileImage ? null : (
-            <a
-              href="https://www.flaticon.com/kr/free-icons/"
-              title="사용자 아이콘"
-              className={styles.card_header_img_credit}
-            >
-              사용자 아이콘 제작자: Ongicon - Flaticon
-            </a>
-          )}
+          <NavLink
+            to={`/profiles/${postData.profileId}`}
+            className={styles.nav_link}
+          >
+            <img
+              src={profileImage ? profileImage : "/default_profile.png"}
+              className={styles.card_header_img}
+              alt="profile"
+              onError={loadError}
+            />
+          </NavLink>
           <div>
             <Card.Title className={styles.card_header_title}>
-              {postData.profile.nickname}
-              <span className={styles.card_header_username}>
-                {postData.username ? ` (${postData.username})` : ""}
-              </span>
+              <NavLink
+                to={`/profiles/${postData.profileId}`}
+                className={styles.nav_link}
+              >
+                {postData.profile.nickname}
+                <span className={styles.card_header_username}>
+                  {postData.username ? ` (${postData.username})` : ""}
+                </span>
+              </NavLink>
             </Card.Title>
             <Card.Subtitle className={styles.card_header_subtitle}>
               {postData.date.substring(0, postData.date.length - 4)}
@@ -407,14 +442,13 @@ export default function PostElement({ post, removePost }: PropsType) {
         postId={`${post.username}/${post.date}`}
         commentsData={commentsData}
         showComment={showComment}
-        setShowComment={setShowComment}
+        setShowComment={childShowCommentHandler}
       />
       <RemoveConfirmModal
         close={handleRemoveModalClose}
         show={showRemoveModal}
         loading={removeLoading}
         remove={sendRemovePost}
-        className={styles.card_remove_modal}
       />
     </Card>
   );

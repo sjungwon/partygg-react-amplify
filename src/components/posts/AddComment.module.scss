@@ -1,4 +1,5 @@
 @import "../../scss/variables";
+@import "../../scss/mixin";
 
 .add_comment{
   padding-left: .5rem;
@@ -20,9 +21,10 @@
   width: 95%;
   border-radius: .5rem;
   padding: .5rem;
+  margin-top: .25rem;
   &:focus{
-    border: none;
-    outline: .13rem solid $primary-blue;
+    border: .13rem solid $primary-blue;
+    outline: none;
   }
 }
 

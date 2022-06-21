@@ -1,4 +1,5 @@
 @import "../../scss/variables";
+@import "../../scss/mixin";
 
 .add_comment{
   padding-left: .5rem;
@@ -20,9 +21,10 @@
   width: 95%;
   border-radius: .5rem;
   padding: .5rem;
+  margin-top: .25rem;
   &:focus{
-    border: none;
-    outline: .13rem solid $primary-blue;
+    border: .13rem solid $primary-blue;
+    outline: none;
   }
 }
 
@@ -49,6 +51,6 @@
 .add_comment_need_login{
   width: 100%;
   font-size: .9rem;
-  margin: 1rem 0;
+  margin: .8rem 0;
   color: $primary-blue;
 }

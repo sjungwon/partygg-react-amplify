@@ -1,16 +1,23 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { Button } from "react-bootstrap";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate } from "react-router-dom";
 import { UserDataContext } from "../context/UserDataContextProvider";
 import GameSearchRecommend from "./RecommendSearchBar";
 import styles from "./NavBar.module.scss";
 import { GiHamburgerMenu } from "react-icons/gi";
 import {
-  AiOutlineLogout,
-  AiOutlineLogin,
+  AiOutlinePoweroff,
+  AiOutlineHome,
   AiOutlineSearch,
 } from "react-icons/ai";
 import gsap from "gsap";
+import _ from "lodash";
 
 interface PropsType {
   showCategoryHandler: () => void;
@@ -30,9 +37,9 @@ export default function NavBar({ showCategoryHandler }: PropsType) {
 
   const searchBarRef = useRef<HTMLDivElement>(null);
 
+  //모바일에서 search 버튼 클릭 시 searchBar 애니메이션 처리
   useEffect(() => {
     if (window.innerWidth > 829) {
-      console.log("desktop");
       return;
     }
     if (searchBarRef.current && showSearchBar) {
@@ -49,19 +56,61 @@ export default function NavBar({ showCategoryHandler }: PropsType) {
     }
   }, [showSearchBar]);
 
+  //데스크탑인 경우 화면 크기 변경으로 searchBar가 안나올 수 있는거 방지
+  const [viewWidth, setViewWidth] = useState<number>(0);
+  const widthChangeHandler = useMemo(
+    () =>
+      _.debounce(function (this: Window, event: UIEvent) {
+        setViewWidth(this.innerWidth);
+      }, 300),
+    []
+  );
+
+  useEffect(() => {
+    window.addEventListener("resize", widthChangeHandler);
+    return () => {
+      window.removeEventListener("resize", widthChangeHandler);
+    };
+  }, [widthChangeHandler]);
+
+  useEffect(() => {
+    if (viewWidth > 829 && searchBarRef.current) {
+      searchBarRef.current.style.display = "flex";
+      searchBarRef.current.style.opacity = "1";
+    } else {
+      if (viewWidth > 0 && searchBarRef.current) {
+        searchBarRef.current.style.display = "none";
+        searchBarRef.current.style.opacity = "0";
+      }
+    }
+  }, [viewWidth]);
+
+  const goHome = useCallback(() => {
+    if (!username) {
+      window.alert("로그인이 필요합니다.");
+      return;
+    }
+    navigate(`/usernames/${username}`);
+  }, [navigate, username]);
+
   return (
     <div className={styles.navbar}>
       <div className={styles.navbar_fixed}>
         <div className={styles.navbar_container}>
-          <button className={styles.navbar_menu} onClick={showCategoryHandler}>
-            <GiHamburgerMenu />
-          </button>
-          <button
-            className={styles.navbar_search_btn}
-            onClick={showSearchBarHandler}
-          >
-            <AiOutlineSearch />
-          </button>
+          <div className={styles.navbar_btns}>
+            <button
+              className={`${styles.navbar_btn} ${styles.navbar_btn_mobile}`}
+              onClick={showCategoryHandler}
+            >
+              <GiHamburgerMenu />
+            </button>
+            <button
+              className={`${styles.navbar_btn} ${styles.navbar_btn_mobile}`}
+              onClick={showSearchBarHandler}
+            >
+              <AiOutlineSearch />
+            </button>
+          </div>
           <a href="/" className={styles.navbar_title}>
             <img src="/logo192.png" alt="logo" className={styles.navbar_logo} />
             <h1>PartyGG</h1>
@@ -72,25 +121,17 @@ export default function NavBar({ showCategoryHandler }: PropsType) {
             />
           </div>
           <div className={styles.navbar_btns}>
-            {username ? <div>{username}</div> : null}
+            <button className={styles.navbar_btn} onClick={goHome}>
+              <AiOutlineHome />
+            </button>
             {username ? (
-              <Button
-                size="sm"
-                onClick={logout}
-                variant="secondary"
-                className={styles.navbar_btn_login}
-              >
-                <AiOutlineLogout />
-              </Button>
+              <button onClick={logout} className={styles.navbar_btn}>
+                <AiOutlinePoweroff />
+              </button>
             ) : (
-              <Button
-                size="sm"
-                onClick={clickToLogin}
-                variant="secondary"
-                className={styles.navbar_btn_login}
-              >
-                <AiOutlineLogin />
-              </Button>
+              <button onClick={clickToLogin} className={styles.navbar_btn}>
+                <AiOutlinePoweroff />
+              </button>
             )}
           </div>
         </div>

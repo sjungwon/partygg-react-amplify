@@ -1,4 +1,5 @@
 @import "../scss/mixin";
+@import "../scss/variables";
 
 $background-orange: rgb(249, 238, 221);
 $border-orange: rgb(239, 207, 160);
@@ -117,7 +118,7 @@ $hover-orange: rgb(255, 123, 0);
   }
 }
 
-.hide{
+.btn_back{
   display: none;
 }
 
@@ -155,6 +156,20 @@ $hover-orange: rgb(255, 123, 0);
         box-shadow: none;
       }
     }
+  }
+  .btn_back{
+    position: absolute;
+    top: 1.5rem;
+    left: 1.5rem;
+    @include flex_center;
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    border: 1px solid $primary-blue;
+    border-radius: .5rem;
+    background-color: $primary-blue;
+    font-size: 1.25rem;
+    color: white;
   }
 }
 

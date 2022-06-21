@@ -151,7 +151,6 @@ export default function CommentElement({
         close={handleRemoveModalClose}
         loading={loading}
         remove={removeComment}
-        className={styles.comment_remove_modal}
       />
     </div>
   );
