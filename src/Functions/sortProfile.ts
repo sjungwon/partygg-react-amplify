@@ -7,7 +7,6 @@ const sortProfiles = (profileArr: Profile[]) => {
     } else if (a.game < b.game) {
       return -1;
     } else {
-      console.log(a, b);
       if (a.nickname < b.nickname) {
         return -1;
       } else if (a.nickname > b.nickname) {

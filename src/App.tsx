@@ -5,7 +5,6 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import LoginPage from "./pages/LoginPage";
 import NotFoundPage from "./pages/NotFoundPage";
-import ErrorPage from "./pages/ErrorPage";
 import { useContext, useEffect } from "react";
 import { UserDataContext } from "./context/UserDataContextProvider";
 import { GameDataContext } from "./context/GameDataContextProvider";
@@ -22,7 +21,7 @@ function App() {
 
   return (
     <div className="App">
-      <ErrorBoundary FallbackComponent={ErrorPage}>
+      <ErrorBoundary FallbackComponent={NotFoundPage}>
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} />

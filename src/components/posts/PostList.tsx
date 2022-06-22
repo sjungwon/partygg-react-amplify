@@ -101,7 +101,6 @@ export default function PostList({ category, searchParam }: Props) {
     const savedLoader = loader.current;
     if (savedLoader) observer.observe(savedLoader);
     return () => {
-      console.log("clear handler");
       if (savedLoader) observer.unobserve(savedLoader);
     };
   }, [handleObserver]);

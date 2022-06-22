@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { Card, Dropdown } from "react-bootstrap";
 import styles from "./PostElement.module.scss";
 import {
@@ -117,10 +110,6 @@ export default function PostElement({ post, removePost }: PropsType) {
     },
     [scrollHeight]
   );
-
-  //댓글 쪽에서 열고 닫을 때 스크롤 조절하기 위해
-  //하위 컴포넌트인 댓글 컴포넌트로 전달할 Ref 생성
-  const headerRef = useRef<HTMLDivElement>(null);
 
   const likeClick = useCallback(async () => {
     if (!postData.date) {
@@ -341,7 +330,7 @@ export default function PostElement({ post, removePost }: PropsType) {
 
   return (
     <Card className={styles.card}>
-      <Card.Header className={styles.card_header} ref={headerRef}>
+      <Card.Header className={styles.card_header}>
         <Card.Title className={styles.card_header_game}>
           <NavLink to={`/games/${postData.game}`} className={styles.nav_link}>
             {postData.game}
