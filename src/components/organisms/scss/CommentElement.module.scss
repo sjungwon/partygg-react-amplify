@@ -1,0 +1,31 @@
+@import "../../../scss/variables";
+@import "../../../scss/mixin";
+
+
+.comment_text{
+  font-size: .85rem;
+  font-weight: 400;
+}
+
+.comment_date{
+  font-size: .8rem;
+}
+
+.comment_btn_text{
+  margin: 0;
+  margin-left: .2rem;
+}
+
+.comment_remove_modal{
+  width: 80%;
+  margin: auto;
+}
+
+.comment_btn_icon{
+  color: orange;
+}
+
+.btn_margin{
+  margin: 0 .5rem;
+}
+

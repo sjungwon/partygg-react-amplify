@@ -19,17 +19,18 @@
   min-height: 1.25rem;
   border: 1px solid transparent;
   border-radius: .25rem;
-  background-color: $primary-default-btn-background;
+  background-color: $btn-background-gray;
   padding: 0;
   font-size: .825rem;
   color: $font-color-gray;
   & svg{
     pointer-events: none;
   }
-  &_icon{
-    color: $primary-orange;
-  }
   &:hover{
+    color: $font-color-light-gray;
+  }
+  &:disabled{
+    background-color: $btn-background-gray-disabled;
     color: $font-color-light-gray;
   }
 }

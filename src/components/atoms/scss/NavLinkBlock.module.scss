@@ -1,0 +1,9 @@
+@import "../../../scss/variables";
+
+a.nav_link{
+  text-decoration: none;
+  color: $font-color-gray;
+  &:hover{
+    color: $font-color-light-gray;
+  }
+}

@@ -1,8 +1,8 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import GameCategoryBar from "../components/GameCategoryBar";
-import NavBar from "../components/NavBar";
-import PostList from "../components/posts/PostList";
-import UserInfoBar from "../components/UserInfoBar";
+import GameCategoryBar from "../components/organisms/GameCategoryBar";
+import NavBar from "../components/organisms/NavBar";
+import PostList from "../components/organisms/PostList";
+import UserInfoBar from "../components/organisms/UserInfoBar";
 import { UserDataContext } from "../context/UserDataContextProvider";
 import useCategory from "../hooks/useCategory";
 import styles from "./HomePage.module.scss";

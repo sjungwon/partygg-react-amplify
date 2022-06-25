@@ -1,0 +1,15 @@
+@import "../../../scss/variables";
+@import "../../../scss/mixin";
+
+.container{
+  margin-left: 1rem;
+}
+
+.more_container{
+  display: flex;
+}
+
+.more_icon{
+  margin-left: .2rem;
+  color: $primary-blue;
+}

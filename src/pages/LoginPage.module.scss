@@ -1,17 +1,20 @@
 @import "../scss/mixin";
 @import "../scss/variables";
 
-$background-orange: rgb(249, 238, 221);
-$border-orange: rgb(239, 207, 160);
-$hover-orange: rgb(255, 123, 0);
-
 .login{
   height: 100vh;
-  background-color: $background-orange;
+  background-color: $primary-default-background;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
+  &_card{
+    width: 25rem;
+    height: 40rem;
+  }
+  &_card__wrapper{
+    margin: 1rem;
+  }
   &_title{
     margin: 0 auto;
     color: orange;
@@ -28,13 +31,6 @@ $hover-orange: rgb(255, 123, 0);
     text-align: center;
     font-size: 1.75rem;
   }
-  &_card{
-    width: 25rem;
-    height: 40rem;
-  }
-  &_card__wrapper{
-    margin: 1rem;
-  }
   &_card__bottom{
     max-width: 25rem;
     margin: auto;
@@ -43,70 +39,6 @@ $hover-orange: rgb(255, 123, 0);
     background-color: white;
     box-shadow: 1px 3px 6px rgba(116, 116, 116, 0.42);
     border-radius: .4rem;
-  }
-  .input{
-    display: block;
-    max-height: 3rem;
-    height: 2.5rem;
-    width: 100%;
-    margin: 0 auto;
-    margin-bottom: .5rem;
-    border: 1px solid $border-orange;
-    border-radius: .4rem;
-    text-indent: .9rem;
-    font-size: 1rem;
-    &:focus{
-      outline: 0;
-      border: 1px solid orange;
-    }
-  }
-  &_btn{
-    height: 3rem;
-    width: 100%;
-    margin: 0 auto;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border-radius: .4rem;
-    font-size: 1.2rem;
-    font-weight: 700;
-    border: 1px solid transparent;
-    cursor: pointer;
-    &:hover:disabled,
-    &:disabled{
-      background-color: rgba(255, 166, 0, 0.525);
-      cursor: default;
-    }
-    &__login{
-      background-color: orange;
-      &:hover{
-        background-color: rgb(255, 157, 0);
-      }
-    }
-    &__register{
-      margin: 2rem auto;
-      width: 60%;
-      background-color:royalblue ;
-      &:hover{
-        background-color: rgb(53, 92, 207);
-      }
-    }
-  }
-  &_message{
-    margin: 1rem 0;
-    font-size: .9rem;
-    text-align: center;
-    color: $hover-orange;
-    cursor: pointer;
-    &:hover{
-      text-decoration: underline;
-    }
-  }
-  &_line{
-    height: 1px;
-    border-bottom: 1px solid $border-orange;
-    margin: .5rem 0;
   }
   &_error__message{
     display: block;
@@ -118,9 +50,30 @@ $hover-orange: rgb(255, 123, 0);
   }
 }
 
+.find_password{
+  margin: 1rem 0;
+  font-size: .9rem;
+  text-align: center;
+  text-decoration: none;
+  color: $primary-blue;
+  cursor: pointer;
+}
+
+.line{
+  height: 1px;
+  border-bottom: 1px solid $primary-default-border;
+  margin: .5rem 0;
+}
+
 .btn_back{
   display: none;
 }
+
+.register_container{
+  width: 70%;
+  margin: 0 auto;
+}
+
 
 @include mobile {
   .login{
@@ -162,14 +115,6 @@ $hover-orange: rgb(255, 123, 0);
     top: 1.5rem;
     left: 1.5rem;
     @include flex_center;
-    width: 2rem;
-    height: 2rem;
-    padding: 0;
-    border: 1px solid $primary-blue;
-    border-radius: .5rem;
-    background-color: $primary-blue;
-    font-size: 1.25rem;
-    color: white;
   }
 }
 

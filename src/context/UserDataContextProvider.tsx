@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useState } from "react";
-import sortProfiles from "../Functions/sortProfile";
+import sortProfiles from "../functions/sortProfile";
 import AuthServices from "../services/AuthServices";
 import ProfileServices from "../services/ProfileServices";
 import UserServices from "../services/UserServices";

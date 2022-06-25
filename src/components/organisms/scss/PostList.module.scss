@@ -1,0 +1,92 @@
+@import "../../../scss/variables";
+@import "../../../scss/mixin";
+
+.container{
+  position: relative;
+  width: 100%;
+  min-width: 20rem;
+  max-width: 32rem;
+  min-height: calc(100vh - 3rem);
+  margin: 0;
+  padding: 0;
+  background-color: $primary-default-background;
+  border-left: 1px solid $primary-default-border;
+  border-right: 1px solid $primary-default-border;
+}
+
+.category{
+  @include flex_center;
+  min-height: 3rem;
+  max-width: 28rem;
+  margin: 0 auto;
+  margin-bottom: 2rem;
+  background-color: white;
+  border: 1px solid $primary-default-border;
+  border-top: 0;
+  border-radius: 0 0 .25rem .25rem;
+  box-shadow: $card-box-shadow-bottom;
+  font-size: 1.1rem;
+}
+
+.final_container{
+  height: 2rem;
+  min-height: 2rem;
+}
+
+.final{
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  @include flex_center;
+  height: 3rem;
+  width: 100%;
+  min-width: 10rem;
+  max-width: 28rem;
+  margin: 0 auto;
+  background-color: white;
+  border: 1px solid $primary-default-border;
+  border-bottom: 0;
+  border-radius: .25rem .25rem 0 0;
+  font-size: 1rem;
+}
+
+.loading{
+  @include flex_center;
+  width: 2rem;
+  height:2rem;
+  font-size: 1.3rem;
+  color: $primary-blue;
+  padding: 0;
+  animation: loading-logo-spin infinite 1s linear;
+}
+
+.loading_done{
+  @include flex_center;
+  width: 1.3rem;
+  height:1.3rem;
+  font-size: .95rem;
+  color: $primary-blue;
+  border: 1.5px solid $primary-blue;
+  border-radius: 50%;
+  padding: 0;
+}
+
+@keyframes loading-logo-spin{
+  from{
+    transform: rotate(0deg);
+  }
+  to{
+    transform: rotate(360deg);
+  }
+}
+
+@include mobile{
+  .container{
+    min-width: 23rem;
+    max-width: 100vw;
+  }
+  .final{
+    max-width: 28rem;
+  }
+}

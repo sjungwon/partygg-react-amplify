@@ -1,6 +1,10 @@
 @import "../scss/mixin";
 @import "../scss/variables";
 
+p{
+  margin: 0;
+}
+
 .content_container{
   display: flex;
   min-width: 44rem;

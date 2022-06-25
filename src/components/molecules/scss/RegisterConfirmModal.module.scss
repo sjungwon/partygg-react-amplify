@@ -1,0 +1,40 @@
+@import "../../../scss/variables";
+@import "../../../scss/modal";
+
+.label{
+  font-size: .9rem;
+}
+
+.input_group{
+  display: flex;
+  align-items: center;
+  height: 2rem;
+}
+
+.input{
+  display: block;
+  max-height: 3rem;
+  height: 2rem;
+  width: 70%;
+  margin: 0;
+  margin-right: .5rem;
+  border: 1px solid $primary-default-border;
+  border-radius: .4rem;
+  text-indent: .9rem;
+  font-size: .95rem;
+  transition: .15s;
+  &:focus{
+    outline: 0;
+    border: 1px solid $primary-default;
+    box-shadow: $primary-default-box-shadow;
+  }
+}
+
+.submit{
+  height: 100%;
+}
+
+.code_error__message{
+  font-size: .8rem;
+  color: red;
+}

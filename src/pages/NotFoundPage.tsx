@@ -1,5 +1,5 @@
 import { useCallback } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styles from "./NotFoundPage.module.scss";
 
 export default function NotFoundPage() {
