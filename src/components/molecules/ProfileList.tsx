@@ -276,7 +276,11 @@ export default function ProfileList({ username, profileArr }: PropsType) {
       >
         <h3 className={styles.title}>프로필</h3>
         {username === myUsername ? (
-          <DefaultButton size="md" onClick={openShowAdd}>
+          <DefaultButton
+            size="md"
+            onClick={openShowAdd}
+            disabled={!profileArr.length}
+          >
             프로필 추가
           </DefaultButton>
         ) : null}

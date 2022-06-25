@@ -1,7 +1,6 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { Button, Card } from "react-bootstrap";
+import { Card } from "react-bootstrap";
 import styles from "./scss/AddPostElement.module.scss";
-import { BsPlusLg } from "react-icons/bs";
 import ProfileSelector from "../atoms/ProfileSelector";
 import { UserDataContext } from "../../context/UserDataContextProvider";
 import { AddPostReqData, Post } from "../../types/post.type";
@@ -17,6 +16,7 @@ import DefaultTextarea from "../atoms/DefaultTextarea";
 import LoadingBlock from "../atoms/LoadingBlock";
 import AddPostImageModal from "./AddPostImageModal";
 import ImageSlide from "./ImageSlide";
+import ProfileList from "./ProfileList";
 
 interface Props {
   prevData: {
@@ -30,20 +30,11 @@ interface Props {
 //prevData에 따라 수정, 추가 상태 결정
 export default function AddPostElement({ prevData }: Props) {
   //프로필 데이터 사용
-  const { filteredProfileArr, currentProfile: defaultProfile } =
-    useContext(UserDataContext);
-  const [currentProfile, setCurrentProfile] = useState<Profile>(defaultProfile);
-  //prevData가 있으면 해당 데이터의 프로필로 현재 프로필 변경, 없으면 첫번째 프로필로 설정
-  useEffect(() => {
-    if (prevData.postData) {
-      const profile = filteredProfileArr.find(
-        (profile) => profile.nickname === prevData.postData?.profile.nickname
-      );
-      setCurrentProfile(profile ? profile : filteredProfileArr[0]);
-      return;
-    }
-    setCurrentProfile(defaultProfile);
-  }, [defaultProfile, filteredProfileArr, prevData]);
+  const {
+    username,
+    filteredProfileArr,
+    currentProfile: defaultProfile,
+  } = useContext(UserDataContext);
 
   //prevData 유무에 따라 form을 바로 보여줄 지 결정
   const [show, setShow] = useState(!!prevData.setMode);
@@ -57,8 +48,21 @@ export default function AddPostElement({ prevData }: Props) {
     setShow(false);
   }, []);
 
+  const [currentProfile, setCurrentProfile] = useState<Profile>(defaultProfile);
   const profileImage = useProfileImage(currentProfile.profileImage);
   const loadError = useImgLoadError();
+
+  //prevData가 있으면 해당 데이터의 프로필로 현재 프로필 변경, 없으면 첫번째 프로필로 설정
+  useEffect(() => {
+    if (prevData.postData) {
+      const profile = filteredProfileArr.find(
+        (profile) => profile.nickname === prevData.postData?.profile.nickname
+      );
+      setCurrentProfile(profile ? profile : filteredProfileArr[0]);
+      return;
+    }
+    setCurrentProfile(defaultProfile);
+  }, [defaultProfile, filteredProfileArr, prevData]);
 
   const select = useCallback(
     (eventKey: string | null) => {
@@ -71,37 +75,52 @@ export default function AddPostElement({ prevData }: Props) {
 
   return (
     <Card className={styles.card}>
-      <Card.Header className={styles.card_header}>
-        <img
-          src={profileImage ? profileImage : "/default_profile.png"}
-          className={styles.card_header_img}
-          alt="profile"
-          onError={loadError}
+      <div className={username ? "" : styles.disabled}>
+        {prevData.postData ? null : (
+          <Card.Header className={styles.card_header}>
+            <Card.Title className={styles.card_header_title}>
+              유저 메뉴
+            </Card.Title>
+            <ProfileList username={username} profileArr={filteredProfileArr} />
+          </Card.Header>
+        )}
+        <Card.Body>
+          <div className={styles.card_body}>
+            <img
+              src={profileImage ? profileImage : "/default_profile.png"}
+              className={styles.card_body_img}
+              alt="profile"
+              onError={loadError}
+            />
+            <Card.Title className={styles.card_body_title}>
+              {currentProfile.nickname ? currentProfile.nickname : ""}
+            </Card.Title>
+            <div className={styles.card_body_right}>
+              <ProfileSelector
+                profileArr={filteredProfileArr}
+                size="sm"
+                onSelect={select}
+              />
+            </div>
+          </div>
+          {prevData.postData ? null : (
+            <DefaultButton
+              size="xl"
+              onClick={showHandler}
+              className={styles.card_body_btn}
+              disabled={!username}
+            >
+              포스트 작성
+            </DefaultButton>
+          )}
+        </Card.Body>
+        <PostForm
+          show={show}
+          close={close}
+          prevData={prevData}
+          currentProfile={currentProfile}
         />
-        <Card.Title className={styles.card_header_title}>
-          {currentProfile.nickname ? currentProfile.nickname : ""}
-        </Card.Title>
-        <div className={styles.card_header_right}>
-          <ProfileSelector
-            profileArr={filteredProfileArr}
-            size="sm"
-            onSelect={select}
-          />
-          <Button
-            onClick={showHandler}
-            size="sm"
-            disabled={!filteredProfileArr.length}
-          >
-            <BsPlusLg />
-          </Button>
-        </div>
-      </Card.Header>
-      <PostForm
-        show={show}
-        close={close}
-        prevData={prevData}
-        currentProfile={currentProfile}
-      />
+      </div>
     </Card>
   );
 }
@@ -261,8 +280,8 @@ function PostForm({ show, close, currentProfile, prevData }: FormPropsType) {
 
   return (
     <>
-      <Card.Body className={styles.card_body}>
-        <div className={styles.card_body_btns}>
+      <Card.Footer className={styles.card_footer}>
+        <div className={styles.card_footer_btns}>
           <DefaultButton size="sq_md" onClick={openMd}>
             <MdOutlinePhotoSizeSelectActual />
           </DefaultButton>
@@ -282,7 +301,7 @@ function PostForm({ show, close, currentProfile, prevData }: FormPropsType) {
           ref={textRef}
           size="lg"
         />
-        <div className={styles.card_body_bottom_btns}>
+        <div className={styles.card_footer_bottom_btns}>
           <DefaultButton
             onClick={submit}
             size="md"
@@ -295,7 +314,7 @@ function PostForm({ show, close, currentProfile, prevData }: FormPropsType) {
             취소
           </DefaultButton>
         </div>
-      </Card.Body>
+      </Card.Footer>
     </>
   );
 }

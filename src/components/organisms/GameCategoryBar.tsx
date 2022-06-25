@@ -33,7 +33,11 @@ export default function GameCategoryBar({ show }: PropsType) {
               <AiOutlineUnorderedList />
               <h3 className={styles.category_title}>게임 리스트</h3>
             </div>
-            <DefaultButton size="sm" onClick={setShowAddHandler}>
+            <DefaultButton
+              size="sm"
+              onClick={setShowAddHandler}
+              disabled={!username}
+            >
               게임 추가
             </DefaultButton>
           </div>

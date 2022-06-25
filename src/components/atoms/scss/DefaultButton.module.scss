@@ -11,6 +11,7 @@
   color: white;
   background-color: $primary-blue;
   &:hover{
+    background-color: $primary-blue-hover;
     color: white;
   }
 }

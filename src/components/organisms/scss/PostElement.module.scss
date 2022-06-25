@@ -48,20 +48,30 @@ div.card_header{
     right: .5rem;
     top: .5rem;
     .header_menu_container{
-      width: 1.5rem;
-      height: 1.5rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background-color: $primary-orange;
-      border-color: $primary-orange;
-      &:hover{
-        background-color: $primary-orange-hover;
-        border-color: $primary-orange-hover;
-      }
+      position: absolute;
+      top: 3px;
+      width: 0;
+      height: 0;
+      background-color: transparent;
+      color:transparent;
+      border-color: transparent;
       &:focus{
-        box-shadow: $primary-orange-box-shadow;
+        box-shadow: none;
       }
+      // width: 1.5rem;
+      // height: 1.5rem;
+      // display: flex;
+      // justify-content: center;
+      // align-items: center;
+      // background-color: $primary-orange;
+      // border-color: $primary-orange;
+      // &:hover{
+      //   background-color: $primary-orange-hover;
+      //   border-color: $primary-orange-hover;
+      // }
+      // &:focus{
+      //   box-shadow: $primary-orange-box-shadow;
+      // }
     }
     .header_menu_items{
       min-width: 4rem;

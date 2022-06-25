@@ -1,4 +1,11 @@
-import { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Card, Dropdown } from "react-bootstrap";
 import styles from "./scss/PostElement.module.scss";
 import {
@@ -304,6 +311,14 @@ export default function PostElement({ post, removePost }: PropsType) {
     setTextMore((prev) => !prev);
   }, []);
 
+  const menuRef = useRef<HTMLButtonElement>(null);
+
+  const menuClick = useCallback(() => {
+    if (menuRef.current) {
+      menuRef.current.click();
+    }
+  }, []);
+
   //렌더
   if (mode === "modify") {
     return (
@@ -330,11 +345,14 @@ export default function PostElement({ post, removePost }: PropsType) {
         </div>
         <CheckUserBlock resourceUsername={post.username}>
           <div className={styles.card_header_menu}>
-            <Dropdown onSelect={select}>
+            <DefaultButton onClick={menuClick} size="xs">
+              ...
+            </DefaultButton>
+            <Dropdown onSelect={select} bsPrefix={styles.header_menu_container}>
               <Dropdown.Toggle
-                variant="primary"
                 id="dropdown-basic"
                 className={styles.header_menu_container}
+                ref={menuRef}
               ></Dropdown.Toggle>
               <Dropdown.Menu className={styles.header_menu_items}>
                 <Dropdown.Item eventKey="1">수정</Dropdown.Item>

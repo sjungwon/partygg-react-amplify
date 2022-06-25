@@ -1,4 +1,4 @@
-import { Dropdown, DropdownButton } from "react-bootstrap";
+import { Dropdown } from "react-bootstrap";
 import { Profile } from "../../types/profile.type";
 import styles from "./scss/Selector.module.scss";
 
@@ -14,24 +14,28 @@ export default function ProfileSelector({
   profileArr,
 }: PropsType) {
   return (
-    <DropdownButton
-      id="dropdown-profile"
-      title="프로필"
-      onSelect={onSelect}
-      size={size}
-      disabled={!profileArr.length}
-    >
-      {profileArr.map((profile, index) => {
-        return (
-          <Dropdown.Item
-            key={profile.game + profile.nickname}
-            eventKey={index}
-            className={styles.item}
-          >
-            {profile.game} - {profile.nickname}
-          </Dropdown.Item>
-        );
-      })}
-    </DropdownButton>
+    <Dropdown onSelect={onSelect}>
+      <Dropdown.Toggle
+        size={size}
+        id="dropdown-profile"
+        title="프로필"
+        disabled={!profileArr.length}
+      >
+        프로필 선택
+        <Dropdown.Menu>
+          {profileArr.map((profile, index) => {
+            return (
+              <Dropdown.Item
+                key={profile.game + profile.nickname}
+                eventKey={index}
+                className={styles.item}
+              >
+                {profile.game} - {profile.nickname}
+              </Dropdown.Item>
+            );
+          })}
+        </Dropdown.Menu>
+      </Dropdown.Toggle>
+    </Dropdown>
   );
 }

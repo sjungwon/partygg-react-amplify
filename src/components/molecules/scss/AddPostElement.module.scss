@@ -10,39 +10,53 @@ div.card{
   border: 1px solid $primary-default-border;
 }
 
+.disabled{
+  width: 100%;
+  height: 100%;
+  background-color: rgba(231, 231, 231, 0.174);
+  z-index: 10;
+  color: $font-color-light-gray;
+  pointer-events: none;
+}
+
 div.card_header{
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  border-bottom: none;
   background-color: rgba(255, 255, 255, 0);
-  .card_header_img{
+  border-bottom: 1px solid $primary-default-border;
+  .card_header_title{
+    text-align: center;
+    font-size: .95rem;
+  }
+}
+
+div.card_body{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: none;
+  .add_post{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card_body_img{
     height: 2.2rem;
     width: 2.2rem;
     border-radius: 50%;
     object-fit:cover;
   }
-  .card_header_img_credit{
-    display: none;
-  }
-  .card_header_title{
+  .card_body_title{
     font-size: .95rem;
     font-weight: 500;
     margin: 0;
   }
-  .card_header_right{
+  .card_body_right{
     display: flex;
-    button{
-      margin-left: .5rem;
-    }
   }
-  .card_header_btn{
-    border: 1px solid $primary-default-dark;
-    background-color: $primary-default-dark;
-    &:focus{
-      box-shadow: $primary-default-box-shadow;
-    }
-  }
+}
+.card_body_btn{
+  height: 1.5rem;
+  font-size: .9rem;
+  margin-top: 1rem;
 }
 
 .modal_body_file{
@@ -77,18 +91,19 @@ div.card_header{
   }
 }
 
-.card_body{
-  border-top: 1px solid $primary-default;
+.card_footer{
+  border-top: 1px solid $primary-default-border;
+  background-color: rgba(255, 255, 255, 0);
 }
 
-.card_body_btns{
+.card_footer_btns{
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-bottom: .5rem;
 }
 
-.card_body_bottom_btns{
+.card_footer_bottom_btns{
   display: flex;
 }
 
