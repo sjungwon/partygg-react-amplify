@@ -26,6 +26,7 @@ import { Profile } from "../../types/profile.type";
 import ProfileServices from "../../services/ProfileServices";
 import LoadingBlock from "../atoms/LoadingBlock";
 import { ChildProps } from "../../types/props.type";
+import LikeServices from "../../services/LikeServices";
 
 interface Props {
   category: string;
@@ -247,6 +248,9 @@ interface PostDataContextType {
   commentsLastEvaluatedKeyHandler: (
     key: CommentsLastEvaluatedKey | undefined
   ) => void;
+  postLike: () => void;
+  postDislike: () => void;
+  modifyPost: (newPost: Post) => void;
 }
 
 const initialPostContext: PostDataContextType = {
@@ -279,6 +283,9 @@ const initialPostContext: PostDataContextType = {
     lastEvaluatedKey?: SubcommentsLastEvaluatedKey
   ) => {},
   commentsLastEvaluatedKeyHandler: (key) => {},
+  postLike: () => {},
+  postDislike: () => {},
+  modifyPost: () => {},
 };
 
 export const PostDataContext =
@@ -292,7 +299,125 @@ const PostDataContextProvider: FC<PostContextType> = ({
   children,
   postData,
 }) => {
+  const { username } = useContext(UserDataContext);
   const [post, setPost] = useState<Post>(postData);
+
+  const modifyPost = useCallback((newPost: Post) => {
+    setPost(newPost);
+  }, []);
+
+  const postLike = useCallback(() => {
+    if (!post.date) {
+      return;
+    }
+    const postId = `${post.username}/${post.date}`;
+    const currentLike = post.likes.includes(username);
+    const currentDislike = post.dislikes.includes(username);
+    setPost((prevData: Post) => {
+      return {
+        ...prevData,
+        likes: currentLike
+          ? prevData.likes.filter((user) => user !== username)
+          : [...prevData.likes, username],
+        dislikes: currentDislike
+          ? prevData.dislikes.filter((user) => user !== username)
+          : prevData.dislikes,
+      };
+    });
+    if (currentLike) {
+      LikeServices.postLikeRemove(postId).then((success) => {
+        if (!success) {
+          setPost((prevData: Post) => {
+            return {
+              ...prevData,
+              likes: [...prevData.likes, username],
+            };
+          });
+          window.alert(
+            "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
+          );
+        }
+      });
+    } else {
+      LikeServices.postLike(postId).then((success) => {
+        if (!success) {
+          setPost((prevData: Post) => {
+            return {
+              ...prevData,
+              likes: prevData.likes.filter((user) => user !== username),
+              dislikes: currentDislike
+                ? [...prevData.dislikes, username]
+                : prevData.dislikes,
+            };
+          });
+
+          window.alert(
+            "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
+          );
+        }
+      });
+    }
+  }, [post.date, post.dislikes, post.likes, post.username, username]);
+
+  const postDislike = useCallback(async () => {
+    if (!post.date) {
+      return;
+    }
+
+    if (!username) {
+      window.alert("로그인이 필요합니다.");
+      return;
+    }
+    //서버에서 알아서 좋아요 있으면 제거하고 싫어요 추가함
+    const postId = `${post.username}/${post.date}`;
+    const currentLike = post.likes.includes(username);
+    const currentDislike = post.dislikes.includes(username);
+    setPost((prevData: Post) => {
+      return {
+        ...prevData,
+        likes: currentLike
+          ? prevData.likes.filter((user) => user !== username)
+          : prevData.likes,
+        dislikes: currentDislike
+          ? prevData.dislikes.filter((user) => user !== username)
+          : [...prevData.dislikes, username],
+      };
+    });
+
+    if (currentDislike) {
+      LikeServices.postDislikeRemove(postId).then((success) => {
+        if (!success) {
+          setPost((prevData: Post) => {
+            return {
+              ...prevData,
+              dislikes: [...prevData.dislikes, username],
+            };
+          });
+          window.alert(
+            "싫어요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
+          );
+        }
+      });
+    } else {
+      LikeServices.postDislike(postId).then((success) => {
+        if (!success) {
+          setPost((prevData: Post) => {
+            return {
+              ...prevData,
+              likes: currentLike
+                ? [...prevData.likes, username]
+                : prevData.likes,
+              dislikes: prevData.dislikes.filter((user) => user !== username),
+            };
+          });
+          window.alert(
+            "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
+          );
+        }
+      });
+    }
+  }, [post.date, post.dislikes, post.likes, post.username, username]);
+
   const [comments, setComments] = useState<Comment[]>(postData.comments);
   const [commentsLastEvaluatedKey, setCommentsLastEvaluatedKey] = useState<
     CommentsLastEvaluatedKey | undefined
@@ -421,6 +546,9 @@ const PostDataContextProvider: FC<PostContextType> = ({
         commentsLastEvaluatedKeyHandler,
         commentsListHandler,
         subcommentsListHandler,
+        postLike,
+        postDislike,
+        modifyPost,
       }}
     >
       {children}

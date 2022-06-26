@@ -17,14 +17,12 @@ export interface CommentsData {
 
 interface CommentElementProps {
   postId: string;
-  commentsData: CommentsData;
   showComment: boolean;
   setShowComment: (value: boolean) => void;
 }
 
 export default function CommentList({
   postId,
-  commentsData,
   showComment,
   setShowComment,
 }: CommentElementProps) {
@@ -43,7 +41,7 @@ export default function CommentList({
     if (!showComment) {
       setRenderLength(comments.length > 2 ? 3 : comments.length);
     }
-  }, [comments.length, commentsData.data.length, showComment]);
+  }, [comments.length, showComment]);
 
   const [commentLoading, setCommentLoading] = useState<boolean>(false);
   const renderLengthHandler = useCallback(

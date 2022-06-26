@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Card, Dropdown } from "react-bootstrap";
 import styles from "./scss/PostElement.module.scss";
 import {
@@ -15,15 +8,13 @@ import {
   BsHandThumbsDownFill,
 } from "react-icons/bs";
 import ImageSlide from "../molecules/ImageSlide";
-import { Post } from "../../types/post.type";
 import { UserDataContext } from "../../context/UserDataContextProvider";
 import RemoveConfirmModal from "../molecules/RemoveConfirmModal";
-import LikeServices from "../../services/LikeServices";
 import FileServices from "../../services/FileServices";
 import { ImageKeys } from "../../types/file.type";
 import PostServices from "../../services/PostServices";
 import AddPostElement from "../molecules/AddPostElement";
-import CommentList, { CommentsData } from "./CommentList";
+import CommentList from "./CommentList";
 import { NavLink } from "react-router-dom";
 import DefaultButton from "../atoms/DefaultButton";
 import CheckUserBlock from "../atoms/CheckUserBlock";
@@ -37,17 +28,10 @@ interface PropsType {
 
 export default function PostElement({ removePost }: PropsType) {
   const { username, filteredProfileArr } = useContext(UserDataContext);
-  const { post } = useContext(PostDataContext);
+  const { post, postLike, postDislike, modifyPost, comments } =
+    useContext(PostDataContext);
   const [images, setImages] = useState<string[]>([]);
-  const [postData, setPostData] = useState<Post>(post);
-  const postId = useMemo<string>(() => `${post.username}/${post.date}`, [post]);
-  const commentsData = useMemo<CommentsData>(
-    () => ({
-      data: post.comments,
-      lastEvaluatedKey: post.commentsLastEvaluatedKey,
-    }),
-    [post.comments, post.commentsLastEvaluatedKey]
-  );
+
   const getImageAsync = useCallback(async (imageKeys: ImageKeys[]) => {
     const imageURLArr = await Promise.all(
       imageKeys.map(async (imageKey) => {
@@ -69,10 +53,10 @@ export default function PostElement({ removePost }: PropsType) {
 
   //이미지 가져옴 + 수정 시 새로 가져옴
   useEffect(() => {
-    if (postData && postData.images.length) {
-      getImageAsync(postData.images);
+    if (post && post.images.length) {
+      getImageAsync(post.images);
     }
-  }, [getImageAsync, postData]);
+  }, [getImageAsync, post]);
 
   //댓글 보기 관련 함수
   const [showComment, setShowComment] = useState<boolean>(false);
@@ -105,123 +89,7 @@ export default function PostElement({ removePost }: PropsType) {
     [scrollHeight]
   );
 
-  const likeClick = useCallback(async () => {
-    if (!postData.date) {
-      return;
-    }
-
-    if (!username) {
-      window.alert("로그인이 필요합니다.");
-      return;
-    }
-
-    //서버에서 알아서 좋아요 있으면 제거하고 싫어요 추가함
-    const currentLike = postData.likes.includes(username);
-    const currentDislike = postData.dislikes.includes(username);
-    setPostData((prevData: Post) => {
-      return {
-        ...prevData,
-        likes: currentLike
-          ? prevData.likes.filter((user) => user !== username)
-          : [...prevData.likes, username],
-        dislikes: currentDislike
-          ? prevData.dislikes.filter((user) => user !== username)
-          : prevData.dislikes,
-      };
-    });
-    if (currentLike) {
-      LikeServices.postLikeRemove(postId).then((success) => {
-        if (!success) {
-          setPostData((prevData: Post) => {
-            return {
-              ...prevData,
-              likes: [...prevData.likes, username],
-            };
-          });
-          window.alert(
-            "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
-          );
-        }
-      });
-    } else {
-      LikeServices.postLike(postId).then((success) => {
-        if (!success) {
-          setPostData((prevData: Post) => {
-            return {
-              ...prevData,
-              likes: prevData.likes.filter((user) => user !== username),
-              dislikes: currentDislike
-                ? [...prevData.dislikes, username]
-                : prevData.dislikes,
-            };
-          });
-
-          window.alert(
-            "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
-          );
-        }
-      });
-    }
-  }, [postData, postId, username]);
-
   //싫어요 클릭 함수
-  const dislikeClick = useCallback(async () => {
-    if (!postData.date) {
-      return;
-    }
-
-    if (!username) {
-      window.alert("로그인이 필요합니다.");
-      return;
-    }
-    //서버에서 알아서 좋아요 있으면 제거하고 싫어요 추가함
-    const currentLike = postData.likes.includes(username);
-    const currentDislike = postData.dislikes.includes(username);
-    setPostData((prevData: Post) => {
-      return {
-        ...prevData,
-        likes: currentLike
-          ? prevData.likes.filter((user) => user !== username)
-          : prevData.likes,
-        dislikes: currentDislike
-          ? prevData.dislikes.filter((user) => user !== username)
-          : [...prevData.dislikes, username],
-      };
-    });
-
-    if (currentDislike) {
-      LikeServices.postDislikeRemove(postId).then((success) => {
-        if (!success) {
-          setPostData((prevData: Post) => {
-            return {
-              ...prevData,
-              dislikes: [...prevData.dislikes, username],
-            };
-          });
-          window.alert(
-            "싫어요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
-          );
-        }
-      });
-    } else {
-      LikeServices.postDislike(postId).then((success) => {
-        if (!success) {
-          setPostData((prevData: Post) => {
-            return {
-              ...prevData,
-              likes: currentLike
-                ? [...prevData.likes, username]
-                : prevData.likes,
-              dislikes: prevData.dislikes.filter((user) => user !== username),
-            };
-          });
-          window.alert(
-            "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
-          );
-        }
-      });
-    }
-  }, [postData, postId, username]);
 
   //포스트 제거, 제거 확인 모달 관련 데이터
 
@@ -236,23 +104,23 @@ export default function PostElement({ removePost }: PropsType) {
   const [removeLoading, setRemoveLoading] = useState<boolean>(false);
   const sendRemovePost = useCallback(async () => {
     setRemoveLoading(true);
-    const success = await PostServices.removePost(postData);
+    const success = await PostServices.removePost(post);
     if (!success) {
       window.alert("포스트 제거에 실패했습니다. 다시 시도해주세요.");
       setRemoveLoading(false);
       handleRemoveModalClose();
     }
-    if (postData.images.length) {
+    if (post.images.length) {
       await Promise.all(
-        postData.images.map(async (image) => {
+        post.images.map(async (image) => {
           return FileServices.removeImage(image);
         })
       );
     }
-    removePost(postId);
+    removePost(`${post.username}/${post.date}`);
     setRemoveLoading(false);
     handleRemoveModalClose();
-  }, [handleRemoveModalClose, postData, postId, removePost]);
+  }, [handleRemoveModalClose, post, removePost]);
 
   const [mode, setMode] = useState<"" | "modify">("");
   //포스트 관리 함수 -> 수정, 제거 선택
@@ -260,7 +128,7 @@ export default function PostElement({ removePost }: PropsType) {
     (eventKey: any) => {
       if (eventKey === "1") {
         const profile = filteredProfileArr.find(
-          (profile) => profile.nickname === postData.profile.nickname
+          (profile) => profile.nickname === post.profile.nickname
         );
         if (profile) {
           setMode("modify");
@@ -281,7 +149,7 @@ export default function PostElement({ removePost }: PropsType) {
         return;
       }
     },
-    [filteredProfileArr, handleRemoveModalOpen, postData.profile.nickname]
+    [filteredProfileArr, handleRemoveModalOpen, post.profile.nickname]
   );
 
   //텍스트 제한 관련 데이터
@@ -291,22 +159,22 @@ export default function PostElement({ removePost }: PropsType) {
 
   useEffect(() => {
     if (textMore) {
-      setShowTextLength(postData.text.length);
+      setShowTextLength(post.text.length);
     }
 
-    if (postData.images.length) {
-      const length = postData.text.length < 100 ? postData.text.length : 100;
+    if (post.images.length) {
+      const length = post.text.length < 100 ? post.text.length : 100;
       setShowTextLength(length);
       return;
     }
 
-    if (postData.text.length < 200) {
-      setShowTextLength(postData.text.length);
+    if (post.text.length < 200) {
+      setShowTextLength(post.text.length);
       return;
     }
 
     setShowTextLength(200);
-  }, [postData, textMore]);
+  }, [post, textMore]);
 
   const showMore = useCallback(() => {
     setTextMore((prev) => !prev);
@@ -324,7 +192,12 @@ export default function PostElement({ removePost }: PropsType) {
   if (mode === "modify") {
     return (
       <AddPostElement
-        prevData={{ setMode, postData, setPostData, imageURLs: images }}
+        prevData={{
+          setMode,
+          postData: post,
+          setPostData: modifyPost,
+          imageURLs: images,
+        }}
       />
     );
   }
@@ -333,14 +206,14 @@ export default function PostElement({ removePost }: PropsType) {
     <Card className={styles.card}>
       <Card.Header className={styles.card_header}>
         <Card.Title className={styles.card_header_game}>
-          <NavLink to={`/games/${postData.game}`} className={styles.nav_link}>
-            {postData.game}
+          <NavLink to={`/games/${post.game}`} className={styles.nav_link}>
+            {post.game}
           </NavLink>
         </Card.Title>
         <div className={styles.card_header_profile}>
-          <ProfileBlock profile={postData.profile} size="lg">
+          <ProfileBlock profile={post.profile} size="lg">
             <Card.Subtitle className={styles.card_header_subtitle}>
-              {postData.date.substring(0, postData.date.length - 4)}
+              {post.date.substring(0, post.date.length - 4)}
             </Card.Subtitle>
           </ProfileBlock>
         </div>
@@ -366,9 +239,9 @@ export default function PostElement({ removePost }: PropsType) {
       <Card.Body className={`${styles.card_body}`}>
         {images.length > 0 ? <ImageSlide images={images} /> : null}
         <Card.Text className={styles.card_body_text}>
-          {postData.text.slice(0, showTextLength)}
-          {(postData.images.length && postData.text.length > 100) ||
-          (!postData.images.length && postData.text.length > 200) ? (
+          {post.text.slice(0, showTextLength)}
+          {(post.images.length && post.text.length > 100) ||
+          (!post.images.length && post.text.length > 200) ? (
             <span className={styles.card_body_text_more} onClick={showMore}>
               {textMore ? " 접기" : " 더보기"}
               더보기...
@@ -376,39 +249,38 @@ export default function PostElement({ removePost }: PropsType) {
           ) : null}
         </Card.Text>
         <div className={styles.card_body_buttons}>
-          <DefaultButton onClick={likeClick} size="lg">
-            {postData.likes.includes(username) ? (
+          <DefaultButton onClick={postLike} size="lg">
+            {post.likes.includes(username) ? (
               <BsHandThumbsUpFill className={styles.btn_icon} />
             ) : (
               <BsHandThumbsUp />
             )}
             <p className={styles.btn_text}>좋아요</p>
-            <p className={styles.btn_badge}>{postData.likes.length}</p>
+            <p className={styles.btn_badge}>{post.likes.length}</p>
           </DefaultButton>
           <CommentsButton
             onClick={commentHandler}
             size="lg"
             active={showComment}
           ></CommentsButton>
-          <DefaultButton onClick={dislikeClick} size="lg">
-            {postData.dislikes.includes(username) ? (
+          <DefaultButton onClick={postDislike} size="lg">
+            {post.dislikes.includes(username) ? (
               <BsHandThumbsDownFill className={styles.btn_icon} />
             ) : (
               <BsHandThumbsDown />
             )}
             <p className={styles.btn_text}>싫어요</p>
-            <p className={styles.btn_badge}>{postData.dislikes.length}</p>
+            <p className={styles.btn_badge}>{post.dislikes.length}</p>
           </DefaultButton>
         </div>
       </Card.Body>
       <Card.Footer
         className={`${styles.card_footer} ${
-          post.comments.length ? "" : styles.card_footer_no_border
+          comments.length ? "" : styles.card_footer_no_border
         }`}
       >
         <CommentList
           postId={`${post.username}/${post.date}`}
-          commentsData={commentsData}
           showComment={showComment}
           setShowComment={childShowCommentHandler}
         />
