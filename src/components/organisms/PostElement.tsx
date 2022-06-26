@@ -27,7 +27,7 @@ interface PropsType {
 }
 
 export default function PostElement({ removePost }: PropsType) {
-  const { username, filteredProfileArr } = useContext(UserDataContext);
+  const { username, profileArr } = useContext(UserDataContext);
   const { post, postLike, postDislike, modifyPost, comments } =
     useContext(PostDataContext);
   const [images, setImages] = useState<string[]>([]);
@@ -127,29 +127,23 @@ export default function PostElement({ removePost }: PropsType) {
   const select = useCallback(
     (eventKey: any) => {
       if (eventKey === "1") {
-        const profile = filteredProfileArr.find(
-          (profile) => profile.nickname === post.profile.nickname
+        const filteredProfileArr = profileArr.filter(
+          (profile) => profile.game === post.game
         );
-        if (profile) {
-          setMode("modify");
-          return;
-        } else {
-          if (filteredProfileArr.length) {
-            setMode("modify");
-            return;
-          }
+        if (!filteredProfileArr.length) {
           window.alert(
-            "현재 카테고리에 포함되는 프로필이 없어 수정할 수 없습니다."
+            "해당 포스트 카테고리에 포함되는 프로필이 없어 수정할 수 없습니다. 프로필을 추가해주세요."
           );
           return;
         }
+        setMode("modify");
       }
       if (eventKey === "2") {
         handleRemoveModalOpen();
         return;
       }
     },
-    [filteredProfileArr, handleRemoveModalOpen, post.profile.nickname]
+    [handleRemoveModalOpen, post.game, profileArr]
   );
 
   //텍스트 제한 관련 데이터

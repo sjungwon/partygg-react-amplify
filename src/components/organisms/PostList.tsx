@@ -53,6 +53,7 @@ export default function PostList({ category, searchParam }: Props) {
 
   useEffect(() => {
     if (addPostData) {
+      console.log(addPostData);
       setPosts((prev: Post[]) => [addPostData, ...prev]);
       setAddPostData(null);
     }
@@ -205,11 +206,11 @@ export default function PostList({ category, searchParam }: Props) {
         ) : null}
         {posts.map((post, i) => {
           return (
-            <PostDataContextProvider postData={post}>
-              <PostElement
-                key={`${post.username}/${post.date}`}
-                removePost={removePost}
-              />
+            <PostDataContextProvider
+              postData={post}
+              key={`${post.username}/${post.date}`}
+            >
+              <PostElement removePost={removePost} />
             </PostDataContextProvider>
           );
         })}

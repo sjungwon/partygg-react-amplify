@@ -33,6 +33,7 @@ export default function AddPostElement({ prevData }: Props) {
   const {
     username,
     filteredProfileArr,
+    profileArr,
     currentProfile: defaultProfile,
   } = useContext(UserDataContext);
 
@@ -49,20 +50,27 @@ export default function AddPostElement({ prevData }: Props) {
   }, []);
 
   const [currentProfile, setCurrentProfile] = useState<Profile>(defaultProfile);
+  const [filteredProfile, setFilteredProfile] =
+    useState<Profile[]>(filteredProfileArr);
   const profileImage = useProfileImage(currentProfile.profileImage);
   const loadError = useImgLoadError();
 
   //prevData가 있으면 해당 데이터의 프로필로 현재 프로필 변경, 없으면 첫번째 프로필로 설정
   useEffect(() => {
     if (prevData.postData) {
-      const profile = filteredProfileArr.find(
-        (profile) => profile.nickname === prevData.postData?.profile.nickname
+      const filtered = profileArr.filter(
+        (profile) => profile.game === prevData.postData?.game
       );
-      setCurrentProfile(profile ? profile : filteredProfileArr[0]);
+      setFilteredProfile(filtered);
+      const finded = profileArr.find(
+        (profile) => profile.id === prevData.postData?.profileId
+      );
+      setCurrentProfile(finded ? finded : filtered[0]);
+
       return;
     }
     setCurrentProfile(defaultProfile);
-  }, [defaultProfile, filteredProfileArr, prevData]);
+  }, [defaultProfile, filteredProfileArr, prevData, profileArr]);
 
   const select = useCallback(
     (eventKey: string | null) => {
@@ -97,7 +105,9 @@ export default function AddPostElement({ prevData }: Props) {
             </Card.Title>
             <div className={styles.card_body_right}>
               <ProfileSelector
-                profileArr={filteredProfileArr}
+                profileArr={
+                  prevData.postData ? filteredProfile : filteredProfileArr
+                }
                 size="sm"
                 onSelect={select}
               />
@@ -108,7 +118,7 @@ export default function AddPostElement({ prevData }: Props) {
               size="xl"
               onClick={showHandler}
               className={styles.card_body_btn}
-              disabled={!username}
+              disabled={!username || !filteredProfileArr.length}
             >
               포스트 작성
             </DefaultButton>

@@ -258,7 +258,7 @@ export default function ProfileList({ username, profileArr }: PropsType) {
       return;
     }
     if (removeProfile.profileImage) {
-      FileServices.removeImage(removeProfile.profileImage);
+      await FileServices.removeImage(removeProfile.profileImage);
     }
     updateProfileHandler(removeProfile, "remove");
     setLoading(false);
@@ -276,11 +276,7 @@ export default function ProfileList({ username, profileArr }: PropsType) {
       >
         <h3 className={styles.title}>프로필</h3>
         {username === myUsername ? (
-          <DefaultButton
-            size="md"
-            onClick={openShowAdd}
-            disabled={!profileArr.length}
-          >
+          <DefaultButton size="md" onClick={openShowAdd} disabled={!username}>
             프로필 추가
           </DefaultButton>
         ) : null}
