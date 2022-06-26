@@ -29,14 +29,15 @@ import DefaultButton from "../atoms/DefaultButton";
 import CheckUserBlock from "../atoms/CheckUserBlock";
 import CommentsButton from "../atoms/CommentsButton";
 import ProfileBlock from "../molecules/ProfileBlock";
+import { PostDataContext } from "./PostList";
 
 interface PropsType {
-  post: Post;
   removePost: (value: string) => void;
 }
 
-export default function PostElement({ post, removePost }: PropsType) {
+export default function PostElement({ removePost }: PropsType) {
   const { username, filteredProfileArr } = useContext(UserDataContext);
+  const { post } = useContext(PostDataContext);
   const [images, setImages] = useState<string[]>([]);
   const [postData, setPostData] = useState<Post>(post);
   const postId = useMemo<string>(() => `${post.username}/${post.date}`, [post]);

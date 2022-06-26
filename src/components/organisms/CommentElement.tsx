@@ -82,13 +82,14 @@ export default function CommentElement({
         />
         {comment.subcomments ? (
           <SubcommentList
-            subcommentsData={{
+            subcomments={{
               data: comment.subcomments,
               lastEvaluatedKey: comment.subcommentsLastEvaluatedKey,
             }}
             commentId={`${comment.postId}/${comment.date}`}
             addSubcomment={addSubcomment}
             setAddSubcomment={setAddSubcomment}
+            key={`${comment.postId}/${comment.date}`}
           />
         ) : null}
       </CommentCard>
@@ -130,13 +131,14 @@ export default function CommentElement({
       ) : null}
       {comment.subcomments && parentShowComment ? (
         <SubcommentList
-          subcommentsData={{
+          subcomments={{
             data: comment.subcomments,
             lastEvaluatedKey: comment.subcommentsLastEvaluatedKey,
           }}
           commentId={`${comment.postId}/${comment.date}`}
           addSubcomment={addSubcomment}
           setAddSubcomment={setAddSubcomment}
+          key={`${comment.postId}/${comment.date}`}
         />
       ) : null}
       <RemoveConfirmModal

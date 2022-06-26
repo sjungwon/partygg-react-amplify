@@ -2,8 +2,22 @@ import styles from "./scss/PostList.module.scss";
 import AddPostElement from "../molecules/AddPostElement";
 import PostElement from "./PostElement";
 import PostServices from "../../services/PostServices";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { Post } from "../../types/post.type";
+import {
+  createContext,
+  FC,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import {
+  Comment,
+  CommentsLastEvaluatedKey,
+  Post,
+  Subcomment,
+  SubcommentsLastEvaluatedKey,
+} from "../../types/post.type";
 import { UserDataContext } from "../../context/UserDataContextProvider";
 import { AiOutlineCheck } from "react-icons/ai";
 import UserHomeCard from "./UserHomeCard";
@@ -11,6 +25,7 @@ import ProfileCard from "./ProfileCard";
 import { Profile } from "../../types/profile.type";
 import ProfileServices from "../../services/ProfileServices";
 import LoadingBlock from "../atoms/LoadingBlock";
+import { ChildProps } from "../../types/props.type";
 
 interface Props {
   category: string;
@@ -189,11 +204,12 @@ export default function PostList({ category, searchParam }: Props) {
         ) : null}
         {posts.map((post, i) => {
           return (
-            <PostElement
-              key={`${post.username}/${post.date}`}
-              post={post}
-              removePost={removePost}
-            />
+            <PostDataContextProvider postData={post}>
+              <PostElement
+                key={`${post.username}/${post.date}`}
+                removePost={removePost}
+              />
+            </PostDataContextProvider>
           );
         })}
         <div className={styles.final_container} ref={loader}>
@@ -211,3 +227,203 @@ export default function PostList({ category, searchParam }: Props) {
     </>
   );
 }
+
+//Context
+interface PostDataContextType {
+  post: Post;
+  setPost: (post: Post) => void;
+  comments: Comment[];
+  commentsListHandler: (
+    comments: Comment[],
+    type: "modify" | "add" | "remove" | "more"
+  ) => void;
+  subcommentsListHandler: (
+    type: "modify" | "add" | "remove" | "more",
+    handleCommentId: string,
+    handleSubcomments: Subcomment[],
+    lastEvaluatedKey?: SubcommentsLastEvaluatedKey
+  ) => void;
+  commentsLastEvaluatedKey?: CommentsLastEvaluatedKey;
+  commentsLastEvaluatedKeyHandler: (
+    key: CommentsLastEvaluatedKey | undefined
+  ) => void;
+}
+
+const initialPostContext: PostDataContextType = {
+  post: {
+    date: "",
+    images: [],
+    likes: [],
+    dislikes: [],
+    comments: [],
+    profileId: "",
+    game: "",
+    text: "",
+    username: "",
+    profile: {
+      username: "",
+      id: "",
+      nickname: "",
+      game: "",
+      profileImage: undefined,
+    },
+  },
+  setPost: (post: Post) => {},
+  comments: [],
+  commentsLastEvaluatedKey: undefined,
+  commentsListHandler: (comments, type) => {},
+  subcommentsListHandler: (
+    type: "modify" | "add" | "remove" | "more",
+    handleCommentId: string,
+    handleSubcomments: Subcomment[],
+    lastEvaluatedKey?: SubcommentsLastEvaluatedKey
+  ) => {},
+  commentsLastEvaluatedKeyHandler: (key) => {},
+};
+
+export const PostDataContext =
+  createContext<PostDataContextType>(initialPostContext);
+
+interface PostContextType extends ChildProps {
+  postData: Post;
+}
+
+const PostDataContextProvider: FC<PostContextType> = ({
+  children,
+  postData,
+}) => {
+  const [post, setPost] = useState<Post>(postData);
+  const [comments, setComments] = useState<Comment[]>(postData.comments);
+  const [commentsLastEvaluatedKey, setCommentsLastEvaluatedKey] = useState<
+    CommentsLastEvaluatedKey | undefined
+  >(postData.commentsLastEvaluatedKey);
+
+  const commentsLastEvaluatedKeyHandler = (
+    key: CommentsLastEvaluatedKey | undefined
+  ) => {
+    setCommentsLastEvaluatedKey(key);
+  };
+
+  const commentsListHandler = useCallback(
+    (comments: Comment[], type: "modify" | "add" | "remove" | "more") => {
+      if (type === "add") {
+        setComments((prev) => [...comments, ...prev]);
+        return;
+      }
+
+      if (type === "more") {
+        setComments((prev) => [...prev, ...comments]);
+      }
+
+      if (!comments.length) {
+        return;
+      }
+
+      const handledComment = comments[0];
+      const handleCommentId = `${handledComment.postId}/${handledComment.date}`;
+
+      if (type === "remove") {
+        setComments((prev) =>
+          prev.filter((prevComment) => {
+            const commentId = `${prevComment.postId}/${prevComment.date}`;
+            return commentId !== handleCommentId;
+          })
+        );
+        return;
+      }
+
+      setComments((prev) =>
+        prev.map((prevComment) => {
+          const commentId = `${prevComment.postId}/${prevComment.date}`;
+          if (commentId === handleCommentId) {
+            return {
+              ...prevComment,
+              ...handledComment,
+            };
+          }
+
+          return prevComment;
+        })
+      );
+    },
+    []
+  );
+
+  const subcommentsListHandler = useCallback(
+    (
+      type: "modify" | "add" | "remove" | "more",
+      handleCommentId: string,
+      handleSubcomments: Subcomment[],
+      lastEvaluatedKey?: SubcommentsLastEvaluatedKey
+    ) => {
+      setComments((prev) => {
+        if (!handleSubcomments.length) {
+          return prev;
+        }
+
+        return prev.map((comment) => {
+          const commentId = `${comment.postId}/${comment.date}`;
+
+          if (commentId !== handleCommentId) {
+            return comment;
+          }
+
+          if (type === "more") {
+            return {
+              ...comment,
+              subcomments: [...comment.subcomments, ...handleSubcomments],
+              subcommentsLastEvaluatedKey: lastEvaluatedKey,
+            };
+          }
+
+          const handleSubcomment = handleSubcomments[0];
+
+          if (type === "add") {
+            return {
+              ...comment,
+              subcomments: [handleSubcomment, ...comment.subcomments],
+            };
+          }
+
+          if (type === "remove") {
+            return {
+              ...comment,
+              subcomments: comment.subcomments.filter(
+                (prevSubcomment) =>
+                  prevSubcomment.date !== handleSubcomment.date
+              ),
+            };
+          }
+
+          return {
+            ...comment,
+            subcomments: comment.subcomments.map((prevSubcomment) => {
+              if (prevSubcomment.date !== handleSubcomment.date) {
+                return prevSubcomment;
+              }
+
+              return handleSubcomment;
+            }),
+          };
+        });
+      });
+    },
+    []
+  );
+
+  return (
+    <PostDataContext.Provider
+      value={{
+        post,
+        setPost,
+        comments,
+        commentsLastEvaluatedKey,
+        commentsLastEvaluatedKeyHandler,
+        commentsListHandler,
+        subcommentsListHandler,
+      }}
+    >
+      {children}
+    </PostDataContext.Provider>
+  );
+};

@@ -1,12 +1,13 @@
 import { Subcomment, SubcommentsLastEvaluatedKey } from "../../types/post.type";
 import { AiOutlineDownCircle, AiOutlineUpCircle } from "react-icons/ai";
-import { useCallback, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import styles from "./scss/SubcommentList.module.scss";
 import AddSubcomment from "../molecules/AddSubcomment";
 import PostServices from "../../services/PostServices";
 import SubcommentElement from "./SubcommentElement";
 import DefaultButton from "../atoms/DefaultButton";
 import LoadingBlock from "../atoms/LoadingBlock";
+import { PostDataContext } from "./PostList";
 
 interface SubcommentsData {
   data: Subcomment[];
@@ -15,43 +16,42 @@ interface SubcommentsData {
 
 interface PropsType {
   commentId: string;
-  subcommentsData: SubcommentsData;
+  subcomments: SubcommentsData;
   addSubcomment: boolean;
   setAddSubcomment: (value: boolean) => void;
 }
 
 export default function SubcommentList({
   commentId,
-  subcommentsData,
+  subcomments,
   addSubcomment,
   setAddSubcomment,
 }: PropsType) {
-  const [subcomments, setSubcomments] = useState<Subcomment[]>(
-    subcommentsData.data
-  );
-  const [lastEvaluatedKey, setLastEvaluatedKey] = useState<
-    SubcommentsLastEvaluatedKey | undefined
-  >(subcommentsData.lastEvaluatedKey);
+  const { subcommentsListHandler } = useContext(PostDataContext);
   const [renderLength, setRenderLength] = useState<number>(
-    subcommentsData.data.length > 0 ? 1 : 0
+    subcomments.data.length > 0 ? 1 : 0
   );
   const [subcommentLoading, setSubcommentLoading] = useState<boolean>(false);
   const renderLengthHandler = useCallback(
     (type: "more" | "close") => {
       return async () => {
         if (type === "close") {
-          setRenderLength(subcomments.length > 0 ? 1 : 0);
+          setRenderLength(subcomments.data.length > 0 ? 1 : 0);
           return;
         }
-        if (renderLength >= subcomments.length) {
-          if (lastEvaluatedKey) {
+        if (renderLength >= subcomments.data.length) {
+          if (subcomments.lastEvaluatedKey) {
             setSubcommentLoading(true);
             const extraComments = await PostServices.getNextSubcomments(
-              lastEvaluatedKey
+              subcomments.lastEvaluatedKey
             );
             if (extraComments) {
-              setSubcomments((prev) => [...prev, ...extraComments.data]);
-              setLastEvaluatedKey(extraComments.subcommentsLastEvaluatedKey);
+              subcommentsListHandler(
+                "more",
+                commentId,
+                extraComments.data,
+                extraComments.subcommentsLastEvaluatedKey
+              );
               setRenderLength((prev) => prev + extraComments.data.length);
             }
             setSubcommentLoading(false);
@@ -59,47 +59,36 @@ export default function SubcommentList({
           return;
         } else {
           setRenderLength((prev) =>
-            prev + 3 > subcomments.length ? subcomments.length : prev + 3
+            prev + 3 > subcomments.data.length
+              ? subcomments.data.length
+              : prev + 3
           );
         }
       };
     },
-    [lastEvaluatedKey, renderLength, subcomments.length]
+    [
+      commentId,
+      renderLength,
+      subcomments.data.length,
+      subcomments.lastEvaluatedKey,
+      subcommentsListHandler,
+    ]
   );
 
-  const subcommentsListHandler = useCallback(
+  const subcommentsListHandlerWithRenderLength = useCallback(
     (subcomment: Subcomment, type: "modify" | "add" | "remove") => {
+      subcommentsListHandler(type, commentId, [subcomment]);
       if (type === "add") {
-        setSubcomments((prev) => [subcomment, ...prev]);
         setRenderLength((prev) => prev + 1);
         return;
       }
 
-      const newSubcommentId = `${subcomment.commentId}/${subcomment.date}`;
-
       if (type === "remove") {
-        setSubcomments((prev) =>
-          prev.filter((prevSubcomment) => {
-            const subcommentId = `${prevSubcomment.commentId}/${prevSubcomment.date}`;
-            return subcommentId !== newSubcommentId;
-          })
-        );
         setRenderLength((prev) => (prev > 1 ? prev - 1 : prev));
         return;
       }
-
-      setSubcomments((prev) =>
-        prev.map((prevSubcomment) => {
-          const subcommentId = `${prevSubcomment.commentId}/${prevSubcomment.date}`;
-          if (subcommentId === newSubcommentId) {
-            return subcomment;
-          }
-
-          return prevSubcomment;
-        })
-      );
     },
-    []
+    [commentId, subcommentsListHandler]
   );
 
   const setModeDefault = useCallback(() => {
@@ -107,7 +96,7 @@ export default function SubcommentList({
   }, [setAddSubcomment]);
 
   //subComment가 없는 경우
-  if (subcomments.length === 0) {
+  if (subcomments.data.length === 0) {
     if (!addSubcomment) {
       return null;
     }
@@ -116,7 +105,7 @@ export default function SubcommentList({
       <div className={styles.container}>
         <AddSubcomment
           commentId={commentId}
-          subcommentsListHandler={subcommentsListHandler}
+          subcommentsListHandler={subcommentsListHandlerWithRenderLength}
           setModeDefault={setModeDefault}
         />
       </div>
@@ -129,21 +118,22 @@ export default function SubcommentList({
       {addSubcomment ? (
         <AddSubcomment
           commentId={commentId}
-          subcommentsListHandler={subcommentsListHandler}
+          subcommentsListHandler={subcommentsListHandlerWithRenderLength}
           setModeDefault={setModeDefault}
         />
       ) : null}
-      {subcomments.slice(0, renderLength).map((subcomment, index) => {
+      {subcomments.data.slice(0, renderLength).map((subcomment, index) => {
         return (
           <SubcommentElement
             key={`${subcomment.commentId}/${subcomment.date}`}
             subcomment={subcomment}
-            subcommentsListHandler={subcommentsListHandler}
+            subcommentsListHandler={subcommentsListHandlerWithRenderLength}
           />
         );
       })}
       <div className={styles.more_container}>
-        {renderLength < subcomments.length || lastEvaluatedKey ? (
+        {renderLength < subcomments.data.length ||
+        subcomments.lastEvaluatedKey ? (
           <DefaultButton
             size="sm"
             onClick={renderLengthHandler("more")}

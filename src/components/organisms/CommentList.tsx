@@ -1,6 +1,6 @@
 import { Comment, CommentsLastEvaluatedKey } from "../../types/post.type";
 import styles from "./scss/CommentList.module.scss";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { GoTriangleUp, GoTriangleDown } from "react-icons/go";
 import { AiOutlineDownCircle, AiOutlineUpCircle } from "react-icons/ai";
 import CommentElement from "./CommentElement";
@@ -8,6 +8,7 @@ import PostServices from "../../services/PostServices";
 import AddComment from "../molecules/AddComment";
 import DefaultButton from "../atoms/DefaultButton";
 import LoadingBlock from "../atoms/LoadingBlock";
+import { PostDataContext } from "./PostList";
 
 export interface CommentsData {
   data: Comment[];
@@ -27,10 +28,12 @@ export default function CommentList({
   showComment,
   setShowComment,
 }: CommentElementProps) {
-  const [comments, setComments] = useState<Comment[]>(commentsData.data);
-  const [lastEvaluatedKey, setLastEvaluatedKey] = useState<
-    CommentsLastEvaluatedKey | undefined
-  >(commentsData.lastEvaluatedKey);
+  const {
+    comments,
+    commentsListHandler,
+    commentsLastEvaluatedKey: lastEvaluatedKey,
+    commentsLastEvaluatedKeyHandler: setLastEvaluatedKey,
+  } = useContext(PostDataContext);
 
   const [renderLength, setRenderLength] = useState<number>(
     comments.length > 2 ? 3 : comments.length
@@ -59,7 +62,7 @@ export default function CommentList({
               lastEvaluatedKey
             );
             if (extraComments) {
-              setComments((prev) => [...prev, ...extraComments.data]);
+              commentsListHandler(extraComments.data, "more");
               setLastEvaluatedKey(extraComments.commentsLastEvaluatedKey);
               setRenderLength((prev) =>
                 extraComments.data.length > 2
@@ -77,7 +80,13 @@ export default function CommentList({
         }
       };
     },
-    [comments.length, lastEvaluatedKey, renderLength]
+    [
+      comments.length,
+      commentsListHandler,
+      lastEvaluatedKey,
+      renderLength,
+      setLastEvaluatedKey,
+    ]
   );
 
   const openComments = useCallback(() => {
@@ -96,39 +105,19 @@ export default function CommentList({
   //lastkey가 있으면 데이터를 가져오고 + 더보기를 보여줌
   //lastkey가 없으면 닫는거만 보여줌
 
-  const commentsListHandler = useCallback(
+  const commentsListHandlerWithRenderLength = useCallback(
     (comment: Comment, type: "modify" | "add" | "remove") => {
+      commentsListHandler([comment], type);
       if (type === "add") {
-        setComments((prev) => [comment, ...prev]);
         setRenderLength((prev) => prev + 1);
         return;
       }
-
-      const newCommentId = `${comment.postId}/${comment.date}`;
-
       if (type === "remove") {
-        setComments((prev) =>
-          prev.filter((prevComment) => {
-            const commentId = `${prevComment.postId}/${prevComment.date}`;
-            return commentId !== newCommentId;
-          })
-        );
         setRenderLength((prev) => (prev > 1 ? prev - 1 : prev));
         return;
       }
-
-      setComments((prev) =>
-        prev.map((prevComment) => {
-          const commentId = `${prevComment.postId}/${prevComment.date}`;
-          if (commentId === newCommentId) {
-            return comment;
-          }
-
-          return prevComment;
-        })
-      );
     },
-    []
+    [commentsListHandler]
   );
 
   //렌더
@@ -145,7 +134,7 @@ export default function CommentList({
           <CommentElement
             key={`${comments[0].postId}/${comments[0].date}`}
             comment={comments[0]}
-            commentsListHandler={commentsListHandler}
+            commentsListHandler={commentsListHandlerWithRenderLength}
             borderBottom={false}
             parentShowComment={showComment}
           />
@@ -169,14 +158,14 @@ export default function CommentList({
     <>
       <AddComment
         postId={`${postId}`}
-        commentsListHandler={commentsListHandler}
+        commentsListHandler={commentsListHandlerWithRenderLength}
       />
       {comments.slice(0, renderLength).map((comment, i) => {
         return (
           <CommentElement
             key={`${comment.postId}/${comment.date}`}
             comment={comment}
-            commentsListHandler={commentsListHandler}
+            commentsListHandler={commentsListHandlerWithRenderLength}
             borderBottom={true}
             parentShowComment={showComment}
           />
