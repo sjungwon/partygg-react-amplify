@@ -1,14 +1,16 @@
 import { Carousel } from "react-bootstrap";
 import styles from "./scss/ImageSlide.module.scss";
-import { useCallback, useEffect } from "react";
+import { FC, MouseEventHandler, useCallback, useEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import useImgLoadError from "../../hooks/useImgLoadError";
+import { CgClose } from "react-icons/cg";
 
 interface PropsType {
   images: string[];
   index?: number;
   setIndex?: (index: number) => void;
   type?: string;
+  expandable?: true;
 }
 
 export default function ImageSlide({
@@ -16,6 +18,7 @@ export default function ImageSlide({
   index,
   setIndex,
   type,
+  expandable,
 }: PropsType) {
   //슬라이드에서 현재 이미지 index 설정
   const handleSelect = useCallback(
@@ -42,6 +45,35 @@ export default function ImageSlide({
   //fullsize 이미지도 실패하면 깨짐 처리
   const loadError = useImgLoadError();
 
+  const [expandURL, setExpandURL] = useState<string>("");
+
+  const scrollBlock = () => {
+    const body = document.getElementsByTagName("body")[0];
+    body.classList.add(styles.scroll_lock);
+  };
+  const scrollRelease = () => {
+    const body = document.getElementsByTagName("body")[0];
+    body.classList.remove(styles.scroll_lock);
+  };
+
+  const click: MouseEventHandler<HTMLImageElement> = useCallback(
+    (event) => {
+      if (expandable) {
+        const imgEl = event.target as HTMLInputElement;
+        const imgSrc = imgEl.src;
+        console.log(imgSrc);
+        setExpandURL(imgSrc);
+        scrollBlock();
+        // setExpandURL(imgSrc);
+      }
+    },
+    [expandable]
+  );
+  const close = useCallback(() => {
+    setExpandURL("");
+    scrollRelease();
+  }, []);
+
   return (
     <>
       <Carousel
@@ -67,18 +99,50 @@ export default function ImageSlide({
                   src={img}
                   alt="inputImg"
                   onError={loadError}
+                  onClick={click}
                 />
               ) : (
                 <LazyLoadImage
                   className={styles.slide_item}
                   src={img}
                   onError={loadError}
+                  onClick={click}
                 />
               )}
             </Carousel.Item>
           );
         })}
       </Carousel>
+      <ExpandImage imageURL={expandURL} close={close} />
     </>
   );
 }
+
+interface ExpandImagePropsType {
+  imageURL: string;
+  close: () => void;
+}
+
+const ExpandImage: FC<ExpandImagePropsType> = ({ imageURL, close }) => {
+  // const dom = document.querySelector(".App");
+  // if (imageURL) {
+  //   dom?.classList.add(styles.scroll_lock);
+  // } else {
+  //   dom?.classList.remove(styles.scroll_lock);
+  // }
+
+  if (!imageURL) {
+    return null;
+  }
+
+  return (
+    <div className={styles.expand_container}>
+      <div className={styles.expand_content}>
+        <button onClick={close} className={styles.expand_close}>
+          <CgClose />
+        </button>
+        <img src={imageURL} alt="expanded" className={styles.expand_img} />
+      </div>
+    </div>
+  );
+};

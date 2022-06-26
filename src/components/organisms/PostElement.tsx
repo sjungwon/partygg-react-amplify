@@ -231,7 +231,7 @@ export default function PostElement({ removePost }: PropsType) {
         </CheckUserBlock>
       </Card.Header>
       <Card.Body className={`${styles.card_body}`}>
-        {images.length > 0 ? <ImageSlide images={images} /> : null}
+        {images.length > 0 ? <ImageSlide images={images} expandable /> : null}
         <Card.Text className={styles.card_body_text}>
           {post.text.slice(0, showTextLength)}
           {(post.images.length && post.text.length > 100) ||
