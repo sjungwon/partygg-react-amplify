@@ -36,8 +36,12 @@ export default function CommentElement({
   }, []);
 
   const handleRemoveModalOpen = useCallback(() => {
+    if (comment.subcomments.length) {
+      window.alert("대댓글이 있는 댓글은 제거할 수 없습니다.");
+      return;
+    }
     setShowRemoveModal(true);
-  }, []);
+  }, [comment]);
 
   const [loading, setLoading] = useState<boolean>(false);
 
