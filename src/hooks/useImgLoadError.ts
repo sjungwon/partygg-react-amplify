@@ -6,8 +6,12 @@ export default function useImgLoadError() {
   const loadError = useCallback(async (event: any) => {
     const imageEl = event.target;
     const origSrc: string = imageEl.src;
-    if (!origSrc) {
-      imageEl.src = "/error.png";
+
+    if (origSrc.includes("error.png") || !origSrc) {
+      imageEl.src = "";
+      imageEl.onerror = null;
+      imageEl.remove();
+      return;
     }
 
     //key로 받아온 이미지가 아니면

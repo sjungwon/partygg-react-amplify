@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Card } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
+import useImgLoadError from "../../hooks/useImgLoadError";
 import FileServices from "../../services/FileServices";
 import { ImageKeys } from "../../types/file.type";
 import { Profile } from "../../types/profile.type";
@@ -41,6 +42,8 @@ export default function ProfileCard({ searchProfile }: PropsType) {
       }
     }
   }, [getProfileImage, searchProfile]);
+
+  const loadError = useImgLoadError();
   return (
     <Card className={styles.container}>
       <Card.Body className={styles.body_container}>
@@ -49,6 +52,7 @@ export default function ProfileCard({ searchProfile }: PropsType) {
             src={image ? image : "/default_profile.png"}
             alt="프로필 이미지"
             className={styles.profile_img}
+            onError={loadError}
           />
         </div>
         <Card.Title className={styles.title}>
