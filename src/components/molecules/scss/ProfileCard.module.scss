@@ -48,6 +48,7 @@
   padding: 0 .25rem;
   border-radius: .25rem;
   background-color: $primary-default-btn-background;
+  box-shadow: $btn-box-shadow;
   color: $font-color-gray;
   text-decoration: none;
   &:hover{

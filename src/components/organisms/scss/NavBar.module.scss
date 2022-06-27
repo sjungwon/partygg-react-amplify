@@ -60,19 +60,19 @@
     width: 2rem;
     height: 2rem;
     padding: 0;
-    margin-right: .5rem;
+    margin-right: 1.5rem;
     background-color: transparent;
     color: $mobile-btn-gray;
-    font-size: 1.5rem;
+    font-size: 2rem;
     svg{
       pointer-events: none;
     }
   }
   .btn_login{
-    min-width: 3rem;
-    height: 1.75rem;
+    min-width: 4rem;
+    height: 2rem;
     margin: auto 0;
-    font-size: .8rem;
+    font-size: .9rem;
     color: white;
     background-color: transparent;
     border: 1px solid white;
@@ -127,6 +127,14 @@
     .navbar_btn_mobile{
       display: flex;
     }
+    .btn_home{
+      font-size: 1.75rem;
+      margin-right: .75rem;
+    }
+    .btn_login{
+      min-width: 3rem;
+      height: 1.75rem;
+      font-size: .8rem;
+    }
   }
-  
 }

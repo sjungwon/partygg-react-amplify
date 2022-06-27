@@ -124,7 +124,7 @@ export default function AddSubcomment({
     <CommentCard>
       <NeedLoginBlock requiredMessage="대댓글을 작성하려면 ">
         <NeedProfileBlock
-          requiredMessage="대댓글을 작성하려면 "
+          requiredMessage="대댓글을 작성하려면 카테고리에 맞는 "
           profiles={filteredProfileArr}
         >
           <CommentCard.Header>

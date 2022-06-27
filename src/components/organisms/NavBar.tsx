@@ -1,11 +1,4 @@
-import {
-  useCallback,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { UserDataContext } from "../../context/UserDataContextProvider";
 import GameSearchRecommend from "../molecules/RecommendSearchBar";
@@ -14,9 +7,9 @@ import { GiHamburgerMenu } from "react-icons/gi";
 import { AiOutlineSearch } from "react-icons/ai";
 import { CgProfile } from "react-icons/cg";
 import gsap from "gsap";
-import _ from "lodash";
 import MobileButton from "../atoms/MobileButton";
 import DefaultButton from "../atoms/DefaultButton";
+import useViewportSize from "../../hooks/useViewportSize";
 
 interface PropsType {
   showCategoryHandler: () => void;
@@ -56,33 +49,19 @@ export default function NavBar({ showCategoryHandler }: PropsType) {
   }, [showSearchBar]);
 
   //데스크탑인 경우 화면 크기 변경으로 searchBar가 안나올 수 있는거 방지
-  const [viewWidth, setViewWidth] = useState<number>(0);
-  const widthChangeHandler = useMemo(
-    () =>
-      _.debounce(function (this: Window, event: UIEvent) {
-        setViewWidth(this.innerWidth);
-      }, 300),
-    []
-  );
+  const viewSize = useViewportSize();
 
   useEffect(() => {
-    window.addEventListener("resize", widthChangeHandler);
-    return () => {
-      window.removeEventListener("resize", widthChangeHandler);
-    };
-  }, [widthChangeHandler]);
-
-  useEffect(() => {
-    if (viewWidth > 829 && searchBarRef.current) {
+    if (viewSize.x > 829 && searchBarRef.current) {
       searchBarRef.current.style.display = "flex";
       searchBarRef.current.style.opacity = "1";
     } else {
-      if (viewWidth > 0 && searchBarRef.current) {
+      if (searchBarRef.current) {
         searchBarRef.current.style.display = "none";
         searchBarRef.current.style.opacity = "0";
       }
     }
-  }, [viewWidth]);
+  }, [viewSize]);
 
   const goHome = useCallback(() => {
     if (!username) {

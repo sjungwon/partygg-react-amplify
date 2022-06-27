@@ -11,6 +11,7 @@ import { Profile } from "../../types/profile.type";
 import ProfileServices from "../../services/ProfileServices";
 import LoadingBlock from "../atoms/LoadingBlock";
 import { PostListContext } from "../../pages/HomePage";
+import UserMenuFixedButton from "../molecules/UserMenuFixedButton";
 
 export default function PostList() {
   const { posts, category, searchParam, morePosts, initPosts } =
@@ -151,6 +152,7 @@ export default function PostList() {
   return (
     <>
       <div className={styles.container}>
+        <UserMenuFixedButton />
         <h3 className={styles.category}>{title}</h3>
         {category === "usernames" && decodeURI(searchParam) !== username ? (
           <UserHomeCard username={decodeURI(searchParam)} />

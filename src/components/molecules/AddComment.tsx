@@ -118,7 +118,7 @@ export default function AddComment({
       <NeedLoginBlock requiredMessage="댓글을 작성하려면 ">
         <NeedProfileBlock
           profiles={filteredProfileArr}
-          requiredMessage="댓글을 작성하려면 "
+          requiredMessage="댓글을 작성하려면 카테고리에 맞는 "
         >
           <CommentCard.Header>
             <ProfileBlock profile={currentProfile} disableNavigate />

@@ -44,7 +44,11 @@ export default function UserHomeCard({ username }: PropsType) {
         <Card.Title className={styles.title}>{username}</Card.Title>
       </Card.Header>
       <Card.Body className={styles.body_container}>
-        <ProfileList profileArr={userProfile} username={username} />
+        {userProfile.length ? (
+          <ProfileList profileArr={userProfile} username={username} />
+        ) : (
+          <p className={styles.no_user}>존재하지 않는 사용자</p>
+        )}
       </Card.Body>
     </Card>
   );
