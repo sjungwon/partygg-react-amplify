@@ -15,6 +15,7 @@ import DefaultTextarea from "../atoms/DefaultTextarea";
 
 interface PropsType {
   postId: string;
+  game: string;
   prevData?: {
     comment: Comment;
     setModeDefault: () => void;
@@ -27,26 +28,31 @@ interface PropsType {
 
 export default function AddComment({
   postId,
+  game,
   prevData,
   commentsListHandlerWithRenderLength: commentsListHandler,
 }: PropsType) {
   //유저 데이터 사용 -> 프로필, 이름
-  const { currentProfile: defaultProfile, filteredProfileArr } =
+  const { profileArr, currentProfile: defaultProfile } =
     useContext(UserDataContext);
 
   const [currentProfile, setCurrentProfile] = useState<Profile>(defaultProfile);
-
+  const [filteredProfileArr, setFilteredProfileArr] =
+    useState<Profile[]>(profileArr);
   useEffect(() => {
+    const filtered = profileArr.filter((profile) => profile.game === game);
+    setFilteredProfileArr(filtered);
     //수정인 경우 수정할 comment profile로 설정
-    if (prevData) {
-      setCurrentProfile(prevData.comment.profile);
+    if (prevData && filtered.length) {
+      const finded = profileArr.find(
+        (profile) => profile.id === prevData.comment.profileId
+      );
+      setCurrentProfile(finded ? finded : filtered[0]);
+      return;
     }
     //수정이 아닌 경우 = 댓글 추가인 경우
-    //defaultProfile이 변경되면 defaultProfile로 설정
-    if (!prevData && defaultProfile) {
-      setCurrentProfile(defaultProfile);
-    }
-  }, [prevData, setCurrentProfile, defaultProfile]);
+    setCurrentProfile(filtered[0]);
+  }, [prevData, setCurrentProfile, profileArr, game]);
 
   //데이터 제출용 ref
   const textAreaRef = useRef<HTMLTextAreaElement>(null);

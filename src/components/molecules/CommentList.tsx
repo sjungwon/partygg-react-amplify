@@ -17,6 +17,7 @@ export interface CommentsData {
 
 interface CommentElementProps {
   postId: string;
+  game: string;
   showComment: boolean;
   setShowComment: (value: boolean) => void;
   comments: Comment[];
@@ -25,6 +26,7 @@ interface CommentElementProps {
 
 export default function CommentList({
   postId,
+  game,
   showComment,
   setShowComment,
   comments,
@@ -140,6 +142,7 @@ export default function CommentList({
             }
             borderBottom={false}
             parentShowComment={showComment}
+            game={game}
           />
           {comments.length > 1 ||
           (comments.length && comments[0].subcomments.length) ? (
@@ -161,6 +164,7 @@ export default function CommentList({
     <>
       <AddComment
         postId={`${postId}`}
+        game={game}
         commentsListHandlerWithRenderLength={
           commentsListHandlerWithRenderLength
         }
@@ -175,6 +179,7 @@ export default function CommentList({
             }
             borderBottom={true}
             parentShowComment={showComment}
+            game={game}
           />
         );
       })}

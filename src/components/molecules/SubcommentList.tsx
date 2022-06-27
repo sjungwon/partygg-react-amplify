@@ -17,6 +17,7 @@ interface SubcommentsData {
 interface PropsType {
   postId: string;
   commentId: string;
+  game: string;
   subcomments: SubcommentsData;
   addSubcomment: boolean;
   setAddSubcomment: (value: boolean) => void;
@@ -25,6 +26,7 @@ interface PropsType {
 export default function SubcommentList({
   postId,
   commentId,
+  game,
   subcomments,
   addSubcomment,
   setAddSubcomment,
@@ -109,6 +111,7 @@ export default function SubcommentList({
       <div className={styles.container}>
         <AddSubcomment
           commentId={commentId}
+          game={game}
           subcommentsListHandlerWithRenderLength={
             subcommentsListHandlerWithRenderLength
           }
@@ -124,6 +127,7 @@ export default function SubcommentList({
       {addSubcomment ? (
         <AddSubcomment
           commentId={commentId}
+          game={game}
           subcommentsListHandlerWithRenderLength={
             subcommentsListHandlerWithRenderLength
           }
@@ -138,6 +142,7 @@ export default function SubcommentList({
             subcommentsListHandlerWithRenderLength={
               subcommentsListHandlerWithRenderLength
             }
+            game={game}
           />
         );
       })}

@@ -10,18 +10,20 @@ import CommentCard from "../atoms/CommentCard";
 import CheckUserBlock from "../atoms/CheckUserBlock";
 import DefaultButton from "../atoms/DefaultButton";
 
-interface CommentElementProps {
+interface SubcommentElementProps {
   subcomment: Subcomment;
   subcommentsListHandlerWithRenderLength: (
     subcomment: Subcomment,
     type: "add" | "modify" | "remove"
   ) => void;
+  game: string;
 }
 
 export default function SubcommentElement({
   subcomment,
   subcommentsListHandlerWithRenderLength: subcommentsListHandler,
-}: CommentElementProps) {
+  game,
+}: SubcommentElementProps) {
   //삭제시 재확인 모달 관련 데이터
   const [showRemoveModal, setShowRemoveModal] = useState(false);
   const handleRemoveModalClose = useCallback(() => {
@@ -65,6 +67,7 @@ export default function SubcommentElement({
           prevData={subcomment}
           setModeDefault={setModeDefault}
           subcommentsListHandlerWithRenderLength={subcommentsListHandler}
+          game={game}
         />
       </div>
     );

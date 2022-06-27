@@ -282,6 +282,7 @@ export default function PostElement({ post }: PropsType) {
         }`}
       >
         <CommentList
+          game={post.game}
           postId={`${post.username}/${post.date}`}
           showComment={showComment}
           setShowComment={childShowCommentHandler}

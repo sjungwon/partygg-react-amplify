@@ -20,6 +20,7 @@ interface CommentElementProps {
   ) => void;
   borderBottom: boolean;
   parentShowComment: boolean;
+  game: string;
 }
 
 export default function CommentElement({
@@ -27,6 +28,7 @@ export default function CommentElement({
   commentsListHandlerWithRenderLength: commentsListHandler,
   borderBottom,
   parentShowComment,
+  game,
 }: CommentElementProps) {
   //삭제 확인 모달
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -83,6 +85,7 @@ export default function CommentElement({
           postId={comment.postId}
           commentsListHandlerWithRenderLength={commentsListHandler}
           prevData={{ comment, setModeDefault }}
+          game={comment.game}
         />
         {comment.subcomments ? (
           <SubcommentList
@@ -95,6 +98,7 @@ export default function CommentElement({
             addSubcomment={addSubcomment}
             setAddSubcomment={setAddSubcomment}
             key={`${comment.postId}/${comment.date}`}
+            game={comment.game}
           />
         ) : null}
       </CommentCard>
@@ -145,6 +149,7 @@ export default function CommentElement({
           addSubcomment={addSubcomment}
           setAddSubcomment={setAddSubcomment}
           key={`${comment.postId}/${comment.date}`}
+          game={game}
         />
       ) : null}
       <RemoveConfirmModal

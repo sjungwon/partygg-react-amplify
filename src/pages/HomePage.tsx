@@ -13,7 +13,6 @@ import UserInfoBar from "../components/organisms/UserInfoBar";
 import { UserDataContext } from "../context/UserDataContextProvider";
 import useCategory from "../hooks/useCategory";
 import LikeServices from "../services/LikeServices";
-import PostServices from "../services/PostServices";
 import {
   Comment,
   CommentsLastEvaluatedKey,
@@ -77,6 +76,7 @@ interface PostListContextData {
   posts: Post[];
   category: string;
   searchParam: string;
+  initPosts: () => void;
   removePost: (postId: string) => void;
   addPost: (post: Post) => void;
   morePosts: (posts: Post[]) => void;
@@ -102,6 +102,7 @@ const initialPostList: PostListContextData = {
   posts: [],
   category: "",
   searchParam: "",
+  initPosts: () => {},
   removePost: () => {},
   addPost: () => {},
   morePosts: () => {},
@@ -138,16 +139,11 @@ const PostListContextProvider: FC<PostListProviderProps> = ({
   const [posts, setPosts] = useState<Post[]>([]);
   const { username } = useContext(UserDataContext);
 
-  useEffect(() => {
-    console.log("init");
-    PostServices.init();
+  const initPosts = useCallback(() => {
     setPosts([]);
-  }, [category, searchParam]);
-
-  console.log(posts);
+  }, []);
 
   const morePosts = useCallback((posts: Post[]) => {
-    console.log("more", posts);
     setPosts((prev: Post[]) => [...prev, ...posts]);
   }, []);
 
@@ -486,6 +482,7 @@ const PostListContextProvider: FC<PostListProviderProps> = ({
     <PostListContext.Provider
       value={{
         posts,
+        initPosts,
         removePost,
         addPost,
         category,

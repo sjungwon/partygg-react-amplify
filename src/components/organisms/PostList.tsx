@@ -13,12 +13,16 @@ import LoadingBlock from "../atoms/LoadingBlock";
 import { PostListContext } from "../../pages/HomePage";
 
 export default function PostList() {
-  const { posts, category, searchParam, morePosts } =
+  const { posts, category, searchParam, morePosts, initPosts } =
     useContext(PostListContext);
+
+  useEffect(() => {
+    PostServices.init();
+    initPosts();
+  }, [category, initPosts, searchParam]);
 
   const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const sendQuery = useCallback(async () => {
-    console.log("query");
     setQueryLoading(true);
     const postList = await PostServices.getPosts(
       category,
@@ -66,7 +70,6 @@ export default function PostList() {
   //margin으로 기준 요소를 수축, 증가시켜서 교차성을 계산
   //threshold -> 가시성을 비율로 나타냄 -> 얼마나 보여지면 콜백을 호출할 것인지 지정
   useEffect(() => {
-    console.log("set handler");
     const option: IntersectionObserverInit = {
       root: null,
       rootMargin: "600px",
