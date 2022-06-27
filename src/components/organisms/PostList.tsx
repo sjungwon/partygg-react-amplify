@@ -149,7 +149,7 @@ export default function PostList() {
     <>
       <div className={styles.container}>
         <h3 className={styles.category}>{title}</h3>
-        {category === "usernames" ? (
+        {category === "usernames" && decodeURI(searchParam) !== username ? (
           <UserHomeCard username={decodeURI(searchParam)} />
         ) : null}
         {category === "profiles" ? (

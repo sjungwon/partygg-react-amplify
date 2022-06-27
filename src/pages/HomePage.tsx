@@ -139,12 +139,16 @@ const PostListContextProvider: FC<PostListProviderProps> = ({
   const { username } = useContext(UserDataContext);
 
   useEffect(() => {
+    console.log("init");
     PostServices.init();
     setPosts([]);
   }, [category, searchParam]);
 
+  console.log(posts);
+
   const morePosts = useCallback((posts: Post[]) => {
-    setPosts((prev: Post[]) => [...posts, ...prev]);
+    console.log("more", posts);
+    setPosts((prev: Post[]) => [...prev, ...posts]);
   }, []);
 
   const removePost = useCallback((postId: string) => {
