@@ -10,7 +10,7 @@ import DefaultButton from "../atoms/DefaultButton";
 import NeedLoginBlock from "../atoms/NeedLoginBlock";
 import NeedProfileBlock from "../atoms/NeedProfileBlock";
 import CommentCard from "../atoms/CommentCard";
-import ProfileBlock from "../molecules/ProfileBlock";
+import ProfileBlock from "./ProfileBlock";
 import DefaultTextarea from "../atoms/DefaultTextarea";
 
 interface PropsType {
@@ -19,13 +19,16 @@ interface PropsType {
     comment: Comment;
     setModeDefault: () => void;
   };
-  commentsListHandler: (newComment: Comment, type: "modify" | "add") => void;
+  commentsListHandlerWithRenderLength: (
+    comment: Comment,
+    type: "modify" | "add" | "remove"
+  ) => void;
 }
 
 export default function AddComment({
   postId,
   prevData,
-  commentsListHandler,
+  commentsListHandlerWithRenderLength: commentsListHandler,
 }: PropsType) {
   //유저 데이터 사용 -> 프로필, 이름
   const { currentProfile: defaultProfile, filteredProfileArr } =

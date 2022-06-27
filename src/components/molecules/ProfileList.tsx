@@ -10,11 +10,11 @@ import { UserDataContext } from "../../context/UserDataContextProvider";
 import FileServices from "../../services/FileServices";
 import ProfileServices from "../../services/ProfileServices";
 import { Profile } from "../../types/profile.type";
-import AddProfileModal from "../molecules/AddProfileModal";
+import AddProfileModal from "./AddProfileModal";
 import RemoveConfirmModal from "./RemoveConfirmModal";
 import styles from "./scss/ProfileList.module.scss";
 import { NavLink } from "react-router-dom";
-import ProfileBlock from "../molecules/ProfileBlock";
+import ProfileBlock from "./ProfileBlock";
 import DefaultButton from "../atoms/DefaultButton";
 
 interface PropsType {

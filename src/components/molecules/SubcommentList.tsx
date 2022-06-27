@@ -7,7 +7,7 @@ import PostServices from "../../services/PostServices";
 import SubcommentElement from "./SubcommentElement";
 import DefaultButton from "../atoms/DefaultButton";
 import LoadingBlock from "../atoms/LoadingBlock";
-import { PostDataContext } from "./PostList";
+import { PostListContext } from "../../pages/HomePage";
 
 interface SubcommentsData {
   data: Subcomment[];
@@ -15,6 +15,7 @@ interface SubcommentsData {
 }
 
 interface PropsType {
+  postId: string;
   commentId: string;
   subcomments: SubcommentsData;
   addSubcomment: boolean;
@@ -22,12 +23,13 @@ interface PropsType {
 }
 
 export default function SubcommentList({
+  postId,
   commentId,
   subcomments,
   addSubcomment,
   setAddSubcomment,
 }: PropsType) {
-  const { subcommentsListHandler } = useContext(PostDataContext);
+  const { subcommentsListHandler } = useContext(PostListContext);
   const [renderLength, setRenderLength] = useState<number>(
     subcomments.data.length > 0 ? 1 : 0
   );
@@ -48,6 +50,7 @@ export default function SubcommentList({
             if (extraComments) {
               subcommentsListHandler(
                 "more",
+                postId,
                 commentId,
                 extraComments.data,
                 extraComments.subcommentsLastEvaluatedKey
@@ -68,6 +71,7 @@ export default function SubcommentList({
     },
     [
       commentId,
+      postId,
       renderLength,
       subcomments.data.length,
       subcomments.lastEvaluatedKey,
@@ -77,7 +81,7 @@ export default function SubcommentList({
 
   const subcommentsListHandlerWithRenderLength = useCallback(
     (subcomment: Subcomment, type: "modify" | "add" | "remove") => {
-      subcommentsListHandler(type, commentId, [subcomment]);
+      subcommentsListHandler(type, postId, commentId, [subcomment]);
       if (type === "add") {
         setRenderLength((prev) => prev + 1);
         return;
@@ -88,7 +92,7 @@ export default function SubcommentList({
         return;
       }
     },
-    [commentId, subcommentsListHandler]
+    [commentId, postId, subcommentsListHandler]
   );
 
   const setModeDefault = useCallback(() => {
@@ -105,7 +109,9 @@ export default function SubcommentList({
       <div className={styles.container}>
         <AddSubcomment
           commentId={commentId}
-          subcommentsListHandler={subcommentsListHandlerWithRenderLength}
+          subcommentsListHandlerWithRenderLength={
+            subcommentsListHandlerWithRenderLength
+          }
           setModeDefault={setModeDefault}
         />
       </div>
@@ -118,7 +124,9 @@ export default function SubcommentList({
       {addSubcomment ? (
         <AddSubcomment
           commentId={commentId}
-          subcommentsListHandler={subcommentsListHandlerWithRenderLength}
+          subcommentsListHandlerWithRenderLength={
+            subcommentsListHandlerWithRenderLength
+          }
           setModeDefault={setModeDefault}
         />
       ) : null}
@@ -127,7 +135,9 @@ export default function SubcommentList({
           <SubcommentElement
             key={`${subcomment.commentId}/${subcomment.date}`}
             subcomment={subcomment}
-            subcommentsListHandler={subcommentsListHandlerWithRenderLength}
+            subcommentsListHandlerWithRenderLength={
+              subcommentsListHandlerWithRenderLength
+            }
           />
         );
       })}

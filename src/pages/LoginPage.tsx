@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import RegisterConfirmModal from "../components/molecules/RegisterConfirmModal";
 import AuthServices from "../services/AuthServices";
 import styles from "./LoginPage.module.scss";
-import RegisterModal from "../components/organisms/RegisterModal";
+import RegisterModal from "../components/molecules/RegisterModal";
 import { UserDataContext } from "../context/UserDataContextProvider";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 import DefaultButton from "../components/atoms/DefaultButton";

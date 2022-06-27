@@ -2,17 +2,17 @@ import styles from "./scss/SubcommentElement.module.scss";
 import { useCallback, useState } from "react";
 import { BsTrash, BsPencilSquare } from "react-icons/bs";
 import { Subcomment } from "../../types/post.type";
-import RemoveConfirmModal from "../molecules/RemoveConfirmModal";
+import RemoveConfirmModal from "./RemoveConfirmModal";
 import PostServices from "../../services/PostServices";
-import AddSubcomment from "../molecules/AddSubcomment";
-import ProfileBlock from "../molecules/ProfileBlock";
+import AddSubcomment from "./AddSubcomment";
+import ProfileBlock from "./ProfileBlock";
 import CommentCard from "../atoms/CommentCard";
 import CheckUserBlock from "../atoms/CheckUserBlock";
 import DefaultButton from "../atoms/DefaultButton";
 
 interface CommentElementProps {
   subcomment: Subcomment;
-  subcommentsListHandler: (
+  subcommentsListHandlerWithRenderLength: (
     subcomment: Subcomment,
     type: "add" | "modify" | "remove"
   ) => void;
@@ -20,7 +20,7 @@ interface CommentElementProps {
 
 export default function SubcommentElement({
   subcomment,
-  subcommentsListHandler,
+  subcommentsListHandlerWithRenderLength: subcommentsListHandler,
 }: CommentElementProps) {
   //삭제시 재확인 모달 관련 데이터
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -64,7 +64,7 @@ export default function SubcommentElement({
           commentId={subcomment.commentId}
           prevData={subcomment}
           setModeDefault={setModeDefault}
-          subcommentsListHandler={subcommentsListHandler}
+          subcommentsListHandlerWithRenderLength={subcommentsListHandler}
         />
       </div>
     );

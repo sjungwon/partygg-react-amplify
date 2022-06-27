@@ -7,29 +7,29 @@ import {
   BsHandThumbsDown,
   BsHandThumbsDownFill,
 } from "react-icons/bs";
-import ImageSlide from "../molecules/ImageSlide";
+import ImageSlide from "./ImageSlide";
 import { UserDataContext } from "../../context/UserDataContextProvider";
-import RemoveConfirmModal from "../molecules/RemoveConfirmModal";
+import RemoveConfirmModal from "./RemoveConfirmModal";
 import FileServices from "../../services/FileServices";
 import { ImageKeys } from "../../types/file.type";
 import PostServices from "../../services/PostServices";
-import AddPostElement from "../molecules/AddPostElement";
+import AddPostElement from "./AddPostElement";
 import CommentList from "./CommentList";
 import { NavLink } from "react-router-dom";
 import DefaultButton from "../atoms/DefaultButton";
 import CheckUserBlock from "../atoms/CheckUserBlock";
 import CommentsButton from "../atoms/CommentsButton";
-import ProfileBlock from "../molecules/ProfileBlock";
-import { PostDataContext } from "./PostList";
+import ProfileBlock from "./ProfileBlock";
+import { PostListContext } from "../../pages/HomePage";
+import { Post } from "../../types/post.type";
 
 interface PropsType {
-  removePost: (value: string) => void;
+  post: Post;
 }
 
-export default function PostElement({ removePost }: PropsType) {
+export default function PostElement({ post }: PropsType) {
   const { username, profileArr } = useContext(UserDataContext);
-  const { post, postLike, postDislike, modifyPost, comments } =
-    useContext(PostDataContext);
+  const { removePost, likePost, dislikePost } = useContext(PostListContext);
   const [images, setImages] = useState<string[]>([]);
 
   const getImageAsync = useCallback(async (imageKeys: ImageKeys[]) => {
@@ -89,7 +89,16 @@ export default function PostElement({ removePost }: PropsType) {
     [scrollHeight]
   );
 
-  //싫어요 클릭 함수
+  //좋아요, 싫어요 클릭 함수
+  const postLike = useCallback(() => {
+    const postId = `${post.username}/${post.date}`;
+    likePost(postId);
+  }, [post, likePost]);
+
+  const postDislike = useCallback(() => {
+    const postId = `${post.username}/${post.date}`;
+    dislikePost(postId);
+  }, [post, dislikePost]);
 
   //포스트 제거, 제거 확인 모달 관련 데이터
 
@@ -189,7 +198,6 @@ export default function PostElement({ removePost }: PropsType) {
         prevData={{
           setMode,
           postData: post,
-          setPostData: modifyPost,
           imageURLs: images,
         }}
       />
@@ -270,13 +278,15 @@ export default function PostElement({ removePost }: PropsType) {
       </Card.Body>
       <Card.Footer
         className={`${styles.card_footer} ${
-          comments.length ? "" : styles.card_footer_no_border
+          post.comments.length ? "" : styles.card_footer_no_border
         }`}
       >
         <CommentList
           postId={`${post.username}/${post.date}`}
           showComment={showComment}
           setShowComment={childShowCommentHandler}
+          comments={post.comments}
+          commentsLastEvaluatedKey={post.commentsLastEvaluatedKey}
         />
       </Card.Footer>
       <RemoveConfirmModal

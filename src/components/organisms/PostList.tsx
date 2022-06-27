@@ -1,83 +1,40 @@
 import styles from "./scss/PostList.module.scss";
 import AddPostElement from "../molecules/AddPostElement";
-import PostElement from "./PostElement";
+import PostElement from "../molecules/PostElement";
 import PostServices from "../../services/PostServices";
-import {
-  createContext,
-  FC,
-  useCallback,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import {
-  Comment,
-  CommentsLastEvaluatedKey,
-  Post,
-  Subcomment,
-  SubcommentsLastEvaluatedKey,
-} from "../../types/post.type";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { UserDataContext } from "../../context/UserDataContextProvider";
 import { AiOutlineCheck } from "react-icons/ai";
-import UserHomeCard from "./UserHomeCard";
-import ProfileCard from "./ProfileCard";
+import UserHomeCard from "../molecules/UserHomeCard";
+import ProfileCard from "../molecules/ProfileCard";
 import { Profile } from "../../types/profile.type";
 import ProfileServices from "../../services/ProfileServices";
 import LoadingBlock from "../atoms/LoadingBlock";
-import { ChildProps } from "../../types/props.type";
-import LikeServices from "../../services/LikeServices";
+import { PostListContext } from "../../pages/HomePage";
 
-interface Props {
-  category: string;
-  searchParam: string;
-}
-
-export default function PostList({ category, searchParam }: Props) {
-  const [posts, setPosts] = useState<Post[]>([]);
-
-  useEffect(() => {
-    PostServices.init();
-    setPosts([]);
-  }, [category, searchParam]);
-
-  const removePost = useCallback((postId: string) => {
-    setPosts((prev: Post[]) =>
-      prev.filter(
-        (prevPost) => `${prevPost.username}/${prevPost.date}` !== postId
-      )
-    );
-  }, []);
-
-  const [addPostData, setAddPostData] = useState<Post | null>(null);
-
-  useEffect(() => {
-    if (addPostData) {
-      console.log(addPostData);
-      setPosts((prev: Post[]) => [addPostData, ...prev]);
-      setAddPostData(null);
-    }
-  }, [addPostData]);
+export default function PostList() {
+  const { posts, category, searchParam, morePosts } =
+    useContext(PostListContext);
 
   const [queryLoading, setQueryLoading] = useState<boolean>(false);
   const sendQuery = useCallback(async () => {
     console.log("query");
     setQueryLoading(true);
-    const postIdList = await PostServices.getPosts(
+    const postList = await PostServices.getPosts(
       category,
       searchParam ? searchParam : ""
     );
-    if (!postIdList) {
+    if (!postList) {
       window.alert(
         "포스트를 가져오는데 오류가 발생했습니다. 다시 시도해주세요."
       );
       return;
     }
-    if (postIdList.length) {
-      setPosts((prev: Post[]) => [...prev, ...postIdList]);
+    if (postList.length) {
+      morePosts(postList);
     }
     setQueryLoading(false);
-  }, [category, searchParam]);
+  }, [category, morePosts, searchParam]);
 
   const loader = useRef<HTMLDivElement>(null);
 
@@ -202,16 +159,11 @@ export default function PostList({ category, searchParam }: Props) {
         category === "games" ||
         (category === "usernames" && username === decodeURI(searchParam)) ||
         (category === "profiles" && currentProfile.id === searchParam) ? (
-          <AddPostElement prevData={{ setPostData: setAddPostData }} />
+          <AddPostElement />
         ) : null}
         {posts.map((post, i) => {
           return (
-            <PostDataContextProvider
-              postData={post}
-              key={`${post.username}/${post.date}`}
-            >
-              <PostElement removePost={removePost} />
-            </PostDataContextProvider>
+            <PostElement post={post} key={`${post.username}/${post.date}`} />
           );
         })}
         <div className={styles.final_container} ref={loader}>
@@ -229,330 +181,3 @@ export default function PostList({ category, searchParam }: Props) {
     </>
   );
 }
-
-//Context
-interface PostDataContextType {
-  post: Post;
-  setPost: (post: Post) => void;
-  comments: Comment[];
-  commentsListHandler: (
-    comments: Comment[],
-    type: "modify" | "add" | "remove" | "more"
-  ) => void;
-  subcommentsListHandler: (
-    type: "modify" | "add" | "remove" | "more",
-    handleCommentId: string,
-    handleSubcomments: Subcomment[],
-    lastEvaluatedKey?: SubcommentsLastEvaluatedKey
-  ) => void;
-  commentsLastEvaluatedKey?: CommentsLastEvaluatedKey;
-  commentsLastEvaluatedKeyHandler: (
-    key: CommentsLastEvaluatedKey | undefined
-  ) => void;
-  postLike: () => void;
-  postDislike: () => void;
-  modifyPost: (newPost: Post) => void;
-}
-
-const initialPostContext: PostDataContextType = {
-  post: {
-    date: "",
-    images: [],
-    likes: [],
-    dislikes: [],
-    comments: [],
-    profileId: "",
-    game: "",
-    text: "",
-    username: "",
-    profile: {
-      username: "",
-      id: "",
-      nickname: "",
-      game: "",
-      profileImage: undefined,
-    },
-  },
-  setPost: (post: Post) => {},
-  comments: [],
-  commentsLastEvaluatedKey: undefined,
-  commentsListHandler: (comments, type) => {},
-  subcommentsListHandler: (
-    type: "modify" | "add" | "remove" | "more",
-    handleCommentId: string,
-    handleSubcomments: Subcomment[],
-    lastEvaluatedKey?: SubcommentsLastEvaluatedKey
-  ) => {},
-  commentsLastEvaluatedKeyHandler: (key) => {},
-  postLike: () => {},
-  postDislike: () => {},
-  modifyPost: () => {},
-};
-
-export const PostDataContext =
-  createContext<PostDataContextType>(initialPostContext);
-
-interface PostContextType extends ChildProps {
-  postData: Post;
-}
-
-const PostDataContextProvider: FC<PostContextType> = ({
-  children,
-  postData,
-}) => {
-  const { username } = useContext(UserDataContext);
-  const [post, setPost] = useState<Post>(postData);
-
-  const modifyPost = useCallback((newPost: Post) => {
-    setPost(newPost);
-  }, []);
-
-  const postLike = useCallback(() => {
-    if (!post.date) {
-      return;
-    }
-    const postId = `${post.username}/${post.date}`;
-    const currentLike = post.likes.includes(username);
-    const currentDislike = post.dislikes.includes(username);
-    setPost((prevData: Post) => {
-      return {
-        ...prevData,
-        likes: currentLike
-          ? prevData.likes.filter((user) => user !== username)
-          : [...prevData.likes, username],
-        dislikes: currentDislike
-          ? prevData.dislikes.filter((user) => user !== username)
-          : prevData.dislikes,
-      };
-    });
-    if (currentLike) {
-      LikeServices.postLikeRemove(postId).then((success) => {
-        if (!success) {
-          setPost((prevData: Post) => {
-            return {
-              ...prevData,
-              likes: [...prevData.likes, username],
-            };
-          });
-          window.alert(
-            "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
-          );
-        }
-      });
-    } else {
-      LikeServices.postLike(postId).then((success) => {
-        if (!success) {
-          setPost((prevData: Post) => {
-            return {
-              ...prevData,
-              likes: prevData.likes.filter((user) => user !== username),
-              dislikes: currentDislike
-                ? [...prevData.dislikes, username]
-                : prevData.dislikes,
-            };
-          });
-
-          window.alert(
-            "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
-          );
-        }
-      });
-    }
-  }, [post.date, post.dislikes, post.likes, post.username, username]);
-
-  const postDislike = useCallback(async () => {
-    if (!post.date) {
-      return;
-    }
-
-    if (!username) {
-      window.alert("로그인이 필요합니다.");
-      return;
-    }
-    //서버에서 알아서 좋아요 있으면 제거하고 싫어요 추가함
-    const postId = `${post.username}/${post.date}`;
-    const currentLike = post.likes.includes(username);
-    const currentDislike = post.dislikes.includes(username);
-    setPost((prevData: Post) => {
-      return {
-        ...prevData,
-        likes: currentLike
-          ? prevData.likes.filter((user) => user !== username)
-          : prevData.likes,
-        dislikes: currentDislike
-          ? prevData.dislikes.filter((user) => user !== username)
-          : [...prevData.dislikes, username],
-      };
-    });
-
-    if (currentDislike) {
-      LikeServices.postDislikeRemove(postId).then((success) => {
-        if (!success) {
-          setPost((prevData: Post) => {
-            return {
-              ...prevData,
-              dislikes: [...prevData.dislikes, username],
-            };
-          });
-          window.alert(
-            "싫어요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
-          );
-        }
-      });
-    } else {
-      LikeServices.postDislike(postId).then((success) => {
-        if (!success) {
-          setPost((prevData: Post) => {
-            return {
-              ...prevData,
-              likes: currentLike
-                ? [...prevData.likes, username]
-                : prevData.likes,
-              dislikes: prevData.dislikes.filter((user) => user !== username),
-            };
-          });
-          window.alert(
-            "좋아요를 수정 중에 오류가 발생했습니다. 다시 시도해주세요."
-          );
-        }
-      });
-    }
-  }, [post.date, post.dislikes, post.likes, post.username, username]);
-
-  const [comments, setComments] = useState<Comment[]>(postData.comments);
-  const [commentsLastEvaluatedKey, setCommentsLastEvaluatedKey] = useState<
-    CommentsLastEvaluatedKey | undefined
-  >(postData.commentsLastEvaluatedKey);
-
-  const commentsLastEvaluatedKeyHandler = (
-    key: CommentsLastEvaluatedKey | undefined
-  ) => {
-    setCommentsLastEvaluatedKey(key);
-  };
-
-  const commentsListHandler = useCallback(
-    (comments: Comment[], type: "modify" | "add" | "remove" | "more") => {
-      if (type === "add") {
-        setComments((prev) => [...comments, ...prev]);
-        return;
-      }
-
-      if (type === "more") {
-        setComments((prev) => [...prev, ...comments]);
-      }
-
-      if (!comments.length) {
-        return;
-      }
-
-      const handledComment = comments[0];
-      const handleCommentId = `${handledComment.postId}/${handledComment.date}`;
-
-      if (type === "remove") {
-        setComments((prev) =>
-          prev.filter((prevComment) => {
-            const commentId = `${prevComment.postId}/${prevComment.date}`;
-            return commentId !== handleCommentId;
-          })
-        );
-        return;
-      }
-
-      setComments((prev) =>
-        prev.map((prevComment) => {
-          const commentId = `${prevComment.postId}/${prevComment.date}`;
-          if (commentId === handleCommentId) {
-            return {
-              ...prevComment,
-              ...handledComment,
-            };
-          }
-
-          return prevComment;
-        })
-      );
-    },
-    []
-  );
-
-  const subcommentsListHandler = useCallback(
-    (
-      type: "modify" | "add" | "remove" | "more",
-      handleCommentId: string,
-      handleSubcomments: Subcomment[],
-      lastEvaluatedKey?: SubcommentsLastEvaluatedKey
-    ) => {
-      setComments((prev) => {
-        if (!handleSubcomments.length) {
-          return prev;
-        }
-
-        return prev.map((comment) => {
-          const commentId = `${comment.postId}/${comment.date}`;
-
-          if (commentId !== handleCommentId) {
-            return comment;
-          }
-
-          if (type === "more") {
-            return {
-              ...comment,
-              subcomments: [...comment.subcomments, ...handleSubcomments],
-              subcommentsLastEvaluatedKey: lastEvaluatedKey,
-            };
-          }
-
-          const handleSubcomment = handleSubcomments[0];
-
-          if (type === "add") {
-            return {
-              ...comment,
-              subcomments: [handleSubcomment, ...comment.subcomments],
-            };
-          }
-
-          if (type === "remove") {
-            return {
-              ...comment,
-              subcomments: comment.subcomments.filter(
-                (prevSubcomment) =>
-                  prevSubcomment.date !== handleSubcomment.date
-              ),
-            };
-          }
-
-          return {
-            ...comment,
-            subcomments: comment.subcomments.map((prevSubcomment) => {
-              if (prevSubcomment.date !== handleSubcomment.date) {
-                return prevSubcomment;
-              }
-
-              return handleSubcomment;
-            }),
-          };
-        });
-      });
-    },
-    []
-  );
-
-  return (
-    <PostDataContext.Provider
-      value={{
-        post,
-        setPost,
-        comments,
-        commentsLastEvaluatedKey,
-        commentsLastEvaluatedKeyHandler,
-        commentsListHandler,
-        subcommentsListHandler,
-        postLike,
-        postDislike,
-        modifyPost,
-      }}
-    >
-      {children}
-    </PostDataContext.Provider>
-  );
-};

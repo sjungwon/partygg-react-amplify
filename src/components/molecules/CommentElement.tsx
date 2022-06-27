@@ -2,21 +2,21 @@ import styles from "./scss/CommentElement.module.scss";
 import { useCallback, useState } from "react";
 import { BsTrash, BsPencilSquare } from "react-icons/bs";
 import { Comment } from "../../types/post.type";
-import RemoveConfirmModal from "../molecules/RemoveConfirmModal";
+import RemoveConfirmModal from "./RemoveConfirmModal";
 import PostServices from "../../services/PostServices";
-import AddComment from "../molecules/AddComment";
+import AddComment from "./AddComment";
 import SubcommentList from "./SubcommentList";
 import CommentCard from "../atoms/CommentCard";
 import CheckUserBlock from "../atoms/CheckUserBlock";
 import DefaultButton from "../atoms/DefaultButton";
 import CommentsButton from "../atoms/CommentsButton";
-import ProfileBlock from "../molecules/ProfileBlock";
+import ProfileBlock from "./ProfileBlock";
 
 interface CommentElementProps {
   comment: Comment;
-  commentsListHandler: (
+  commentsListHandlerWithRenderLength: (
     comment: Comment,
-    type: "add" | "modify" | "remove"
+    type: "modify" | "add" | "remove"
   ) => void;
   borderBottom: boolean;
   parentShowComment: boolean;
@@ -24,7 +24,7 @@ interface CommentElementProps {
 
 export default function CommentElement({
   comment,
-  commentsListHandler,
+  commentsListHandlerWithRenderLength: commentsListHandler,
   borderBottom,
   parentShowComment,
 }: CommentElementProps) {
@@ -81,7 +81,7 @@ export default function CommentElement({
       <CommentCard borderBottom={true}>
         <AddComment
           postId={comment.postId}
-          commentsListHandler={commentsListHandler}
+          commentsListHandlerWithRenderLength={commentsListHandler}
           prevData={{ comment, setModeDefault }}
         />
         {comment.subcomments ? (
@@ -90,6 +90,7 @@ export default function CommentElement({
               data: comment.subcomments,
               lastEvaluatedKey: comment.subcommentsLastEvaluatedKey,
             }}
+            postId={comment.postId}
             commentId={`${comment.postId}/${comment.date}`}
             addSubcomment={addSubcomment}
             setAddSubcomment={setAddSubcomment}
@@ -139,6 +140,7 @@ export default function CommentElement({
             data: comment.subcomments,
             lastEvaluatedKey: comment.subcommentsLastEvaluatedKey,
           }}
+          postId={comment.postId}
           commentId={`${comment.postId}/${comment.date}`}
           addSubcomment={addSubcomment}
           setAddSubcomment={setAddSubcomment}

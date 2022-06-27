@@ -9,7 +9,7 @@ import { Form, Modal } from "react-bootstrap";
 import AuthServices from "../../services/AuthServices";
 import TextValidServices from "../../services/TextValidServices";
 import styles from "./scss/RegisterModal.module.scss";
-import RegisterConfirmModal from "../molecules/RegisterConfirmModal";
+import RegisterConfirmModal from "./RegisterConfirmModal";
 import DefaultTextInput from "../atoms/DefaultTextInput";
 import DefaultButton from "../atoms/DefaultButton";
 import LoadingBlock from "../atoms/LoadingBlock";

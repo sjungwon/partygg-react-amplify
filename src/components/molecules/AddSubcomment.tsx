@@ -9,7 +9,7 @@ import NeedProfileBlock from "../atoms/NeedProfileBlock";
 import LoadingBlock from "../atoms/LoadingBlock";
 import DefaultButton from "../atoms/DefaultButton";
 import CommentCard from "../atoms/CommentCard";
-import ProfileBlock from "../molecules/ProfileBlock";
+import ProfileBlock from "./ProfileBlock";
 import ProfileSelector from "../atoms/ProfileSelector";
 import DefaultTextarea from "../atoms/DefaultTextarea";
 
@@ -17,9 +17,9 @@ interface PropsType {
   commentId: string;
   prevData?: Subcomment;
   setModeDefault: () => void;
-  subcommentsListHandler: (
-    newSubcomment: Subcomment,
-    type: "modify" | "add"
+  subcommentsListHandlerWithRenderLength: (
+    subcomment: Subcomment,
+    type: "modify" | "add" | "remove"
   ) => void;
 }
 
@@ -27,7 +27,7 @@ export default function AddSubcomment({
   commentId,
   prevData,
   setModeDefault,
-  subcommentsListHandler,
+  subcommentsListHandlerWithRenderLength: subcommentsListHandler,
 }: PropsType) {
   //유저 데이터 사용 -> 프로필, 이름
   const { currentProfile: defaultProfile, filteredProfileArr } =

@@ -4,7 +4,7 @@ import { UserDataContext } from "../../context/UserDataContextProvider";
 import sortProfiles from "../../functions/sortProfile";
 import ProfileServices from "../../services/ProfileServices";
 import { Profile } from "../../types/profile.type";
-import ProfileList from "../molecules/ProfileList";
+import ProfileList from "./ProfileList";
 import styles from "./scss/UserHomeCard.module.scss";
 
 interface PropsType {

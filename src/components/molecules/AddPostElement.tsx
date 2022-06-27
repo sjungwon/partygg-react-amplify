@@ -17,13 +17,13 @@ import LoadingBlock from "../atoms/LoadingBlock";
 import AddPostImageModal from "./AddPostImageModal";
 import ImageSlide from "./ImageSlide";
 import ProfileList from "./ProfileList";
+import { PostListContext } from "../../pages/HomePage";
 
 interface Props {
-  prevData: {
-    setMode?: (mode: "" | "modify") => void;
-    postData?: Post;
-    setPostData: (newPost: any) => void;
-    imageURLs?: string[];
+  prevData?: {
+    setMode: (mode: "" | "modify") => void;
+    postData: Post;
+    imageURLs: string[];
   };
 }
 
@@ -38,7 +38,7 @@ export default function AddPostElement({ prevData }: Props) {
   } = useContext(UserDataContext);
 
   //prevData 유무에 따라 form을 바로 보여줄 지 결정
-  const [show, setShow] = useState(!!prevData.setMode);
+  const [show, setShow] = useState(!!prevData);
 
   //form 열고 닫는 함수
   const showHandler = useCallback(() => {
@@ -57,13 +57,13 @@ export default function AddPostElement({ prevData }: Props) {
 
   //prevData가 있으면 해당 데이터의 프로필로 현재 프로필 변경, 없으면 첫번째 프로필로 설정
   useEffect(() => {
-    if (prevData.postData) {
+    if (prevData) {
       const filtered = profileArr.filter(
-        (profile) => profile.game === prevData.postData?.game
+        (profile) => profile.game === prevData?.postData.game
       );
       setFilteredProfile(filtered);
       const finded = profileArr.find(
-        (profile) => profile.id === prevData.postData?.profileId
+        (profile) => profile.id === prevData?.postData.profileId
       );
       setCurrentProfile(finded ? finded : filtered[0]);
 
@@ -84,7 +84,7 @@ export default function AddPostElement({ prevData }: Props) {
   return (
     <Card className={styles.card}>
       <div className={username ? "" : styles.disabled}>
-        {prevData.postData ? null : (
+        {prevData ? null : (
           <Card.Header className={styles.card_header}>
             <Card.Title className={styles.card_header_title}>
               유저 메뉴
@@ -105,15 +105,13 @@ export default function AddPostElement({ prevData }: Props) {
             </Card.Title>
             <div className={styles.card_body_right}>
               <ProfileSelector
-                profileArr={
-                  prevData.postData ? filteredProfile : filteredProfileArr
-                }
+                profileArr={prevData ? filteredProfile : filteredProfileArr}
                 size="sm"
                 onSelect={select}
               />
             </div>
           </div>
-          {prevData.postData ? null : (
+          {prevData ? null : (
             <DefaultButton
               size="xl"
               onClick={showHandler}
@@ -139,15 +137,15 @@ interface FormPropsType {
   show: boolean;
   close: () => void;
   currentProfile: Profile;
-  prevData: {
-    setMode?: (mode: "" | "modify") => void;
-    postData?: Post;
-    setPostData: (newPost: any) => void;
-    imageURLs?: string[];
+  prevData?: {
+    setMode: (mode: "" | "modify") => void;
+    postData: Post;
+    imageURLs: string[];
   };
 }
 
 function PostForm({ show, close, currentProfile, prevData }: FormPropsType) {
+  const { modifyPost, addPost } = useContext(PostListContext);
   //기본 form 데이터 -> 이미지, 텍스트, 프로필
   const [images, setImages] = useState<string[]>([]);
   const [files, setFiles] = useState<File[]>([]);
@@ -164,7 +162,7 @@ function PostForm({ show, close, currentProfile, prevData }: FormPropsType) {
   };
 
   const cancleModify = useCallback(() => {
-    if (prevData.setMode) {
+    if (prevData) {
       prevData.setMode("");
     }
     close();
@@ -173,9 +171,9 @@ function PostForm({ show, close, currentProfile, prevData }: FormPropsType) {
   const [postImageKeys, setPostImageKeys] = useState<ImageKeys[]>([]);
 
   useEffect(() => {
-    if (prevData.postData) {
+    if (prevData) {
       setPostImageKeys(prevData.postData.images);
-      if (prevData.imageURLs) {
+      if (prevData.imageURLs.length) {
         setImages(prevData.imageURLs);
       }
     }
@@ -194,7 +192,7 @@ function PostForm({ show, close, currentProfile, prevData }: FormPropsType) {
         game: currentProfile.game,
       };
       //포스트 수정
-      if (prevData.setMode && prevData.postData) {
+      if (prevData) {
         let newData: Post = {
           ...prevData.postData,
           ...data,
@@ -229,7 +227,7 @@ function PostForm({ show, close, currentProfile, prevData }: FormPropsType) {
           return;
         }
 
-        prevData.setPostData(newData);
+        modifyPost(newData);
         prevData.setMode("");
       } else {
         //post 추가
@@ -272,7 +270,7 @@ function PostForm({ show, close, currentProfile, prevData }: FormPropsType) {
           setLoading(false);
           return;
         }
-        prevData.setPostData(post);
+        addPost(post);
       }
       setLoading(false);
       setImages([]);
@@ -282,7 +280,16 @@ function PostForm({ show, close, currentProfile, prevData }: FormPropsType) {
       }
       close();
     }
-  }, [close, currentProfile, files, images.length, postImageKeys, prevData]);
+  }, [
+    addPost,
+    close,
+    currentProfile,
+    files,
+    images.length,
+    modifyPost,
+    postImageKeys,
+    prevData,
+  ]);
 
   if (!show) {
     return null;
@@ -307,7 +314,7 @@ function PostForm({ show, close, currentProfile, prevData }: FormPropsType) {
         </div>
         {images.length ? <ImageSlide images={images} /> : null}
         <DefaultTextarea
-          defaultValue={prevData.postData?.text}
+          defaultValue={prevData?.postData.text}
           ref={textRef}
           size="lg"
         />

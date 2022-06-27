@@ -5,10 +5,10 @@ import { GoTriangleUp, GoTriangleDown } from "react-icons/go";
 import { AiOutlineDownCircle, AiOutlineUpCircle } from "react-icons/ai";
 import CommentElement from "./CommentElement";
 import PostServices from "../../services/PostServices";
-import AddComment from "../molecules/AddComment";
+import AddComment from "./AddComment";
 import DefaultButton from "../atoms/DefaultButton";
 import LoadingBlock from "../atoms/LoadingBlock";
-import { PostDataContext } from "./PostList";
+import { PostListContext } from "../../pages/HomePage";
 
 export interface CommentsData {
   data: Comment[];
@@ -19,19 +19,18 @@ interface CommentElementProps {
   postId: string;
   showComment: boolean;
   setShowComment: (value: boolean) => void;
+  comments: Comment[];
+  commentsLastEvaluatedKey?: CommentsLastEvaluatedKey;
 }
 
 export default function CommentList({
   postId,
   showComment,
   setShowComment,
+  comments,
+  commentsLastEvaluatedKey: lastEvaluatedKey,
 }: CommentElementProps) {
-  const {
-    comments,
-    commentsListHandler,
-    commentsLastEvaluatedKey: lastEvaluatedKey,
-    commentsLastEvaluatedKeyHandler: setLastEvaluatedKey,
-  } = useContext(PostDataContext);
+  const { commentsListHandler } = useContext(PostListContext);
 
   const [renderLength, setRenderLength] = useState<number>(
     comments.length > 2 ? 3 : comments.length
@@ -60,8 +59,12 @@ export default function CommentList({
               lastEvaluatedKey
             );
             if (extraComments) {
-              commentsListHandler(extraComments.data, "more");
-              setLastEvaluatedKey(extraComments.commentsLastEvaluatedKey);
+              commentsListHandler(
+                "more",
+                postId,
+                extraComments.data,
+                extraComments.commentsLastEvaluatedKey
+              );
               setRenderLength((prev) =>
                 extraComments.data.length > 2
                   ? prev + 3
@@ -82,8 +85,8 @@ export default function CommentList({
       comments.length,
       commentsListHandler,
       lastEvaluatedKey,
+      postId,
       renderLength,
-      setLastEvaluatedKey,
     ]
   );
 
@@ -105,7 +108,7 @@ export default function CommentList({
 
   const commentsListHandlerWithRenderLength = useCallback(
     (comment: Comment, type: "modify" | "add" | "remove") => {
-      commentsListHandler([comment], type);
+      commentsListHandler(type, postId, [comment]);
       if (type === "add") {
         setRenderLength((prev) => prev + 1);
         return;
@@ -115,7 +118,7 @@ export default function CommentList({
         return;
       }
     },
-    [commentsListHandler]
+    [commentsListHandler, postId]
   );
 
   //렌더
@@ -132,7 +135,9 @@ export default function CommentList({
           <CommentElement
             key={`${comments[0].postId}/${comments[0].date}`}
             comment={comments[0]}
-            commentsListHandler={commentsListHandlerWithRenderLength}
+            commentsListHandlerWithRenderLength={
+              commentsListHandlerWithRenderLength
+            }
             borderBottom={false}
             parentShowComment={showComment}
           />
@@ -156,14 +161,18 @@ export default function CommentList({
     <>
       <AddComment
         postId={`${postId}`}
-        commentsListHandler={commentsListHandlerWithRenderLength}
+        commentsListHandlerWithRenderLength={
+          commentsListHandlerWithRenderLength
+        }
       />
       {comments.slice(0, renderLength).map((comment, i) => {
         return (
           <CommentElement
             key={`${comment.postId}/${comment.date}`}
             comment={comment}
-            commentsListHandler={commentsListHandlerWithRenderLength}
+            commentsListHandlerWithRenderLength={
+              commentsListHandlerWithRenderLength
+            }
             borderBottom={true}
             parentShowComment={showComment}
           />
