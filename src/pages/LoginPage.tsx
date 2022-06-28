@@ -133,9 +133,9 @@ export default function LoginPage() {
       </DefaultButton>
       <div className={styles.login_card}>
         <div className={styles.login_card__wrapper}>
-          <h1 className={styles.login_title}>PartyGG</h1>
+          <h1 className={styles.login_title}>그님티</h1>
           <h2 className={styles.login_subtitle}>
-            PartyGG에서 당신의 게임 프로필로 대화해보세요.
+            그님티에서 당신의 게임 프로필로 <br /> 대화해보세요.
           </h2>
           <div className={styles.login_card__bottom}>
             <Form>
