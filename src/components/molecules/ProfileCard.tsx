@@ -5,6 +5,7 @@ import useImgLoadError from "../../hooks/useImgLoadError";
 import FileServices from "../../services/FileServices";
 import { ImageKeys } from "../../types/file.type";
 import { Profile } from "../../types/profile.type";
+import ImageSlide from "./ImageSlide";
 import styles from "./scss/ProfileCard.module.scss";
 
 interface PropsType {
@@ -22,26 +23,49 @@ const initialProfile: Profile = {
 export default function ProfileCard({ searchProfile }: PropsType) {
   const [profile, setProfile] = useState<Profile>(initialProfile);
   const [image, setImage] = useState<string>("");
+  const [credentialImage, setCredentialImage] = useState<string>("");
 
-  const getProfileImage = useCallback(async (imageKey: ImageKeys) => {
-    const image = await FileServices.getImage(imageKey, "fullsize");
-    if (!image) {
-      window.alert(
-        "프로필 이미지를 가져오는 중에 오류가 발생했습니다. 다시 시도해주세요."
-      );
-      return;
-    }
-    setImage(image);
-  }, []);
+  const getImage = useCallback(
+    async (
+      imageKey: ImageKeys,
+      errMessage: string,
+      type: "profile" | "credential"
+    ) => {
+      const image = await FileServices.getImage(imageKey, "fullsize");
+      if (!image) {
+        //"프로필 이미지를 가져오는 중에 오류가 발생했습니다. 다시 시도해주세요."
+        window.alert(errMessage);
+        return;
+      }
+      if (type === "profile") {
+        setImage(image);
+      } else {
+        setCredentialImage(image);
+      }
+    },
+    []
+  );
 
   useEffect(() => {
+    console.log(searchProfile);
     if (searchProfile) {
       setProfile(searchProfile);
       if (searchProfile.profileImage) {
-        getProfileImage(searchProfile.profileImage);
+        getImage(
+          searchProfile.profileImage,
+          "프로필 이미지를 가져오는 중에 오류가 발생했습니다. 다시 시도해주세요.",
+          "profile"
+        );
+      }
+      if (searchProfile.credential) {
+        getImage(
+          searchProfile.credential,
+          "인증 이미지를 가져오는 중에 오류가 발생했습니다. 다시 시도해주세요.",
+          "credential"
+        );
       }
     }
-  }, [getProfileImage, searchProfile]);
+  }, [getImage, searchProfile]);
 
   const loadError = useImgLoadError();
   return (
@@ -81,6 +105,14 @@ export default function ProfileCard({ searchProfile }: PropsType) {
             </NavLink>
           ) : null}
         </Card.Subtitle>
+        <div className={styles.credentials}>
+          <p className={styles.credentials_text}>인증 정보</p>
+          {credentialImage ? (
+            <ImageSlide images={[credentialImage]} expandable noIndicator />
+          ) : (
+            <p className={styles.credentials_text}>없음</p>
+          )}
+        </div>
       </Card.Body>
     </Card>
   );

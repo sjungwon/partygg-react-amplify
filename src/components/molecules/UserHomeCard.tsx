@@ -30,7 +30,6 @@ export default function UserHomeCard({ username }: PropsType) {
   }, []);
 
   useEffect(() => {
-    console.log(username, myUsername);
     if (username === myUsername) {
       setUserProfile(profileArr);
       return;
@@ -47,7 +46,7 @@ export default function UserHomeCard({ username }: PropsType) {
         {userProfile.length ? (
           <ProfileList profileArr={userProfile} username={username} />
         ) : (
-          <p className={styles.no_user}>존재하지 않는 사용자</p>
+          <p className={styles.no_user}>사용자 정보 없음</p>
         )}
       </Card.Body>
     </Card>

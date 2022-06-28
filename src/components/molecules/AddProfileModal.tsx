@@ -1,4 +1,11 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  ChangeEventHandler,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Modal } from "react-bootstrap";
 import { GameDataContext } from "../../context/GameDataContextProvider";
 import { UserDataContext } from "../../context/UserDataContextProvider";
@@ -14,6 +21,8 @@ import DefaultButton from "../atoms/DefaultButton";
 import LoadingBlock from "../atoms/LoadingBlock";
 import DefaultTextInput from "../atoms/DefaultTextInput";
 import AddGames from "./AddGames";
+import ImageSlide from "./ImageSlide";
+import { BsTrash } from "react-icons/bs";
 
 interface PropsType {
   show: boolean;
@@ -27,13 +36,13 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
 
   const nicknameRef = useRef<HTMLInputElement>(null);
 
-  const [selectedGames, setSelectedGames] = useState<string>("");
+  const [selectedGame, setSelectedGame] = useState<string>("");
 
   const select = useCallback(
     (eventKey: string | null) => {
       if (eventKey !== null && games.length) {
         const index = Number(eventKey);
-        setSelectedGames(games[index].name);
+        setSelectedGame(games[index].name);
       }
     },
     [games]
@@ -42,8 +51,18 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
   const [loading, setLoading] = useState<boolean>(false);
 
   const [file, setFile] = useState<File | undefined>(undefined);
-
   const [image, setImage] = useState<string>("");
+  const [prevProfileImageKey, setPrevProfileImageKey] = useState<
+    ImageKeys | undefined
+  >(prevData?.profileImage);
+
+  const [credentialFile, setCredentialFile] = useState<File | undefined>(
+    undefined
+  );
+  const [credentialImage, setCredentialImage] = useState<string>("");
+  const [prevCredentialImageKey, setPrevCredentialImageKey] = useState<
+    ImageKeys | undefined
+  >(prevData?.credential);
 
   const addImage = useCallback((event: any) => {
     const files = (event.target as HTMLInputElement).files;
@@ -51,22 +70,67 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
     if (file) {
       setFile(file);
       setImage(URL.createObjectURL(file));
+      setPrevProfileImageKey({
+        resizedKey: "change",
+        fullsizeKey: "change",
+      });
     }
   }, []);
 
-  const getPrevImage = useCallback(async (key: ImageKeys) => {
-    const image = await FileServices.getImage(key, "resized");
-    if (image) {
-      setImage(image);
-    }
+  const removeImage = useCallback(() => {
+    setFile(undefined);
+    setImage("");
+    setPrevProfileImageKey({
+      resizedKey: "removed",
+      fullsizeKey: "removed",
+    });
   }, []);
+
+  const addCredentialImage: ChangeEventHandler<HTMLInputElement> = useCallback(
+    (event) => {
+      const files = event.target.files;
+      const file = files ? files[0] : null;
+      if (file) {
+        setCredentialFile(file);
+        setCredentialImage(URL.createObjectURL(file));
+        setPrevCredentialImageKey({
+          resizedKey: "change",
+          fullsizeKey: "change",
+        });
+      }
+    },
+    []
+  );
+
+  const removeCredentialImage = useCallback(() => {
+    setCredentialFile(undefined);
+    setCredentialImage("");
+    setPrevCredentialImageKey({
+      resizedKey: "removed",
+      fullsizeKey: "removed",
+    });
+  }, []);
+
+  const getPrevImage = useCallback(
+    async (key: ImageKeys, type: "profile" | "credential") => {
+      const image = await FileServices.getImage(key, "resized");
+      if (image) {
+        if (type === "profile") {
+          setImage(image);
+        } else {
+          setCredentialImage(image);
+        }
+      }
+    },
+    []
+  );
 
   useEffect(() => {
     if (!prevData) {
       if (nicknameRef.current) {
         nicknameRef.current.value = "";
       }
-      setSelectedGames("");
+      setSelectedGame("");
       setImage("");
       return;
     }
@@ -74,15 +138,18 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
       nicknameRef.current.value = prevData.nickname;
     }
     if (prevData.profileImage) {
-      getPrevImage(prevData.profileImage);
+      getPrevImage(prevData.profileImage, "profile");
     } else {
       setImage("");
     }
-    setSelectedGames(prevData.game);
+    if (prevData.credential) {
+      getPrevImage(prevData.credential, "credential");
+    }
+    setSelectedGame(prevData.game);
   }, [getPrevImage, prevData]);
 
   const submitProfile = useCallback(async () => {
-    if (!selectedGames) {
+    if (!selectedGame) {
       window.alert("게임을 선택해주세요.");
       return;
     }
@@ -96,12 +163,22 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
       );
       return;
     }
+    if (
+      prevData &&
+      selectedGame === prevData.game &&
+      prevData.nickname === nickname &&
+      prevProfileImageKey?.resizedKey !== "change" &&
+      prevCredentialImageKey?.resizedKey !== "change"
+    ) {
+      close();
+      return;
+    }
 
     if (!prevData) {
       if (
         profileArr.find(
           (profile) =>
-            profile.game === selectedGames && profile.nickname === nickname
+            profile.game === selectedGame && profile.nickname === nickname
         )
       ) {
         window.alert("이미 존재하는 프로필입니다.");
@@ -110,7 +187,7 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
     }
     let data: AddProfileReqData = {
       nickname,
-      game: selectedGames,
+      game: selectedGame,
       profileImage: undefined,
     };
     setLoading(true);
@@ -131,12 +208,31 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
         profileImage,
       };
     }
+
+    if (credentialFile) {
+      const credentialImage = await FileServices.putPostImage(credentialFile);
+      if (!credentialImage) {
+        window.alert(
+          `프로필 ${
+            prevData ? "수정" : "추가"
+          }에 실패했습니다. 다시 시도해주세요.`
+        );
+        setLoading(false);
+        return;
+      }
+      data = {
+        ...data,
+        credential: credentialImage,
+      };
+      console.log(data);
+    }
     let profile: Profile | null = null;
     if (prevData) {
       const modifyData = {
         ...prevData,
         ...data,
       };
+      console.log(modifyData);
       profile = await ProfileServices.updateProfile(modifyData);
     } else {
       profile = await ProfileServices.addProfile(data);
@@ -153,6 +249,9 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
     if (prevData && prevData.profileImage) {
       FileServices.removeImage(prevData.profileImage);
     }
+    if (prevData && prevData.credential) {
+      FileServices.removeImage(prevData.credential);
+    }
     if (prevData) {
       updateProfileHandler(profile, "modify");
     } else {
@@ -163,7 +262,17 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
     if (prevData) {
       window.location.reload();
     }
-  }, [close, file, prevData, profileArr, selectedGames, updateProfileHandler]);
+  }, [
+    close,
+    credentialFile,
+    file,
+    prevCredentialImageKey,
+    prevData,
+    prevProfileImageKey,
+    profileArr,
+    selectedGame,
+    updateProfileHandler,
+  ]);
 
   const [addGameShow, setAddGameShow] = useState<boolean>(false);
   const addGameShowHandler = useCallback(() => {
@@ -190,8 +299,8 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
             disabled
             value={
               games.length
-                ? selectedGames
-                  ? selectedGames
+                ? selectedGame
+                  ? selectedGame
                   : "게임을 선택해주세요."
                 : "게임을 추가해주세요."
             }
@@ -200,7 +309,7 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
           <GameSelector onSelect={select} size="sm" games={games} />
         </div>
         <div className={styles.form}>
-          <label className={styles.form_label}>이미지:</label>
+          <label className={styles.form_label}>프로필 이미지:</label>
           <img
             src={image ? image : "/default_profile.png"}
             alt="added_profile"
@@ -211,6 +320,14 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
             multiple={false}
             color="blue"
           />
+          <DefaultButton
+            onClick={removeImage}
+            size="sq_md"
+            className={styles.margin_left}
+            color="blue"
+          >
+            <BsTrash />
+          </DefaultButton>
         </div>
         <div className={styles.form}>
           <label className={styles.form_label}>닉네임: </label>
@@ -219,6 +336,29 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
             placeholder="닉네임을 입력해주세요"
             className={styles.input}
           />
+        </div>
+        <div>
+          <div className={styles.form}>
+            <label className={`${styles.form_label} ${styles.margin_right}`}>
+              인증(선택):{" "}
+            </label>
+            <ImageFileInputButton
+              onImageFileInput={addCredentialImage}
+              multiple={false}
+              color="blue"
+            />
+            <DefaultButton
+              onClick={removeCredentialImage}
+              size="sq_md"
+              className={styles.margin_left}
+              color="blue"
+            >
+              <BsTrash />
+            </DefaultButton>
+          </div>
+          {credentialImage ? (
+            <ImageSlide images={[credentialImage]} noIndicator />
+          ) : null}
         </div>
         {prevData ? (
           <p className={styles.warning}>

@@ -76,7 +76,7 @@ const UserMenuFixed: FC<UserMenuFixedProps> = ({ hide, closeMenu }) => {
         프로필 추가
       </button>
       <button onClick={goBack} className={styles.menu_item}>
-        상단 이동
+        맨 위로
       </button>
       <AddProfileModal show={mdShow} close={mdClose} />
     </div>

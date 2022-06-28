@@ -9,8 +9,9 @@ interface PropsType {
   images: string[];
   index?: number;
   setIndex?: (index: number) => void;
-  type?: string;
+  type?: "modal";
   expandable?: true;
+  noIndicator?: true;
 }
 
 export default function ImageSlide({
@@ -19,6 +20,7 @@ export default function ImageSlide({
   setIndex,
   type,
   expandable,
+  noIndicator,
 }: PropsType) {
   //슬라이드에서 현재 이미지 index 설정
   const handleSelect = useCallback(
@@ -85,6 +87,7 @@ export default function ImageSlide({
         controls={images.length > 1}
         nextIcon={null}
         prevIcon={null}
+        indicators={!noIndicator}
       >
         {images?.map((img: string, i: number) => {
           return (

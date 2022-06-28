@@ -54,9 +54,10 @@
 .menu_item{
   width: 6rem;
   height: 2rem;
-  border: 1px solid $mobile-btn-gray;
-  border-radius: .25rem;
   overflow: hidden;
+  border: 1px solid white;
+  border-radius: .25rem;
+  background-color: white;
   font-size: .8rem;
   white-space: nowrap;
   color: $font-color-gray;
@@ -67,6 +68,6 @@
 
 @include overflow {
   .container{
-    right: calc(50vw - 26rem);
+    right: calc(50vw - 24rem);
   }
 }

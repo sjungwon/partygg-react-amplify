@@ -26,8 +26,8 @@
 }
 
 .form_file_img{
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2.2rem;
+  height: 2.2rem;
   margin: 0 .5rem;
   border-radius: 50%;
   object-fit: cover;
@@ -64,6 +64,13 @@
   width: 100%;
 }
 
+.margin_right{
+  margin-right: .5rem;
+}
+.margin_left{
+  margin-left: .5rem;
+}
+
 .profile{
   display: flex;
 }
@@ -76,7 +83,6 @@
 .hide{
   display: none;
   overflow:hidden;
-
 }
 
 @include mobile{

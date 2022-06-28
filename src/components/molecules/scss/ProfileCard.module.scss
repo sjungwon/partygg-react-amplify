@@ -24,6 +24,7 @@
 .profile_img{
   width: 3.5rem;
   height: 3.5rem;
+  border-radius: 50%;
   object-fit: cover;
 }
 
@@ -56,3 +57,13 @@
   }
 }
 
+.credentials{
+  padding-top: .5rem;
+}
+
+.credentials_text{
+  font-size: .95rem;
+  font-weight: 500;
+  text-align: center;
+  padding: .5rem 0;
+}

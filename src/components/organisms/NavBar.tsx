@@ -88,7 +88,7 @@ export default function NavBar({ showCategoryHandler }: PropsType) {
           </div>
           <a href="/" className={styles.navbar_title}>
             <img src="/logo192.png" alt="logo" className={styles.navbar_logo} />
-            <h1>PartyGG</h1>
+            <h1>그님티</h1>
           </a>
           <div className={styles.navbar_search} ref={searchBarRef}>
             <GameSearchRecommend
