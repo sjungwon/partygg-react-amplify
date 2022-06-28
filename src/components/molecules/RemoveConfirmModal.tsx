@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Modal } from "react-bootstrap";
 import DefaultButton from "../atoms/DefaultButton";
 import LoadingBlock from "../atoms/LoadingBlock";
@@ -12,6 +13,7 @@ interface PropsType {
   close: () => void;
   loading: boolean;
   remove: () => void;
+  customMessage?: ReactNode;
 }
 
 export default function RemoveConfirmModal({
@@ -19,6 +21,7 @@ export default function RemoveConfirmModal({
   close,
   loading,
   remove,
+  customMessage,
 }: PropsType) {
   return (
     <Modal show={show} onHide={close} size="sm" centered>
@@ -28,6 +31,7 @@ export default function RemoveConfirmModal({
 
       <Modal.Body>
         <p>정말 삭제하시겠습니까 ?</p>
+        {customMessage ? customMessage : null}
       </Modal.Body>
 
       <Modal.Footer className={styles.footer}>

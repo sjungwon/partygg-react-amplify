@@ -152,6 +152,11 @@
   // background-color: $primary-default;
 }
 
+.warning{
+  color: red;
+  font-size: .8rem;
+}
+
 @include mobile{
   .profile_block_other{
     border: 1px solid $primary-default-btn-background;

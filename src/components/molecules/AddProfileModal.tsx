@@ -13,6 +13,7 @@ import ImageFileInputButton from "../atoms/ImageFileInputButton";
 import DefaultButton from "../atoms/DefaultButton";
 import LoadingBlock from "../atoms/LoadingBlock";
 import DefaultTextInput from "../atoms/DefaultTextInput";
+import AddGames from "./AddGames";
 
 interface PropsType {
   show: boolean;
@@ -164,6 +165,11 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
     }
   }, [close, file, prevData, profileArr, selectedGames, updateProfileHandler]);
 
+  const [addGameShow, setAddGameShow] = useState<boolean>(false);
+  const addGameShowHandler = useCallback(() => {
+    setAddGameShow((prev) => !prev);
+  }, []);
+
   return (
     <Modal backdrop="static" show={show} size="sm" centered>
       <Modal.Header>
@@ -172,6 +178,12 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        <DefaultButton size="md" onClick={addGameShowHandler} color="blue">
+          게임 추가
+        </DefaultButton>
+        <div className={`${styles.form} ${addGameShow ? "" : styles.hide}`}>
+          <AddGames display="flex" />
+        </div>
         <div className={styles.form}>
           <label className={styles.form_label}>게임: </label>
           <DefaultTextInput
@@ -210,7 +222,7 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
         </div>
         {prevData ? (
           <p className={styles.warning}>
-            프로필 수정 시 다른 데이터에 반영을 위해 페이지가 새로고침됩니다.
+            프로필 수정 시 다른 데이터에 반영하기 위해 페이지가 새로고침됩니다.
           </p>
         ) : null}
       </Modal.Body>

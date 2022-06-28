@@ -9,7 +9,7 @@ export interface ProfileStruct {
 
 export interface Profile extends ProfileStruct, UserResource {
   //partition key
-  username: string;
+  //username: string;
   //sort key
   id: string;
 }

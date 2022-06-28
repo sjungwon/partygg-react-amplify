@@ -70,7 +70,10 @@ const AddGames: FC<PropsType> = ({ display = "block" }) => {
         size="sm"
         onClick={gameSubmit}
         disabled={loading}
-        className={styles.btn}
+        className={`${styles.btn} ${
+          display === "flex" ? styles["btn_margin"] : ""
+        }`}
+        color={display === "flex" ? "blue" : "default"}
       >
         <LoadingBlock loading={loading}>추가</LoadingBlock>
       </DefaultButton>

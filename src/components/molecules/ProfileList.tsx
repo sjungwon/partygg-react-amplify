@@ -57,7 +57,7 @@ const ProfileLiEl: FC<{
             }}
             onClick={setIndex}
           >
-            제거
+            삭제
           </DefaultButton>
         </div>
       ) : null}
@@ -230,7 +230,7 @@ export default function ProfileList({ username, profileArr }: PropsType) {
       if (isNaN(index)) {
         window.alert(
           `프로필 ${
-            type === "remove" ? "제거" : "수정"
+            type === "remove" ? "삭제" : "수정"
           }에 오류가 발생했습니다. 다시 시도해주세요.`
         );
         return;
@@ -253,7 +253,7 @@ export default function ProfileList({ username, profileArr }: PropsType) {
     const removeProfile = profileArr[profileIndex];
     const success = await ProfileServices.deleteProfile(removeProfile.id);
     if (!success) {
-      window.alert("프로필 제거에 오류가 발생했습니다. 다시 시도해주세요.");
+      window.alert("프로필 삭제에 오류가 발생했습니다. 다시 시도해주세요.");
       setLoading(false);
       return;
     }
@@ -263,6 +263,7 @@ export default function ProfileList({ username, profileArr }: PropsType) {
     updateProfileHandler(removeProfile, "remove");
     setLoading(false);
     setShowRemoveMd(false);
+    window.location.reload();
   }, [profileArr, profileIndex, updateProfileHandler]);
 
   return (
@@ -299,7 +300,16 @@ export default function ProfileList({ username, profileArr }: PropsType) {
         loading={loading}
         remove={deleteProfile}
         close={removeMdClose}
+        customMessage={<RemoveMessage />}
       />
     </>
   );
 }
+
+const RemoveMessage = () => {
+  return (
+    <p className={styles.warning}>
+      프로필 제거 시 다른 데이터에 반영하기 위해 페이지가 새로고침됩니다.
+    </p>
+  );
+};
