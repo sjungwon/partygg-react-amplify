@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import styles from "./NotFoundPage.module.scss";
+import styles from "./scss/NotFoundPage.module.scss";
 
 export default function NotFoundPage() {
   const navigate = useNavigate();

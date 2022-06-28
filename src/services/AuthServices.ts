@@ -14,11 +14,9 @@ export default class AuthServices {
     data: ConfirmSignUpReqData
   ): Promise<boolean> {
     try {
-      const response = await Auth.confirmSignUp(data.username, data.code);
-      console.log(response);
+      await Auth.confirmSignUp(data.username, data.code);
       return true;
     } catch (error: any) {
-      console.log(error.message);
       if (error.message.includes("Current status is CONFIRMED")) {
         return true;
       }

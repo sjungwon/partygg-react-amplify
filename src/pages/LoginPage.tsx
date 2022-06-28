@@ -3,7 +3,7 @@ import { Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import RegisterConfirmModal from "../components/molecules/RegisterConfirmModal";
 import AuthServices from "../services/AuthServices";
-import styles from "./LoginPage.module.scss";
+import styles from "./scss/LoginPage.module.scss";
 import RegisterModal from "../components/molecules/RegisterModal";
 import { UserDataContext } from "../context/UserDataContextProvider";
 import { AiOutlineArrowLeft } from "react-icons/ai";
@@ -81,7 +81,6 @@ export default function LoginPage() {
   const click = async () => {
     if (username && password) {
       setLoading(true);
-      console.log(username, password);
       try {
         await AuthServices.signIn({
           username,
@@ -90,13 +89,11 @@ export default function LoginPage() {
         checkLogin();
         navigate(-1);
       } catch (error: any) {
-        console.log(error.message);
         setLoading(false);
         //가입 확인을 안한 유저이면
         if (error.message === "User is not confirmed.") {
           try {
             //확인 코드 재전송
-            console.log("hi");
             await AuthServices.resendConfirmationCode(username);
             //확인 모달 열기
             setLoginFailMessage("");

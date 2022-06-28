@@ -64,7 +64,6 @@ export default function AddSubcomment({
     if (!text) {
       return;
     }
-    console.log(text);
     setLoading(true);
 
     const submitData: AddSubcommentReqData = {
@@ -74,7 +73,6 @@ export default function AddSubcomment({
       commentId,
       text,
     };
-    console.log(submitData);
     if (!prevData) {
       const newSubcomment = await PostServices.addSubcomments(submitData);
       if (!newSubcomment) {

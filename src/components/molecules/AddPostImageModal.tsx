@@ -70,7 +70,6 @@ export default function AddPostImageModal({
   //앞쪽 image 지움 -> file엔 영향 없어야함
   const removeImages = useCallback(
     (event: any): void => {
-      console.log(index, imageKeys.length, files.length);
       if (index !== 0) {
         if (index < imageKeys.length) {
           setImageKeys((prevImageKeys: ImageKeys[]) =>
@@ -104,7 +103,7 @@ export default function AddPostImageModal({
         }
       });
     },
-    [files.length, imageKeys.length, index]
+    [imageKeys.length, index]
   );
 
   //상위 컴포넌트의 상태로 이미지 전달, 모달 닫음

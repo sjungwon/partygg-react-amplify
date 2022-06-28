@@ -33,7 +33,6 @@ export default function RegisterConfirmModal({
   const clickSubmit = useCallback(
     async (event: any) => {
       event.preventDefault();
-      console.log(username, codeRef.current?.value);
       const code = (codeRef.current as HTMLInputElement).value;
       const success = await AuthServices.confirmSignUp({ username, code });
       if (success) {
@@ -51,7 +50,6 @@ export default function RegisterConfirmModal({
   const enterSubmit = useCallback(
     (event: KeyboardEvent) => {
       if (event.key === "Enter") {
-        console.log("hi");
         submitRef.current?.click();
       }
     },

@@ -225,7 +225,6 @@ export default function ProfileList({ username, profileArr }: PropsType) {
       }
       const btnEl = event.target as HTMLButtonElement;
       const index = Number(btnEl.dataset.index);
-      console.log(btnEl, index);
       const type = btnEl.dataset.type;
       if (isNaN(index)) {
         window.alert(

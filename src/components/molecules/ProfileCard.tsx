@@ -47,7 +47,6 @@ export default function ProfileCard({ searchProfile }: PropsType) {
   );
 
   useEffect(() => {
-    console.log(searchProfile);
     if (searchProfile) {
       setProfile(searchProfile);
       if (searchProfile.profileImage) {

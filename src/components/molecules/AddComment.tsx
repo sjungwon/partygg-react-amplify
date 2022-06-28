@@ -65,7 +65,6 @@ export default function AddComment({
     if (!text) {
       return;
     }
-    console.log(text);
     setLoading(true);
 
     const submitData: AddCommentReqData = {

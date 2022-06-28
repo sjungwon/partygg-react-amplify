@@ -21,7 +21,6 @@ export default function GameSearchRecommend({
 
   const [selectedMenu, setSelectedMenu] = useState<string>("게임");
   const menuSelect = useCallback((eventKey: string | null) => {
-    console.log(eventKey);
     if (eventKey) {
       setSelectedMenu(eventKey);
       setText("");
@@ -79,7 +78,6 @@ export default function GameSearchRecommend({
   const [index, setIndex] = useState<number>(-1);
   const keyDownEventHandler = useCallback(
     (event: any) => {
-      console.log(isComposing);
       if (isComposing) {
         return;
       }
@@ -100,7 +98,6 @@ export default function GameSearchRecommend({
         return;
       }
       if (event.key === "Enter") {
-        console.log("enter");
         searchSubmit()();
       }
       setIndex(-1);
@@ -113,7 +110,6 @@ export default function GameSearchRecommend({
     (event: any) => {
       const target: HTMLDivElement = event.target;
       const text = target.textContent;
-      console.log(target, text);
       if (text) {
         setText(text);
         setPrevent(true);

@@ -224,7 +224,6 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
         ...data,
         credential: credentialImage,
       };
-      console.log(data);
     }
     let profile: Profile | null = null;
     if (prevData) {
@@ -232,7 +231,6 @@ export default function AddProfileModal({ show, close, prevData }: PropsType) {
         ...prevData,
         ...data,
       };
-      console.log(modifyData);
       profile = await ProfileServices.updateProfile(modifyData);
     } else {
       profile = await ProfileServices.addProfile(data);

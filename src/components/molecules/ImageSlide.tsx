@@ -63,7 +63,6 @@ export default function ImageSlide({
       if (expandable) {
         const imgEl = event.target as HTMLInputElement;
         const imgSrc = imgEl.src;
-        console.log(imgSrc);
         setExpandURL(imgSrc);
         scrollBlock();
         // setExpandURL(imgSrc);

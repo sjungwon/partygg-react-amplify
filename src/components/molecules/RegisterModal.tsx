@@ -149,18 +149,16 @@ export default function RegisterModal({
       event.preventDefault();
       setLoading(true);
       try {
-        const user = await AuthServices.signUp({
+        await AuthServices.signUp({
           username,
           password,
           attributes: {
             email,
           },
         });
-        console.log(user);
         setRegisterUsername(username);
         modalOpen();
       } catch (error) {
-        console.log(error);
         //닉네임 중복 오류 처리 -> 메세지 보여주기
         setUsernameVerifyMessage("닉네임이 중복되었습니다.");
       }

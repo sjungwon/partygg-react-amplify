@@ -21,7 +21,7 @@ import {
   SubcommentsLastEvaluatedKey,
 } from "../types/post.type";
 import { ChildProps } from "../types/props.type";
-import styles from "./HomePage.module.scss";
+import styles from "./scss/HomePage.module.scss";
 
 export default function HomePage() {
   const { category, searchParam } = useCategory();
