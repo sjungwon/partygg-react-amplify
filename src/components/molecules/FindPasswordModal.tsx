@@ -1,7 +1,7 @@
 import { ChangeEventHandler, FC, useCallback, useState } from "react";
 import { Modal } from "react-bootstrap";
+import useConfirmPassword from "../../hooks/useConfirmPassword";
 import AuthServices from "../../services/AuthServices";
-import TextValidServices from "../../services/TextValidServices";
 import DefaultButton from "../atoms/DefaultButton";
 import DefaultTextInput from "../atoms/DefaultTextInput";
 import LoadingBlock from "../atoms/LoadingBlock";
@@ -52,34 +52,17 @@ const FindPasswordModal: FC<PropsType> = ({ show, close }) => {
     setLoading(false);
   }, [username]);
 
-  const [password, setPassword] = useState<string>("");
-  const [passwordValid, setPasswordValid] = useState<boolean>(false);
-  const [passwordValidMessage, setPasswordValidMessage] = useState<string>("");
-
-  const onChangePassword: ChangeEventHandler<HTMLInputElement> = useCallback(
-    (event) => {
-      const password = event.target.value;
-      setPassword(password);
-      if (!TextValidServices.isIncludeAlphabet(password)) {
-        setPasswordValidMessage("문자를 1개 이상 포함해야 합니다.");
-        setPasswordValid(false);
-        return;
-      }
-      if (!TextValidServices.isIncludeNumber(password)) {
-        setPasswordValidMessage("숫자를 1개 이상 포함해야 합니다.");
-        setPasswordValid(false);
-        return;
-      }
-      if (!TextValidServices.isLongerThanNumber(password, 8)) {
-        setPasswordValidMessage("8자 이상 입력해주세요.");
-        setPasswordValid(false);
-        return;
-      }
-      setPasswordValidMessage("");
-      setPasswordValid(true);
-    },
-    []
-  );
+  const {
+    password,
+    passwordVerify,
+    passwordVerifyMessage,
+    confirmPassword,
+    confirmPasswordVerify,
+    confirmPasswordVerifyMessage,
+    setAndVerifyPassword,
+    changeConfirmPassword,
+    init: passwordInit,
+  } = useConfirmPassword();
 
   const [code, setCode] = useState<string>("");
   const [codeMessage, setCodeMessage] = useState<string>("");
@@ -96,16 +79,20 @@ const FindPasswordModal: FC<PropsType> = ({ show, close }) => {
     setLoading(false);
     setSuccess(false);
     setUsernameMsg("");
-    setPassword("");
-    setPasswordValid(false);
-    setPassword("");
+    passwordInit();
     setCode("");
     setCodeMessage("");
     close();
-  }, [close]);
+  }, [close, passwordInit]);
 
   const confirmSubmit = useCallback(async () => {
-    if (!password || !code || !username || !passwordValid) {
+    if (
+      !password ||
+      !code ||
+      !username ||
+      !passwordVerify ||
+      !confirmPasswordVerify
+    ) {
       return;
     }
 
@@ -123,7 +110,14 @@ const FindPasswordModal: FC<PropsType> = ({ show, close }) => {
       setCodeMessage("인증번호를 잘못 입력하셨습니다. 다시 시도해주세요.");
       console.log(err);
     }
-  }, [closeWithInit, code, password, passwordValid, username]);
+  }, [
+    closeWithInit,
+    code,
+    confirmPasswordVerify,
+    password,
+    passwordVerify,
+    username,
+  ]);
 
   return (
     <Modal
@@ -156,11 +150,20 @@ const FindPasswordModal: FC<PropsType> = ({ show, close }) => {
             <label className={styles.label}>새 암호 :</label>
             <DefaultTextInput
               value={password}
-              onChange={onChangePassword}
+              onChange={setAndVerifyPassword}
               type="password"
             />
           </div>
-          <p className={styles.message}>{passwordValidMessage}</p>
+          <p className={styles.message}>{passwordVerifyMessage}</p>
+          <div className={styles.input_block}>
+            <label className={styles.label}>새 암호 확인 :</label>
+            <DefaultTextInput
+              value={confirmPassword}
+              onChange={changeConfirmPassword}
+              type="password"
+            />
+          </div>
+          <p className={styles.message}>{confirmPasswordVerifyMessage}</p>
           <div className={styles.input_block}>
             <label className={styles.label}>인증번호 :</label>
             <DefaultTextInput value={code} onChange={onChangeCode} />
@@ -169,7 +172,13 @@ const FindPasswordModal: FC<PropsType> = ({ show, close }) => {
           <DefaultButton
             size="md"
             onClick={confirmSubmit}
-            disabled={!username || !password || !code || !passwordValid}
+            disabled={
+              !username ||
+              !password ||
+              !code ||
+              !passwordVerify ||
+              !confirmPasswordVerify
+            }
           >
             변경
           </DefaultButton>

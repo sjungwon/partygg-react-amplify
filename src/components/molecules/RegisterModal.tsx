@@ -13,6 +13,7 @@ import RegisterConfirmModal from "./RegisterConfirmModal";
 import DefaultTextInput from "../atoms/DefaultTextInput";
 import DefaultButton from "../atoms/DefaultButton";
 import LoadingBlock from "../atoms/LoadingBlock";
+import useConfirmPassword from "../../hooks/useConfirmPassword";
 
 type RegisterProps = {
   parentMdShow: boolean;
@@ -26,7 +27,6 @@ export default function RegisterModal({
   //form 데이터
   const [email, setEmail] = useState<string>("");
   const [username, setUsername] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
 
   //회원가입 제출 결과 모달
   const [mdShow, setMdShow] = useState<boolean>(false);
@@ -91,40 +91,18 @@ export default function RegisterModal({
     [setEmail]
   );
 
-  //비밀번호 입력 검증
-  const [passwordVerify, setPasswordVerify] = useState<boolean>(false);
-  const [passwordVerifyMessage, setPasswordVerifyMessage] =
-    useState<string>("");
-  const verifyPassword: ChangeEventHandler<HTMLInputElement> = useCallback(
-    (event) => {
-      const passwordText = event.target.value;
-      setPassword(passwordText);
-      const textVerify = TextValidServices.isIncludeAlphabet(passwordText);
-      if (!textVerify) {
-        setPasswordVerifyMessage("문자를 1개 이상 포함해야 합니다.");
-        setPasswordVerify(false);
-        return;
-      }
-      const numberVerify = TextValidServices.isIncludeNumber(passwordText);
-      if (!numberVerify) {
-        setPasswordVerifyMessage("숫자를 1개 이상 포함해야 합니다.");
-        setPasswordVerify(false);
-        return;
-      }
-      const lengthVerify = TextValidServices.isLongerThanNumber(
-        passwordText,
-        8
-      );
-      if (!lengthVerify) {
-        setPasswordVerifyMessage("8자 이상 입력해주세요.");
-        setPasswordVerify(false);
-        return;
-      }
-      setPasswordVerifyMessage("");
-      setPasswordVerify(true);
-    },
-    [setPassword]
-  );
+  //비밀번호
+  const {
+    password,
+    passwordVerify,
+    passwordVerifyMessage,
+    setAndVerifyPassword,
+    confirmPassword,
+    confirmPasswordVerify,
+    confirmPasswordVerifyMessage,
+    changeConfirmPassword,
+    init: passwordInit,
+  } = useConfirmPassword();
 
   useEffect(() => {
     setUsername("");
@@ -133,10 +111,8 @@ export default function RegisterModal({
     setEmail("");
     setEmailVerify(false);
     setEmailVerifyMessage("");
-    setPassword("");
-    setPasswordVerify(false);
-    setPasswordVerifyMessage("");
-  }, [parentMdShow]);
+    passwordInit();
+  }, [parentMdShow, passwordInit]);
 
   //가입 확인 모달 데이터
   const [registerUsername, setRegisterUsername] = useState<string>("");
@@ -224,18 +200,39 @@ export default function RegisterModal({
                 type="password"
                 placeholder="비밀번호를 입력해주세요."
                 value={password}
-                onChange={verifyPassword}
+                onChange={setAndVerifyPassword}
                 required
               />
               <Form.Text id="passwordHelpBlock" className={styles.red}>
                 {passwordVerifyMessage}
               </Form.Text>
             </Form.Group>
+            <Form.Group className="mb-3" controlId="formBasicConfirmPassword">
+              <Form.Label className={styles.label}>
+                비밀번호 확인 <span className={styles.red}>*</span>
+              </Form.Label>
+              <DefaultTextInput
+                size="xl"
+                type="password"
+                placeholder="입력하신 비밀번호를 다시 입력해주세요."
+                value={confirmPassword}
+                onChange={changeConfirmPassword}
+                required
+              />
+              <Form.Text id="confirmpasswordHelpBlock" className={styles.red}>
+                {confirmPasswordVerifyMessage}
+              </Form.Text>
+            </Form.Group>
             <DefaultButton
               size="xl"
               onClick={submitSignUp}
               className={styles.submit_btn}
-              disabled={!emailVerify || !usernameVerify || !passwordVerify}
+              disabled={
+                !emailVerify ||
+                !usernameVerify ||
+                !passwordVerify ||
+                !confirmPasswordVerify
+              }
             >
               <LoadingBlock loading={loading}>회원가입</LoadingBlock>
             </DefaultButton>
