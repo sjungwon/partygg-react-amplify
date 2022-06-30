@@ -6,6 +6,8 @@ import UserInfoBar from "../components/organisms/UserInfoBar";
 import PostListContextProvider from "../context/PostListContextProvider";
 import { UserDataContext } from "../context/UserDataContextProvider";
 import useCategory from "../hooks/useCategory";
+import { useIsMobile } from "../hooks/useIsMobile";
+import useScrollLock from "../hooks/useScrollLock";
 import styles from "./scss/HomePage.module.scss";
 
 export default function HomePage() {
@@ -14,10 +16,25 @@ export default function HomePage() {
   const { setFilteredProfileHandler, setFilteredProfileHandlerByProfile } =
     useContext(UserDataContext);
 
+  const { scrollLock, scrollRelease } = useScrollLock();
   const [showCategory, setShowCategory] = useState<boolean>(false);
   const showCategoryHandler = useCallback(() => {
-    setShowCategory((prev) => !prev);
-  }, []);
+    setShowCategory((prev) => {
+      if (prev) {
+        scrollRelease();
+      } else {
+        scrollLock();
+      }
+      return !prev;
+    });
+  }, [scrollLock, scrollRelease]);
+
+  const isMobile = useIsMobile();
+  useEffect(() => {
+    if (!isMobile) {
+      document.body.style.overflow = "auto";
+    }
+  }, [isMobile]);
 
   useEffect(() => {
     if (category === "games" && searchParam) {

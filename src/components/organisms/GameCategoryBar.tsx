@@ -43,7 +43,11 @@ export default function GameCategoryBar({ show }: PropsType) {
           </div>
           {showAdd ? <AddGames /> : null}
         </div>
-        <nav className={styles.category_list}>
+        <nav
+          className={`${styles.category_list} ${
+            showAdd ? styles.list_short : ""
+          }`}
+        >
           <NavLink
             to={"/"}
             className={({ isActive }) =>
