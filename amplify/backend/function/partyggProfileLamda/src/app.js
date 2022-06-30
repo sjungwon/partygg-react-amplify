@@ -415,48 +415,173 @@ app.post(
  * HTTP remove method to delete object *
  ***************************************/
 
-app.delete(path + "/object" + hashKeyPath + sortKeyPath, function (req, res) {
-  const params = {};
-  if (userIdPresent && req.apiGateway) {
-    params[partitionKeyName] =
-      req.apiGateway.event.requestContext.identity.cognitoIdentityId || UNAUTH;
-  } else {
-    params[partitionKeyName] = req.params[partitionKeyName];
-    try {
-      params[partitionKeyName] = convertUrlType(
-        req.params[partitionKeyName],
-        partitionKeyType
-      );
-    } catch (err) {
-      res.statusCode = 500;
-      res.json({ error: "Wrong column type " + err });
+app.delete(
+  path + "/object" + hashKeyPath + sortKeyPath,
+  async function (req, res) {
+    const params = {};
+    if (userIdPresent && req.apiGateway) {
+      params[partitionKeyName] =
+        req.apiGateway.event.requestContext.identity.cognitoIdentityId ||
+        UNAUTH;
+    } else {
+      params[partitionKeyName] = req.params[partitionKeyName];
+      try {
+        params[partitionKeyName] = convertUrlType(
+          req.params[partitionKeyName],
+          partitionKeyType
+        );
+      } catch (err) {
+        res.statusCode = 500;
+        res.json({ error: "Wrong column type " + err });
+      }
     }
-  }
-  if (hasSortKey) {
-    try {
-      params[sortKeyName] = convertUrlType(
-        req.params[sortKeyName],
-        sortKeyType
-      );
-    } catch (err) {
-      res.statusCode = 500;
-      res.json({ error: "Wrong column type " + err });
+    if (hasSortKey) {
+      try {
+        params[sortKeyName] = convertUrlType(
+          req.params[sortKeyName],
+          sortKeyType
+        );
+      } catch (err) {
+        res.statusCode = 500;
+        res.json({ error: "Wrong column type " + err });
+      }
     }
-  }
 
-  let removeItemParams = {
-    TableName: tableName,
-    Key: params,
-  };
-  dynamodb.delete(removeItemParams, (err, data) => {
-    if (err) {
+    let removeItemParams = {
+      TableName: tableName,
+      Key: params,
+    };
+
+    // dynamodb.delete(removeItemParams, (err, data) => {
+    //   if (err) {
+    //     res.statusCode = 500;
+    //     res.json({ error: err, url: req.url });
+    //   } else {
+    //     res.json({ url: req.url, data: data });
+    //   }
+    // });
+    try {
+      const profileDb = await dynamodb.get(removeItemParams).promise();
+      const profile = profileDb.Item;
+      if (!profile) {
+        throw new Error("Not exist profile");
+      }
+      await dynamodb.delete(removeItemParams).promise();
+      const updateFunc = async () => {
+        const param = {
+          IndexName: profileIdIndexName,
+          KeyConditionExpression: "profileId = :p",
+          ExpressionAttributeValues: {
+            ":p": req.params[sortKeyName],
+          },
+          ScanIndexForward: false,
+        };
+        const updateParam = {
+          ExpressionAttributeNames: {
+            "#P": "profile",
+          },
+          ExpressionAttributeValues: {
+            ":p": {
+              ...profile,
+              nickname: "삭제된 프로필",
+              profileImage: undefined,
+            },
+          },
+          UpdateExpression: "SET #P = :p",
+        };
+        const postUpdate = new Promise(async (res) => {
+          const postQueryParam = {
+            TableName: postTableName,
+            ...param,
+          };
+          const posts = await dynamodb.query(postQueryParam).promise();
+          let result;
+          if (posts.Items) {
+            result = await Promise.all(
+              posts.Items.map(async (item) => {
+                const postUpdateParam = {
+                  TableName: postTableName,
+                  Key: {
+                    username: item.username,
+                    date: item.date,
+                  },
+                  ...updateParam,
+                };
+                const test = await dynamodb.update(postUpdateParam).promise();
+                return test;
+              })
+            );
+          }
+          res(result);
+        });
+        const commentUpdate = new Promise(async (res) => {
+          const commentQueryParam = {
+            TableName: commentTableName,
+            ...param,
+          };
+          const comments = await dynamodb.query(commentQueryParam).promise();
+          let result;
+          if (comments.Items) {
+            result = await Promise.all(
+              comments.Items.map(async (item) => {
+                const commentUpdateParam = {
+                  TableName: commentTableName,
+                  Key: {
+                    postId: item.postId,
+                    date: item.date,
+                  },
+                  ...updateParam,
+                };
+                const test = await dynamodb
+                  .update(commentUpdateParam)
+                  .promise();
+                return test;
+              })
+            );
+          }
+          res(result);
+        });
+        const subcommentUpdate = new Promise(async (res) => {
+          const subcommentQueryParam = {
+            TableName: subcommentTableName,
+            ...param,
+          };
+          const subcomments = await dynamodb
+            .query(subcommentQueryParam)
+            .promise();
+          let result;
+          if (subcomments.Items) {
+            result = await Promise.all(
+              subcomments.Items.map(async (item) => {
+                const subcommentUpdateParam = {
+                  TableName: subcommentTableName,
+                  Key: {
+                    commentId: item.commentId,
+                    date: item.date,
+                  },
+                  ...updateParam,
+                };
+                const test = await dynamodb
+                  .update(subcommentUpdateParam)
+                  .promise();
+                return test;
+              })
+            );
+          }
+          res(result);
+        });
+
+        await Promise.all([postUpdate, commentUpdate, subcommentUpdate]);
+      };
+      await updateFunc();
+      res.json({ success: "delete call succeed!", url: req.url });
+    } catch (err) {
+      console.log("Profile delete error: " + err);
       res.statusCode = 500;
       res.json({ error: err, url: req.url });
-    } else {
-      res.json({ url: req.url, data: data });
     }
-  });
-});
+  }
+);
 
 app.listen(3000, function () {
   console.log("App started");
