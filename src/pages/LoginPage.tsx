@@ -1,12 +1,23 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
-import { Button, Form } from "react-bootstrap";
+import {
+  MouseEventHandler,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import { Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import RegisterConfirmModal from "../components/RegisterConfirmModal";
+import RegisterConfirmModal from "../components/molecules/RegisterConfirmModal";
 import AuthServices from "../services/AuthServices";
-import styles from "./LoginPage.module.scss";
-import RegisterModal from "../components/RegisterModal";
+import styles from "./scss/LoginPage.module.scss";
+import RegisterModal from "../components/molecules/RegisterModal";
 import { UserDataContext } from "../context/UserDataContextProvider";
 import { AiOutlineArrowLeft } from "react-icons/ai";
+import DefaultButton from "../components/atoms/DefaultButton";
+import DefaultTextInput from "../components/atoms/DefaultTextInput";
+import LoadingBlock from "../components/atoms/LoadingBlock";
+import FindPasswordModal from "../components/molecules/FindPasswordModal";
 
 export default function LoginPage() {
   const [username, setUsername] = useState<string>("");
@@ -75,10 +86,10 @@ export default function LoginPage() {
   }, [loginUser, navigate]);
 
   //제출
-  const click = async () => {
+  const clickToSubmit: MouseEventHandler<HTMLButtonElement> = async (event) => {
+    event.preventDefault();
     if (username && password) {
       setLoading(true);
-      console.log(username, password);
       try {
         await AuthServices.signIn({
           username,
@@ -87,13 +98,11 @@ export default function LoginPage() {
         checkLogin();
         navigate(-1);
       } catch (error: any) {
-        console.log(error.message);
         setLoading(false);
         //가입 확인을 안한 유저이면
         if (error.message === "User is not confirmed.") {
           try {
             //확인 코드 재전송
-            console.log("hi");
             await AuthServices.resendConfirmationCode(username);
             //확인 모달 열기
             setLoginFailMessage("");
@@ -126,26 +135,33 @@ export default function LoginPage() {
     navigate(-1);
   }, [navigate]);
 
+  const [showFindPassword, setShowFindPassword] = useState<boolean>(false);
+  const openFindPassword = useCallback(() => {
+    setShowFindPassword(true);
+  }, []);
+  const closeFindPassword = useCallback(() => {
+    setShowFindPassword(false);
+  }, []);
+
   return (
     <div className={styles.login}>
-      <button onClick={goBack} className={styles.btn_back}>
+      <DefaultButton size="sq_md" onClick={goBack} className={styles.btn_back}>
         <AiOutlineArrowLeft />
-      </button>
+      </DefaultButton>
       <div className={styles.login_card}>
         <div className={styles.login_card__wrapper}>
-          <h1 className={styles.login_title}>PartyGG</h1>
+          <h1 className={styles.login_title}>그님티</h1>
           <h2 className={styles.login_subtitle}>
-            PartyGG에서 당신의 게임 프로필로 대화해보세요.
+            그님티에서 당신의 게임 프로필로 <br /> 대화해보세요.
           </h2>
           <div className={styles.login_card__bottom}>
             <Form>
               <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label visuallyHidden={true}>사용자 이름</Form.Label>
-                <Form.Control
+                <DefaultTextInput
                   type="text"
                   placeholder="사용자 이름을 입력해주세요."
-                  bsPrefix={`${styles.input}`}
-                  name="username"
+                  size="xl"
                   value={username}
                   onChange={usernameChange}
                   required
@@ -153,14 +169,13 @@ export default function LoginPage() {
               </Form.Group>
               <Form.Group className="mb-3" controlId="formBasicPassword">
                 <Form.Label visuallyHidden={true}>비밀번호</Form.Label>
-                <Form.Control
+                <DefaultTextInput
                   type="password"
                   placeholder="비밀번호를 입력해주세요."
-                  bsPrefix={`${styles.input}`}
-                  name="password"
                   value={password}
                   onChange={passwordChange}
                   onKeyDown={enterSubmit as any}
+                  size="xl"
                   required
                 />
               </Form.Group>
@@ -170,36 +185,42 @@ export default function LoginPage() {
               >
                 {loginFailMessage}
               </Form.Text>
-              <Button
-                bsPrefix={`${styles.login_btn} ${styles.login_btn__login}`}
+              <DefaultButton
+                size="xl"
+                onClick={clickToSubmit}
                 disabled={loading || btnDisabled}
-                onClick={click}
                 ref={submitRef}
               >
-                {loading ? "로그인 중..." : "로그인"}
-              </Button>
+                <LoadingBlock loading={loading}>로그인</LoadingBlock>
+              </DefaultButton>
             </Form>
-            <div className={styles.login_message} tabIndex={0}>
+            <div
+              className={styles.find_password}
+              tabIndex={0}
+              onClick={openFindPassword}
+            >
               비밀번호를 잊으셨나요?
             </div>
-            <div className={styles.login_line}></div>
-            <Button
-              bsPrefix={`${styles.login_btn} ${styles.login_btn__register}`}
-              onClick={openModal}
-            >
-              회원가입
-            </Button>
+            <FindPasswordModal
+              show={showFindPassword}
+              close={closeFindPassword}
+            />
+            <div className={styles.line}></div>
+            <div className={styles.register_container}>
+              <DefaultButton size="xl" onClick={openModal} color="blue">
+                회원가입
+              </DefaultButton>
+              <RegisterConfirmModal
+                mdShow={confirmModalShow}
+                modalClose={closeConfirmModal}
+                parentMdClose={() => {}}
+                username={loginUsername}
+              />
+            </div>
             <RegisterModal parentMdShow={mdShow} parentMdClose={closeModal} />
           </div>
         </div>
       </div>
-
-      <RegisterConfirmModal
-        mdShow={confirmModalShow}
-        modalClose={closeConfirmModal}
-        parentMdClose={() => {}}
-        username={loginUsername}
-      />
     </div>
   );
 }

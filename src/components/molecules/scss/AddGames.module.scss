@@ -1,0 +1,30 @@
+.container{
+  align-items: center;
+  width: 100%;
+  min-height: 2rem;
+  font-size: .9rem;
+  margin-bottom: .3rem;
+}
+
+.container_flex{
+  display: flex;
+}
+
+.text_label{
+  min-width: 4rem;
+  margin-right: .5rem;
+}
+
+.input{
+  height: 1.75rem;
+  width: 100%;
+  margin: .25rem 0;
+}
+
+.input_flex{
+  margin: 0;
+}
+
+.btn_margin{
+  margin: .5rem;
+}

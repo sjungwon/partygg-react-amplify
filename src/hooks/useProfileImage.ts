@@ -8,7 +8,6 @@ export default function useProfileImage(key?: ImageKeys) {
   const getImage = useCallback(async (key: ImageKeys) => {
     const resizedImage = await FileServices.getImage(key, "resized");
     if (resizedImage) {
-      console.log("async set image");
       setProfileImage(resizedImage);
       return;
     }

@@ -1,0 +1,16 @@
+@import "../../../scss/variables";
+
+
+.modal_body_btns{
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal_title{
+  font-size: 1.1rem;
+}
+
+.modal_footer{
+  justify-content: flex-start;
+}

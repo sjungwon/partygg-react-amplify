@@ -1,0 +1,69 @@
+@import "../../../scss/variables";
+@import "../../../scss/mixin";
+
+.container{
+  max-width: 28rem;
+  min-height: 10rem; 
+  margin: 2.5rem auto;
+  margin-top: 0;
+  box-shadow: $card-box-shadow-bottom;
+  border-radius: .5rem;
+  border: 1px solid $primary-default-border;
+}
+
+.body_container{
+  @include flex_center;
+  flex-direction: column;
+  color: $font-color-gray;
+}
+
+.img_container{
+  padding: .5rem;
+}
+
+.profile_img{
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.title{
+  font-size: 1.1rem;
+}
+
+.subtitle{
+  display: flex;
+  align-items: center;
+  padding: .3rem;
+  font-size: .95rem;
+}
+
+.subtitle_link{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: .25rem;
+  min-width: 2.5rem;
+  min-height: 1.75rem;
+  padding: 0 .25rem;
+  border-radius: .25rem;
+  background-color: $primary-default-btn-background;
+  box-shadow: $btn-box-shadow;
+  color: $font-color-gray;
+  text-decoration: none;
+  &:hover{
+    color: $font-color-light-gray;
+  }
+}
+
+.credentials{
+  padding-top: .5rem;
+}
+
+.credentials_text{
+  font-size: .95rem;
+  font-weight: 500;
+  text-align: center;
+  padding: .5rem 0;
+}

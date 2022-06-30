@@ -14,11 +14,9 @@ export default class AuthServices {
     data: ConfirmSignUpReqData
   ): Promise<boolean> {
     try {
-      const response = await Auth.confirmSignUp(data.username, data.code);
-      console.log(response);
+      await Auth.confirmSignUp(data.username, data.code);
       return true;
     } catch (error: any) {
-      console.log(error.message);
       if (error.message.includes("Current status is CONFIRMED")) {
         return true;
       }
@@ -36,5 +34,17 @@ export default class AuthServices {
 
   public static async signOut() {
     await Auth.signOut();
+  }
+
+  public static async findPassword(username: string) {
+    await Auth.forgotPassword(username);
+  }
+
+  public static async findPasswordSubmit(
+    username: string,
+    code: string,
+    new_password: string
+  ) {
+    await Auth.forgotPasswordSubmit(username, code, new_password);
   }
 }

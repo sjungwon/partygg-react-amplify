@@ -26,10 +26,8 @@ export default class ProfileServices {
         path,
         {}
       );
-      console.log(profiles);
       return profiles;
     } catch (error) {
-      console.log(error);
       return null;
     }
   }
@@ -50,13 +48,11 @@ export default class ProfileServices {
     try {
       const path = `${this.path}/object/${profileId}`;
       const profile: Profile[] = await API.get(this.apiName, path, {});
-      console.log(profile);
       if (!profile.length) {
         return this.removedProfileGen(profileId);
       }
       return profile[0];
     } catch (error) {
-      console.log(error);
       return null;
     }
   }
@@ -80,10 +76,8 @@ export default class ProfileServices {
         path,
         myInit
       );
-      console.log(response);
       return response.data;
     } catch (error) {
-      console.log(error);
       return null;
     }
   }
@@ -104,10 +98,8 @@ export default class ProfileServices {
         path,
         myInit
       );
-      console.log(profile);
       return profile.data;
     } catch (error) {
-      console.log(error);
       return null;
     }
   }
@@ -116,15 +108,13 @@ export default class ProfileServices {
     const path = `/profiles/object`;
     try {
       const { username } = await UserServices.getUsernameWithRefresh();
-      const response = await API.del(
+      await API.del(
         this.apiName,
         `${path}/${encodeURIComponent(username)}/${encodeURIComponent(id)}`,
         {}
       );
-      console.log(response);
       return true;
     } catch (error) {
-      console.log(error);
       return false;
     }
   }

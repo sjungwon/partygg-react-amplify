@@ -1,11 +1,16 @@
 @import "./variables";
 
 @mixin mobile {
-  @media (min-width: #{$breakpoint-mobile}) and (max-width: #{$breakpoint-tablet - 1px}) {
+  @media screen and (min-width: #{$breakpoint-mobile}) and (max-width: #{$breakpoint-tablet - 1px}) {
     @content;
   }
 }
 
+@mixin overflow{
+  @media screen and (min-width: 58rem){
+    @content;
+  }
+}
 
 @mixin flex_center{
   display: flex;
@@ -19,17 +24,19 @@
   min-height: 1.25rem;
   border: 1px solid transparent;
   border-radius: .25rem;
-  background-color: $primary-default-btn-background;
+  background-color: $btn-background-gray;
   padding: 0;
   font-size: .825rem;
   color: $font-color-gray;
+  box-shadow: $btn-box-shadow;
   & svg{
     pointer-events: none;
   }
-  &_icon{
-    color: $primary-orange;
-  }
   &:hover{
+    color: $font-color-light-gray;
+  }
+  &:disabled{
+    background-color: $btn-background-gray-disabled;
     color: $font-color-light-gray;
   }
 }

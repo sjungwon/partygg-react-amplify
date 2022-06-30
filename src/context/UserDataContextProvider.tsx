@@ -1,5 +1,5 @@
 import React, { createContext, useCallback, useState } from "react";
-import sortProfiles from "../Functions/sortProfile";
+import sortProfiles from "../functions/sortProfile";
 import AuthServices from "../services/AuthServices";
 import ProfileServices from "../services/ProfileServices";
 import UserServices from "../services/UserServices";
@@ -83,7 +83,6 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
 
   const setFilteredProfileHandler = useCallback(
     (gameName: string) => {
-      console.log(gameName, profileArr);
       if (!username) {
         return;
       }
@@ -184,7 +183,6 @@ const UserDataContextProvider: React.FC<Props> = ({ children }) => {
   const checkLogin = useCallback(async () => {
     try {
       const { username } = await UserServices.getUsernameWithRefresh();
-      console.log(username);
       if (username) {
         setUsername(username);
         const profiles = await ProfileServices.getProfiles();

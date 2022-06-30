@@ -1,0 +1,29 @@
+@import "../../../scss/variables";
+
+.profile_img{
+  height: 1.75rem;
+  width: 1.75rem;
+  margin-right: .25rem;
+  border-radius: 50%;
+  object-fit:cover;
+}
+.profile_img_lg{
+  height: 2rem;
+  width: 2rem;
+}
+
+.profile_nickname{
+  font-size: 0.8rem;
+  font-weight: 500;
+  word-break: break-all;
+}
+
+.profile_nickname_lg{
+  font-size: 0.85rem;
+  margin-bottom: 1px;
+}
+
+.profile_username{
+  padding-right: .5rem;
+  font-size: .8rem;
+}
