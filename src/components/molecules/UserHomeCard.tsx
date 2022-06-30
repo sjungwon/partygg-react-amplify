@@ -14,6 +14,7 @@ interface PropsType {
 export default function UserHomeCard({ username }: PropsType) {
   const [userProfile, setUserProfile] = useState<Profile[]>([]);
   const { profileArr, username: myUsername } = useContext(UserDataContext);
+  const [success, setSuccess] = useState<boolean>(false);
 
   const getUserProfile = useCallback(async (username: string) => {
     if (!username) {
@@ -24,8 +25,10 @@ export default function UserHomeCard({ username }: PropsType) {
       window.alert(
         "프로필을 가져오는데 오류가 발생했습니다. 다시 시도해주세요."
       );
+      setSuccess(false);
       return;
     }
+    setSuccess(true);
     setUserProfile(sortProfiles(profile));
   }, []);
 
@@ -43,15 +46,17 @@ export default function UserHomeCard({ username }: PropsType) {
         <Card.Title className={styles.title}>{username}</Card.Title>
       </Card.Header>
       <Card.Body className={styles.body_container}>
-        {userProfile.length ? (
-          <ProfileList profileArr={userProfile} username={username} />
-        ) : (
-          <>
-            <p className={styles.no_user}>
-              존재하지 않는 사용자 또는 사용자의 프로필 정보 없음
-            </p>
-          </>
-        )}
+        {success ? (
+          userProfile.length ? (
+            <ProfileList profileArr={userProfile} username={username} />
+          ) : (
+            <>
+              <p className={styles.no_user}>
+                존재하지 않는 사용자 또는 사용자의 프로필 정보 없음
+              </p>
+            </>
+          )
+        ) : null}
       </Card.Body>
     </Card>
   );
