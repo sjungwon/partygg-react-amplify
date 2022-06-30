@@ -4,12 +4,13 @@ import { ImageKeys } from "./file.type";
 export interface ProfileStruct {
   nickname: string;
   game: string;
-  profileImage: ImageKeys | undefined;
+  profileImage?: ImageKeys;
+  credential?: ImageKeys;
 }
 
 export interface Profile extends ProfileStruct, UserResource {
   //partition key
-  username: string;
+  //username: string;
   //sort key
   id: string;
 }

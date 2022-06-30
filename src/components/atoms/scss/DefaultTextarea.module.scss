@@ -1,0 +1,30 @@
+@import "../../../scss/variables";
+
+.textarea{
+  width: 100%;
+  padding: .5rem;
+  margin-top: .5rem;
+  border: 1px solid $primary-default-border;
+  border-radius: .5rem;
+  resize: none;
+  outline: none;
+  font-size: .95rem;
+  text-align:justify;
+  &:focus{
+    border: 2px solid $primary-default-dark;
+  }
+}
+
+.textarea_sm{
+  height: 4rem;
+  font-size: .85rem;
+}
+
+.textarea_lg{
+  height: 12rem;
+}
+
+.textarea_length{
+  margin-bottom: .5rem;
+  font-size: .8rem;
+}

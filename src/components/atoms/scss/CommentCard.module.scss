@@ -1,0 +1,30 @@
+@import "../../../scss/variables";
+
+.card{
+  min-height: 3rem;
+  padding: .5rem;
+  color: $font-color-gray;
+  font-size: .85rem;
+}
+
+.card_border{
+  border-bottom: 1px dashed $primary-blue;
+}
+
+.header{
+  display: flex;
+  align-items: center;
+  max-height: 2rem;
+}
+
+.body{
+  min-height: 2rem;
+}
+
+.buttons{
+  display: flex;
+  align-items: center;
+  min-width: 3rem;
+  max-width: 10rem;
+  max-height: 2.5rem;
+}

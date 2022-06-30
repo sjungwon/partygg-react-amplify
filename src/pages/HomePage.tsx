@@ -1,11 +1,12 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import GameCategoryBar from "../components/GameCategoryBar";
-import NavBar from "../components/NavBar";
-import PostList from "../components/posts/PostList";
-import UserInfoBar from "../components/UserInfoBar";
+import GameCategoryBar from "../components/organisms/GameCategoryBar";
+import NavBar from "../components/organisms/NavBar";
+import PostList from "../components/organisms/PostList";
+import UserInfoBar from "../components/organisms/UserInfoBar";
+import PostListContextProvider from "../context/PostListContextProvider";
 import { UserDataContext } from "../context/UserDataContextProvider";
 import useCategory from "../hooks/useCategory";
-import styles from "./HomePage.module.scss";
+import styles from "./scss/HomePage.module.scss";
 
 export default function HomePage() {
   const { category, searchParam } = useCategory();
@@ -47,7 +48,9 @@ export default function HomePage() {
       <NavBar showCategoryHandler={showCategoryHandler} />
       <div className={styles.content_container}>
         <GameCategoryBar show={showCategory} />
-        <PostList category={category} searchParam={searchParam} />
+        <PostListContextProvider category={category} searchParam={searchParam}>
+          <PostList />
+        </PostListContextProvider>
         <UserInfoBar />
       </div>
     </div>

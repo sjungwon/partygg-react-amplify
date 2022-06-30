@@ -1,0 +1,28 @@
+@import "../../../scss/variables";
+@import "../../../scss/mixin";
+
+.container{
+  max-width: 28rem;
+  min-height: 10rem; 
+  margin: 2.5rem auto;
+  margin-top: 0;
+  box-shadow: $card-box-shadow-bottom;
+  border-radius: .5rem;
+  border: 1px solid $primary-default-border;
+}
+
+
+.title{
+  @include flex_center;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.body_container{
+  padding-top: .5rem;
+}
+
+.no_user{
+  font-size: 1rem;
+  text-align: center;
+}

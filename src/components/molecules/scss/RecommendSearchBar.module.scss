@@ -1,0 +1,76 @@
+@import "../../../scss/variables";
+@import "../../../scss/mixin";
+
+.container{
+  display: flex;
+  height: 2rem;
+  border: 1px solid $primary-gray;
+  border-radius: .25rem;
+  background-color: $primary-gray;
+  box-shadow: 1px 2px 3px 1px rgba(100, 100, 100, 0.648);
+}
+
+.dropdown{
+  height: 100%;
+}
+
+.search_input{
+  display: block;
+  height: 100%;
+  border: 1px solid $primary-gray;
+  outline: none;
+}
+
+.search_recommand_container{
+  background-color: white;
+  border: 1px solid $primary-gray;
+  border-radius: 0 0 .25rem .25rem;
+  border-top: none;
+}
+
+.finded_game_border{
+  background-color: rgba(0, 0, 255, 0.234);
+}
+
+.navbar_btns{
+  display: flex;
+  right: 1rem;
+}
+
+.hide{
+  display: none;
+}
+
+@include mobile{
+  .container{
+    margin: auto;
+    width: 100%;
+    max-width: 25rem;
+    box-shadow: none;
+  }
+  .input_container{
+    position:relative;
+    width: 100%;
+    max-width: 20rem;
+  }
+  .search_input{
+    width: 100%;
+    max-width: 20rem;
+    &:focus{
+      border: 1px solid transparent;
+    }
+  }
+  .navbar_search_btn{
+    min-width: 3rem;
+  }
+  .search_recommand_container{
+    position: absolute;
+    top: 1.9rem;
+    width: 100%;
+    max-width: 20rem;
+    padding: 2px;
+    border-top: 1px solid $primary-gray;
+    border-radius: 0 0 .25rem .25rem;
+    font-size: .9rem;
+  }
+}

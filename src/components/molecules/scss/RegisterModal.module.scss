@@ -1,0 +1,32 @@
+@import "../../../scss/variables";
+@import "../../../scss/modal";
+
+.register_btn{
+  height: 3rem;
+    width: 30%;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: .4rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    margin: 1rem auto;
+    background-color: $primary-blue;
+    &:hover{
+      background-color: $primary-blue-hover;
+    }
+}
+
+.label{
+  font-size: .9rem;
+}
+
+.red{
+  color: red;
+}
+
+.submit_btn{
+  margin: 0 auto;
+}

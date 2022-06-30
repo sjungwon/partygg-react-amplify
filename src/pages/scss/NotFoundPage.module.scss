@@ -1,0 +1,67 @@
+@import "../../scss/variables";
+@import "../../scss/mixin";
+
+.container{
+  min-width: 100vw;
+  min-height: 100vh;
+  @include flex_center;  
+  background-color: $primary-default-background;
+}
+
+.card{
+  width: 80%;
+  max-width: 32rem;
+  max-height: 35rem;
+  margin: 0 auto;
+  border-radius: .5rem;
+  background-color: white;
+  color: $font-color-gray;
+}
+
+.title{
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.card_img{
+  width: 100%;
+  max-width: 30rem;
+  max-height: 20rem;
+  padding: 1rem 0;
+  margin: 0 auto;
+}
+
+.not_found_img{
+  width: 100%;
+  height: 100%;
+  border-radius: .5rem;
+}
+
+.text{
+  width: 100%;
+  text-align: center;
+  margin: 0 auto;
+}
+
+.btn{
+  @include btn_gray;
+  display: block;
+  width: 5rem;
+  height: 2rem;
+  margin: 1rem auto;
+  font-size: 1rem;
+}
+
+@include mobile{
+  .card{
+    min-width: 100%;
+    min-height: 100vh;
+    padding-top: 3rem;
+    border-radius: 0;
+    background-color: $primary-default-background;
+  }
+  .card_img{
+    width: 90%;
+  }
+}

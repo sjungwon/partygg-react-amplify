@@ -18,11 +18,9 @@ export default class LikeServices {
           postId,
         },
       };
-      const response = await API.post(this.apiName, this.likePath, myInit);
-      console.log(response);
+      await API.post(this.apiName, this.likePath, myInit);
       return true;
     } catch (error) {
-      console.log(error);
       return false;
     }
   }
@@ -36,11 +34,9 @@ export default class LikeServices {
       postId
     )}/${encodeURIComponent(username)}`;
     try {
-      const response = await API.del(this.apiName, path, {});
-      console.log(response);
+      await API.del(this.apiName, path, {});
       return true;
     } catch (error) {
-      console.log(error);
       return false;
     }
   }
@@ -57,11 +53,9 @@ export default class LikeServices {
           postId,
         },
       };
-      const response = await API.post(this.apiName, this.dislikePath, myInit);
-      console.log(response);
+      await API.post(this.apiName, this.dislikePath, myInit);
       return true;
     } catch (error) {
-      console.log(error);
       return false;
     }
   }
@@ -75,11 +69,9 @@ export default class LikeServices {
       postId
     )}/${encodeURIComponent(username)}`;
     try {
-      const response = await API.del(this.apiName, path, {});
-      console.log(response);
+      await API.del(this.apiName, path, {});
       return true;
     } catch (error) {
-      console.log(error);
       return false;
     }
   }

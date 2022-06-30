@@ -79,7 +79,6 @@ export default class PostServices {
         comments: [],
       };
     } catch (error) {
-      console.log(error);
       return null;
     }
   }
@@ -108,7 +107,6 @@ export default class PostServices {
       const data: UpdatePostResData = response.data;
       return { ...postData, ...data };
     } catch (error) {
-      console.log(error);
       return null;
     }
   }
@@ -128,7 +126,6 @@ export default class PostServices {
       );
       return true;
     } catch (error) {
-      console.log(error);
       return false;
     }
   }
@@ -137,13 +134,10 @@ export default class PostServices {
     category: string,
     searchParam: string
   ): Promise<Post[] | null> {
-    console.log("services", this.getDone, this.loading);
     if (this.getDone || this.loading) {
       return [];
     }
     this.loading = true;
-
-    console.log(this.getDone, this.loading);
 
     if (category === "games" && searchParam) {
       const path = this.lastEvaluatedKeyForGame
@@ -166,7 +160,6 @@ export default class PostServices {
         this.loading = false;
         return response.data;
       } catch (error) {
-        console.log(error);
         this.loading = false;
         return null;
       }
@@ -191,7 +184,6 @@ export default class PostServices {
         this.loading = false;
         return response.data;
       } catch (error) {
-        console.log(error);
         this.loading = false;
         return null;
       }
@@ -218,7 +210,6 @@ export default class PostServices {
         this.loading = false;
         return response.data;
       } catch (error) {
-        console.log(error);
         this.loading = false;
         return null;
       }
@@ -237,91 +228,10 @@ export default class PostServices {
       this.loading = false;
       return response.data;
     } catch (error) {
-      console.log(error);
       this.loading = false;
       return null;
     }
   }
-
-  // public static async getPostsByGame(
-  //   game: string
-  // ): Promise<GetGamePostsResData | null> {
-  //   if (this.getDone) {
-  //     return null;
-  //   }
-  //   const path = this.lastEvaluatedKeyForGame
-  //     ? `${this.path}/game/${encodeURIComponent(
-  //         this.lastEvaluatedKeyForGame.game
-  //       )}/${encodeURIComponent(
-  //         this.lastEvaluatedKeyForGame.username
-  //       )}/${encodeURIComponent(this.lastEvaluatedKeyForGame.date)}`
-  //     : `${this.path}/game/${game}`;
-  //   try {
-  //     const response: GetGamePostsResData = await API.get(
-  //       this.apiName,
-  //       path,
-  //       {}
-  //     );
-  //     if (!response.lastEvaluatedKey) {
-  //       this.getDone = true;
-  //     }
-  //     this.lastEvaluatedKeyForGame = response.lastEvaluatedKey;
-  //     return response;
-  //   } catch (error) {
-  //     console.log(error);
-  //     return null;
-  //   }
-  // }
-
-  // public static async getPostsByUser(
-  //   username: string
-  // ): Promise<Post[] | null> {
-  //   if (this.getDone) {
-  //     return null;
-  //   }
-  //   const path = this.lastEvaluatedKeyForUser
-  //     ? `${this.path}/user/${encodeURIComponent(
-  //         this.lastEvaluatedKeyForUser.username
-  //       )}/${encodeURIComponent(this.lastEvaluatedKeyForUser.date)}`
-  //     : `${this.path}/user/${username}`;
-  //   try {
-  //     const response: GetUserPostsResData = await API.get(this.apiName, path, {});
-  //     if (!response.lastEvaluatedKey) {
-  //       this.getDone = true;
-  //     }
-  //     this.lastEvaluatedKeyForUser = response.lastEvaluatedKey;
-  //     return response.data;
-  //   } catch (error) {
-  //     console.log(error);
-  //     return null;
-  //   }
-  // }
-
-  // public static async getPostByProfile(
-  //   profileId: string
-  // ): Promise<GetProfilePostsResData | null> {
-  //   if (this.getDone) {
-  //     return null;
-  //   }
-  //   const path = this.lastEvaluatedKeyForProfile
-  //     ? `${this.path}/profile/${encodeURIComponent(
-  //         this.lastEvaluatedKeyForProfile.profileId
-  //       )}/${encodeURIComponent(
-  //         this.lastEvaluatedKeyForProfile?.username
-  //       )}/${encodeURIComponent(this.lastEvaluatedKeyForProfile.date)}}`
-  //     : `${this.path}/profile/${profileId}`;
-  //   try{
-  //     const response: GetProfilePostsResData = await API.get(this.apiName,path,{});
-  //     if(!response.lastEvaluatedKey){
-  //       this.getDone = true;
-  //     }
-  //     this.lastEvaluatedKeyForProfile = response.lastEvaluatedKey;
-  //     return response;
-  //   }catch(error){
-  //     console.log(error);
-  //     return null;
-  //   }
-  // }
 
   public static async getUserPostIdListByGame(
     username: string,
@@ -334,7 +244,6 @@ export default class PostServices {
       const response: GetPostsResData = await API.get(this.apiName, path, {});
       return response;
     } catch (error) {
-      console.log(error);
       return null;
     }
   }
@@ -350,7 +259,6 @@ export default class PostServices {
       const response: GetPostsResData = await API.get(this.apiName, path, {});
       return response;
     } catch (error) {
-      console.log(error);
       return null;
     }
   }
@@ -366,7 +274,6 @@ export default class PostServices {
       const response: Post = await API.get(this.apiName, path, {});
       return response;
     } catch (error) {
-      console.log(error);
       return null;
     }
   }
@@ -381,7 +288,6 @@ export default class PostServices {
       const response = await API.get(this.apiName, path, {});
       return response;
     } catch (error) {
-      console.log(error);
       return null;
     }
   }
@@ -404,7 +310,6 @@ export default class PostServices {
         subcomments: [],
       };
     } catch (error) {
-      console.log(error);
       return null;
     }
   }
@@ -427,7 +332,6 @@ export default class PostServices {
       const data: Comment = response.data;
       return data;
     } catch (err) {
-      console.log(err);
       return null;
     }
   }
@@ -440,7 +344,6 @@ export default class PostServices {
       await API.del(this.apiName, path, {});
       return true;
     } catch (err) {
-      console.log(err);
       return false;
     }
   }
@@ -455,7 +358,6 @@ export default class PostServices {
       const response = await API.get(this.apiName, path, {});
       return response;
     } catch (err) {
-      console.log(err);
       return null;
     }
   }
@@ -479,7 +381,6 @@ export default class PostServices {
       const data: AddSubcommentResData = response.data;
       return data;
     } catch (error) {
-      console.log(error);
       return null;
     }
   }
@@ -502,7 +403,6 @@ export default class PostServices {
       const data: Subcomment = response.data;
       return data;
     } catch (err) {
-      console.log(err);
       return null;
     }
   }
@@ -515,7 +415,6 @@ export default class PostServices {
       await API.del(this.apiName, path, {});
       return true;
     } catch (err) {
-      console.log(err);
       return false;
     }
   }

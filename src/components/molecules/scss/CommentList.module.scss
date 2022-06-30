@@ -1,0 +1,79 @@
+@import "../../../scss/variables";
+@import "../../../scss/mixin";
+
+.comment{
+  padding: .5rem;
+  color: $font-color-gray;
+}
+
+.comment_nickname{
+  color: black;
+  font-weight: 500;
+}
+
+.comment_username{
+  font-size: .8rem;
+}
+
+.comment_text{
+  font-weight: 500;
+}
+
+.comment_date{
+  font-size: .8rem;
+}
+
+.blank{
+  height: .25rem;
+}
+
+.direct{
+  height: 1.25rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: $primary-orange;
+  &:hover{
+    color: $primary-orange-hover;
+  }
+}
+
+.direct_icon{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 10rem;
+  margin: 0 auto;
+}
+
+.more_container{
+  display: flex;
+  padding: .5rem;
+}
+
+.more_icon{
+  margin-left: .2rem;
+  color: $primary-blue;
+}
+
+.comments_pivot{
+  color: $primary-blue;
+  font-size: 1.25rem;
+  text-align: center;
+  border-bottom: 1px dashed $primary-blue;
+}
+
+.border_line{
+  border-bottom: 1px dashed $primary-default;
+}
+
+.card_body_btn{
+  @include btn_gray;
+  height: 1rem;
+  width: 4rem;
+  padding: 1px 0;
+  font-size: .8rem;
+  span{
+    margin: 0;
+    margin-left: .2rem;
+  }
+}

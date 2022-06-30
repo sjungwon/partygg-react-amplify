@@ -1,0 +1,73 @@
+@import "../../../scss/mixin";
+@import "../../../scss/variables";
+
+.container{
+  position: fixed;
+  bottom: 10%;
+  right: 10%;
+  z-index: 3;
+  display: flex;
+  min-width: 2.5rem;
+  min-height: 2.5rem;
+  background-color: transparent;
+}
+
+.menu_btn{
+  position: absolute;
+  top: 0;
+  right: 0;
+  @include flex_center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid $primary-default;
+  border-radius: 50%;
+  overflow: hidden;
+  background-color: $primary-default;
+  box-shadow: 2px 2px 3px -1px rgba(100, 100, 100, 0.617);
+  color: white;
+  font-size: 1.5rem;
+}
+
+.menu{
+  position: absolute;
+  right: 1rem;
+  display: flex;
+  align-items: center;
+  max-width: 60vw;
+  height: 2.5rem;
+  padding-right: 1.75rem;
+  padding-left: .5rem;
+  border-radius: .5rem 0 0 .5rem;
+  background-color: $primary-default;
+  box-shadow: $card-box-shadow-bottom;
+  transition: max-width .5s ease;
+  overflow: hidden;
+}
+
+.menu_hide{
+  max-width: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.menu_item{
+  width: 6rem;
+  height: 2rem;
+  overflow: hidden;
+  border: 1px solid white;
+  border-radius: .25rem;
+  background-color: white;
+  font-size: .8rem;
+  white-space: nowrap;
+  color: $font-color-gray;
+  &:first-child{
+    margin-right: .5rem;
+  }
+}
+
+@include overflow {
+  .container{
+    right: calc(50vw - 24rem);
+  }
+}

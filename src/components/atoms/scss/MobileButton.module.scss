@@ -1,0 +1,25 @@
+@import "../../../scss/variables";
+@import "../../../scss/mixin";
+
+.btn{
+  display: none;
+}
+
+
+@include mobile{
+  .btn{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid transparent;
+    background-color: transparent;
+    padding: 0;
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.5rem;
+    color: white;
+    svg{
+      pointer-events: none;
+    }
+  }
+}

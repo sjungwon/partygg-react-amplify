@@ -1,0 +1,25 @@
+@import "../../../scss/variables";
+
+.input{
+  min-width: 50%;
+  min-height: .9rem;
+  font-size: .9rem;
+  border: 1px solid $primary-default-border;
+  border-radius: .25rem;
+  text-indent: .25rem;
+  outline: none;
+  &:focus{
+    border: 2px solid $primary-default-dark;
+  }
+}
+
+.size_xl{
+  height: 2.25rem;
+  width: 100%;
+  margin-bottom: .5rem;
+}
+
+.size_lg{
+  height: 1.75rem;
+  width: 100%;
+}
