@@ -1,4 +1,11 @@
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import {
+  MouseEventHandler,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import RegisterConfirmModal from "../components/molecules/RegisterConfirmModal";
@@ -10,6 +17,7 @@ import { AiOutlineArrowLeft } from "react-icons/ai";
 import DefaultButton from "../components/atoms/DefaultButton";
 import DefaultTextInput from "../components/atoms/DefaultTextInput";
 import LoadingBlock from "../components/atoms/LoadingBlock";
+import FindPasswordModal from "../components/molecules/FindPasswordModal";
 
 export default function LoginPage() {
   const [username, setUsername] = useState<string>("");
@@ -78,7 +86,8 @@ export default function LoginPage() {
   }, [loginUser, navigate]);
 
   //제출
-  const click = async () => {
+  const clickToSubmit: MouseEventHandler<HTMLButtonElement> = async (event) => {
+    event.preventDefault();
     if (username && password) {
       setLoading(true);
       try {
@@ -126,6 +135,14 @@ export default function LoginPage() {
     navigate(-1);
   }, [navigate]);
 
+  const [showFindPassword, setShowFindPassword] = useState<boolean>(false);
+  const openFindPassword = useCallback(() => {
+    setShowFindPassword(true);
+  }, []);
+  const closeFindPassword = useCallback(() => {
+    setShowFindPassword(false);
+  }, []);
+
   return (
     <div className={styles.login}>
       <DefaultButton size="sq_md" onClick={goBack} className={styles.btn_back}>
@@ -170,16 +187,24 @@ export default function LoginPage() {
               </Form.Text>
               <DefaultButton
                 size="xl"
-                onClick={click}
+                onClick={clickToSubmit}
                 disabled={loading || btnDisabled}
                 ref={submitRef}
               >
                 <LoadingBlock loading={loading}>로그인</LoadingBlock>
               </DefaultButton>
             </Form>
-            <div className={styles.find_password} tabIndex={0}>
+            <div
+              className={styles.find_password}
+              tabIndex={0}
+              onClick={openFindPassword}
+            >
               비밀번호를 잊으셨나요?
             </div>
+            <FindPasswordModal
+              show={showFindPassword}
+              close={closeFindPassword}
+            />
             <div className={styles.line}></div>
             <div className={styles.register_container}>
               <DefaultButton size="xl" onClick={openModal} color="blue">

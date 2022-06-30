@@ -35,4 +35,16 @@ export default class AuthServices {
   public static async signOut() {
     await Auth.signOut();
   }
+
+  public static async findPassword(username: string) {
+    await Auth.forgotPassword(username);
+  }
+
+  public static async findPasswordSubmit(
+    username: string,
+    code: string,
+    new_password: string
+  ) {
+    await Auth.forgotPasswordSubmit(username, code, new_password);
+  }
 }

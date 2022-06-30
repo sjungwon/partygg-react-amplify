@@ -7,7 +7,7 @@ import PostServices from "../../services/PostServices";
 import SubcommentElement from "./SubcommentElement";
 import DefaultButton from "../atoms/DefaultButton";
 import LoadingBlock from "../atoms/LoadingBlock";
-import { PostListContext } from "../../pages/HomePage";
+import { PostListContext } from "../../context/PostListContextProvider";
 
 interface SubcommentsData {
   data: Subcomment[];

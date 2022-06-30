@@ -80,7 +80,7 @@ export default function CommentElement({
 
   if (mode === "modify") {
     return (
-      <CommentCard borderBottom={true}>
+      <>
         <AddComment
           postId={comment.postId}
           commentsListHandlerWithRenderLength={commentsListHandler}
@@ -101,43 +101,52 @@ export default function CommentElement({
             game={comment.game}
           />
         ) : null}
-      </CommentCard>
+      </>
     );
   }
 
   return (
-    <CommentCard borderBottom={borderBottom}>
-      <CommentCard.Header>
-        <ProfileBlock profile={comment.profile} />
-      </CommentCard.Header>
-      <CommentCard.Body>
-        <div className={styles.comment_text}>{comment.text}</div>
-        <div className={styles.comment_date}>{`${
-          comment.game
-        } - ${comment.date.slice(0, comment.date.length - 4)}`}</div>
-      </CommentCard.Body>
-      {parentShowComment ? (
-        <CommentCard.Buttons>
-          <CommentsButton
-            size="sm"
-            onClick={addSubcommentHandler}
-            active={addSubcomment}
-          ></CommentsButton>
-          <CheckUserBlock resourceUsername={comment.username}>
-            <DefaultButton
+    <>
+      <CommentCard>
+        <CommentCard.Header>
+          <ProfileBlock profile={comment.profile} />
+        </CommentCard.Header>
+        <CommentCard.Body>
+          <div className={styles.comment_text}>{comment.text}</div>
+          <div className={styles.comment_date}>{`${
+            comment.game
+          } - ${comment.date.slice(0, comment.date.length - 4)}`}</div>
+        </CommentCard.Body>
+        {parentShowComment ? (
+          <CommentCard.Buttons>
+            <CommentsButton
               size="sm"
-              onClick={setModeModify}
-              className={styles.btn_margin}
-            >
-              <BsPencilSquare />{" "}
-              <span className={styles.comment_btn_text}>수정</span>
-            </DefaultButton>
-            <DefaultButton size="sm" onClick={handleRemoveModalOpen}>
-              <BsTrash /> <span className={styles.comment_btn_text}>삭제</span>
-            </DefaultButton>
-          </CheckUserBlock>
-        </CommentCard.Buttons>
-      ) : null}
+              onClick={addSubcommentHandler}
+              active={addSubcomment}
+            ></CommentsButton>
+            <CheckUserBlock resourceUsername={comment.username}>
+              <DefaultButton
+                size="sm"
+                onClick={setModeModify}
+                className={styles.btn_margin}
+              >
+                <BsPencilSquare />{" "}
+                <span className={styles.comment_btn_text}>수정</span>
+              </DefaultButton>
+              <DefaultButton size="sm" onClick={handleRemoveModalOpen}>
+                <BsTrash />{" "}
+                <span className={styles.comment_btn_text}>삭제</span>
+              </DefaultButton>
+            </CheckUserBlock>
+          </CommentCard.Buttons>
+        ) : null}
+        <RemoveConfirmModal
+          show={showRemoveModal}
+          close={handleRemoveModalClose}
+          loading={loading}
+          remove={removeComment}
+        />
+      </CommentCard>
       {comment.subcomments && parentShowComment ? (
         <SubcommentList
           subcomments={{
@@ -152,12 +161,6 @@ export default function CommentElement({
           game={game}
         />
       ) : null}
-      <RemoveConfirmModal
-        show={showRemoveModal}
-        close={handleRemoveModalClose}
-        loading={loading}
-        remove={removeComment}
-      />
-    </CommentCard>
+    </>
   );
 }

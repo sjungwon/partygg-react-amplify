@@ -8,7 +8,7 @@ import PostServices from "../../services/PostServices";
 import AddComment from "./AddComment";
 import DefaultButton from "../atoms/DefaultButton";
 import LoadingBlock from "../atoms/LoadingBlock";
-import { PostListContext } from "../../pages/HomePage";
+import { PostListContext } from "../../context/PostListContextProvider";
 
 export interface CommentsData {
   data: Comment[];

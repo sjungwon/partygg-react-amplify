@@ -1,20 +1,6 @@
 @import "../../../scss/variables";
 @import "../../../scss/mixin";
 
-
-.add_comment_textArea{
-  resize: none;
-  width: 95%;
-  min-height: 5rem;
-  border-radius: .5rem;
-  padding: .5rem;
-  margin-top: .25rem;
-  &:focus{
-    border: .13rem solid $primary-blue;
-    outline: none;
-  }
-}
-
 .btn_margin{
   margin-right: .5rem;
 }

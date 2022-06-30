@@ -1,38 +1,6 @@
 @import "../../../scss/variables";
 @import "../../../scss/mixin";
 
-.add_subcomment{
-  padding-left: .5rem;
-}
-
-.add_subcomment_border{
-  padding-left: .5rem;
-  border-bottom: 1px dashed $primary-blue;
-}
-
-.add_subcomment_header{
-  display: flex;
-  align-items: center;
-  margin: .2rem;
-}
-
-.add_subcomment_textArea{
-  resize: none;
-  width: 95%;
-  border-radius: .5rem;
-  padding: .5rem;
-  margin-top: .25rem;
-  &:focus{
-    border: .13rem solid $primary-blue;
-    outline: none;
-  }
-}
-
-.add_subcomment_btns{
-  display: flex;
-  padding: .5rem 0;
-}
-
 .btn_margin{
   margin-right: .5rem;
 }

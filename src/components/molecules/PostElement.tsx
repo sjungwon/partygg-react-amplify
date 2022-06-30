@@ -20,7 +20,7 @@ import DefaultButton from "../atoms/DefaultButton";
 import CheckUserBlock from "../atoms/CheckUserBlock";
 import CommentsButton from "../atoms/CommentsButton";
 import ProfileBlock from "./ProfileBlock";
-import { PostListContext } from "../../pages/HomePage";
+import { PostListContext } from "../../context/PostListContextProvider";
 import { Post } from "../../types/post.type";
 
 interface PropsType {
@@ -163,6 +163,7 @@ export default function PostElement({ post }: PropsType) {
   useEffect(() => {
     if (textMore) {
       setShowTextLength(post.text.length);
+      return;
     }
 
     if (post.images.length) {
@@ -242,14 +243,17 @@ export default function PostElement({ post }: PropsType) {
         {images.length > 0 ? <ImageSlide images={images} expandable /> : null}
         <Card.Text className={styles.card_body_text}>
           {post.text.slice(0, showTextLength)}
-          {(post.images.length && post.text.length > 100) ||
-          (!post.images.length && post.text.length > 200) ? (
-            <span className={styles.card_body_text_more} onClick={showMore}>
-              {textMore ? " 접기" : " 더보기"}
-              더보기...
-            </span>
-          ) : null}
         </Card.Text>
+        {post.images.length && post.text.length > 100 ? (
+          <p className={styles.card_body_text_more} onClick={showMore}>
+            {textMore ? " 접기" : " 더보기"}
+          </p>
+        ) : null}
+        {!post.images.length && post.text.length > 200 ? (
+          <p className={styles.card_body_text_more} onClick={showMore}>
+            {textMore ? " 접기" : " 더보기"}
+          </p>
+        ) : null}
         <div className={styles.card_body_buttons}>
           <DefaultButton onClick={postLike} size="lg">
             {post.likes.includes(username) ? (

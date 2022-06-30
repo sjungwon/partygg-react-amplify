@@ -61,15 +61,13 @@ export default function SubcommentElement({
 
   if (mode === "modify") {
     return (
-      <div className={styles.subcomment}>
-        <AddSubcomment
-          commentId={subcomment.commentId}
-          prevData={subcomment}
-          setModeDefault={setModeDefault}
-          subcommentsListHandlerWithRenderLength={subcommentsListHandler}
-          game={game}
-        />
-      </div>
+      <AddSubcomment
+        commentId={subcomment.commentId}
+        prevData={subcomment}
+        setModeDefault={setModeDefault}
+        subcommentsListHandlerWithRenderLength={subcommentsListHandler}
+        game={game}
+      />
     );
   }
 

@@ -46,7 +46,11 @@ export default function UserHomeCard({ username }: PropsType) {
         {userProfile.length ? (
           <ProfileList profileArr={userProfile} username={username} />
         ) : (
-          <p className={styles.no_user}>사용자 정보 없음</p>
+          <>
+            <p className={styles.no_user}>
+              존재하지 않는 사용자 또는 사용자의 프로필 정보 없음
+            </p>
+          </>
         )}
       </Card.Body>
     </Card>

@@ -138,6 +138,7 @@ export default function AddSubcomment({
               size="sm"
               ref={textAreaRef}
               defaultValue={prevData?.text}
+              maxLength={250}
             />
           </CommentCard.Body>
           <CommentCard.Buttons>

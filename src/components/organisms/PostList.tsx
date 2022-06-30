@@ -10,8 +10,8 @@ import ProfileCard from "../molecules/ProfileCard";
 import { Profile } from "../../types/profile.type";
 import ProfileServices from "../../services/ProfileServices";
 import LoadingBlock from "../atoms/LoadingBlock";
-import { PostListContext } from "../../pages/HomePage";
 import UserMenuFixedButton from "../molecules/UserMenuFixedButton";
+import { PostListContext } from "../../context/PostListContextProvider";
 
 export default function PostList() {
   const { posts, category, searchParam, morePosts, initPosts } =

@@ -17,7 +17,7 @@ import LoadingBlock from "../atoms/LoadingBlock";
 import AddPostImageModal from "./AddPostImageModal";
 import ImageSlide from "./ImageSlide";
 import ProfileList from "./ProfileList";
-import { PostListContext } from "../../pages/HomePage";
+import { PostListContext } from "../../context/PostListContextProvider";
 
 interface Props {
   prevData?: {
