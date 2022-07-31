@@ -4,6 +4,7 @@ import { FC, MouseEventHandler, useCallback, useEffect, useState } from "react";
 import { LazyLoadImage } from "react-lazy-load-image-component";
 import useImgLoadError from "../../hooks/useImgLoadError";
 import { CgClose } from "react-icons/cg";
+import useScrollLock from "../../hooks/useScrollLock";
 
 interface PropsType {
   images: string[];
@@ -49,14 +50,7 @@ export default function ImageSlide({
 
   const [expandURL, setExpandURL] = useState<string>("");
 
-  const scrollBlock = () => {
-    const body = document.getElementsByTagName("body")[0];
-    body.classList.add(styles.scroll_lock);
-  };
-  const scrollRelease = () => {
-    const body = document.getElementsByTagName("body")[0];
-    body.classList.remove(styles.scroll_lock);
-  };
+  const { scrollLock, scrollRelease } = useScrollLock();
 
   const click: MouseEventHandler<HTMLImageElement> = useCallback(
     (event) => {
@@ -64,16 +58,17 @@ export default function ImageSlide({
         const imgEl = event.target as HTMLInputElement;
         const imgSrc = imgEl.src;
         setExpandURL(imgSrc);
-        scrollBlock();
+        scrollLock();
         // setExpandURL(imgSrc);
       }
     },
-    [expandable]
+    [expandable, scrollLock]
   );
   const close = useCallback(() => {
+    console.log(close);
     setExpandURL("");
     scrollRelease();
-  }, []);
+  }, [scrollRelease]);
 
   return (
     <>
@@ -143,7 +138,12 @@ const ExpandImage: FC<ExpandImagePropsType> = ({ imageURL, close }) => {
         <button onClick={close} className={styles.expand_close}>
           <CgClose />
         </button>
-        <img src={imageURL} alt="expanded" className={styles.expand_img} />
+        <img
+          src={imageURL}
+          alt="expanded"
+          className={styles.expand_img}
+          onClick={close}
+        />
       </div>
     </div>
   );
