@@ -1,5 +1,7 @@
 # 그님티(구 버전)
 
+> ### 링크 : [그님티(구버전)](https://main.dltr9601tbnay.amplifyapp.com/)
+
 ## 현재 프로젝트 링크 : [프론트 Github](https://github.com/sjungwon/gnt-react-ts-webpack-frontend)
 
 ## 구현
