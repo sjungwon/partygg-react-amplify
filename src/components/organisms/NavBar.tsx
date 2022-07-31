@@ -9,7 +9,7 @@ import { CgProfile } from "react-icons/cg";
 import gsap from "gsap";
 import MobileButton from "../atoms/MobileButton";
 import DefaultButton from "../atoms/DefaultButton";
-import useViewportSize from "../../hooks/useViewportSize";
+import { useIsMobile } from "../../hooks/useIsMobile";
 
 interface PropsType {
   showCategoryHandler: () => void;
@@ -49,10 +49,10 @@ export default function NavBar({ showCategoryHandler }: PropsType) {
   }, [showSearchBar]);
 
   //데스크탑인 경우 화면 크기 변경으로 searchBar가 안나올 수 있는거 방지
-  const viewSize = useViewportSize();
+  const isMobile = useIsMobile();
 
   useEffect(() => {
-    if (viewSize.x > 829 && searchBarRef.current) {
+    if (!isMobile && searchBarRef.current) {
       searchBarRef.current.style.display = "flex";
       searchBarRef.current.style.opacity = "1";
     } else {
@@ -61,7 +61,7 @@ export default function NavBar({ showCategoryHandler }: PropsType) {
         searchBarRef.current.style.opacity = "0";
       }
     }
-  }, [viewSize]);
+  }, [isMobile]);
 
   const goHome = useCallback(() => {
     if (!username) {
